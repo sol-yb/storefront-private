@@ -8,7 +8,6 @@ import { useProductListing } from "@/hooks/useProductListing";
 import { trackViewItemList } from "@/lib/analytics/gtm";
 import { getTaxonProducts } from "@/lib/data/products";
 
-
 interface CategoryProductsContentProps {
   taxonPermalink: string;
   taxonId: string;

@@ -1,12 +1,12 @@
 "use server";
 
-import type { TaxonListParams } from "@spree/sdk";
 import {
   getTaxon as _getTaxon,
   getTaxonomy as _getTaxonomy,
   listTaxonomies,
   listTaxons,
 } from "@spree/next";
+import type { TaxonListParams } from "@spree/sdk";
 
 export async function getTaxonomies(params?: TaxonListParams) {
   return listTaxonomies(params);

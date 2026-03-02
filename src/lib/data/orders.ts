@@ -1,7 +1,7 @@
 "use server";
 
-import type { OrderListParams } from "@spree/sdk";
 import { getOrder as _getOrder, listOrders } from "@spree/next";
+import type { OrderListParams } from "@spree/sdk";
 import { withFallback } from "./utils";
 
 export async function getOrders(params?: OrderListParams) {

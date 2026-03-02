@@ -9,7 +9,6 @@ import { useProductListing } from "@/hooks/useProductListing";
 import { trackViewItemList, trackViewSearchResults } from "@/lib/analytics/gtm";
 import { getProducts } from "@/lib/data/products";
 
-
 interface ProductsContentProps {
   basePath: string;
 }

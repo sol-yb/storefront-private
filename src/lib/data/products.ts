@@ -1,12 +1,12 @@
 "use server";
 
-import type { ProductListParams } from "@spree/sdk";
 import {
   getProduct as _getProduct,
   getProductFilters as _getProductFilters,
   listProducts,
   listTaxonProducts,
 } from "@spree/next";
+import type { ProductListParams } from "@spree/sdk";
 
 export async function getProducts(params?: ProductListParams) {
   return listProducts(params);
