@@ -1,11 +1,11 @@
 "use client";
 
 import type { Order } from "@spree/sdk";
+import { CircleCheckBig, ImageIcon as ImagePlaceholder } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
-import { CheckCircleSolidIcon, ImagePlaceholderIcon } from "@/components/icons";
 import { useCheckout } from "@/contexts/CheckoutContext";
 import { trackPurchase } from "@/lib/analytics/gtm";
 import { getCheckoutOrder } from "@/lib/data/checkout";
@@ -110,7 +110,7 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
         </h1>
         <Link
           href={`${basePath}/`}
-          className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-700"
+          className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-700"
         >
           Continue Shopping
         </Link>
@@ -125,7 +125,7 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
     <div className="py-8 max-w-2xl mx-auto">
       {/* Success Header */}
       <div className="text-center mb-10">
-        <CheckCircleSolidIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <CircleCheckBig className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           Thanks for your order
           {customerName ? `, ${customerName.split(" ")[0]}` : ""}!
@@ -155,7 +155,7 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <ImagePlaceholderIcon className="w-6 h-6" strokeWidth={2} />
+                    <ImagePlaceholder className="w-6 h-6" strokeWidth={2} />
                   </div>
                 )}
               </div>
@@ -279,7 +279,7 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
       <div className="text-center">
         <Link
           href={`${basePath}/`}
-          className="inline-flex items-center px-6 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
+          className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
         >
           Continue Shopping
         </Link>

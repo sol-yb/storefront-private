@@ -1,6 +1,15 @@
 "use client";
 
 import type { Country, State } from "@spree/sdk";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { AddressFormData } from "@/lib/utils/address";
 
 interface AddressFormFieldsProps {
@@ -24,200 +33,154 @@ export function AddressFormFields({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label
-          htmlFor={`${idPrefix}-firstname`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          First name
-        </label>
-        <input
+      <Field>
+        <FieldLabel htmlFor={`${idPrefix}-firstname`}>First name</FieldLabel>
+        <Input
           type="text"
           id={`${idPrefix}-firstname`}
           required
           value={address.firstname}
           onChange={(e) => onChange("firstname", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         />
-      </div>
+      </Field>
 
-      <div>
-        <label
-          htmlFor={`${idPrefix}-lastname`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          Last name
-        </label>
-        <input
+      <Field>
+        <FieldLabel htmlFor={`${idPrefix}-lastname`}>Last name</FieldLabel>
+        <Input
           type="text"
           id={`${idPrefix}-lastname`}
           required
           value={address.lastname}
           onChange={(e) => onChange("lastname", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         />
-      </div>
+      </Field>
 
-      <div className="sm:col-span-2">
-        <label
-          htmlFor={`${idPrefix}-company`}
-          className="block text-sm font-medium text-gray-700"
-        >
+      <Field className="sm:col-span-2">
+        <FieldLabel htmlFor={`${idPrefix}-company`}>
           Company (optional)
-        </label>
-        <input
+        </FieldLabel>
+        <Input
           type="text"
           id={`${idPrefix}-company`}
           value={address.company}
           onChange={(e) => onChange("company", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         />
-      </div>
+      </Field>
 
-      <div className="sm:col-span-2">
-        <label
-          htmlFor={`${idPrefix}-address1`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          Address
-        </label>
-        <input
+      <Field className="sm:col-span-2">
+        <FieldLabel htmlFor={`${idPrefix}-address1`}>Address</FieldLabel>
+        <Input
           type="text"
           id={`${idPrefix}-address1`}
           required
           value={address.address1}
           onChange={(e) => onChange("address1", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
           placeholder="Street address"
         />
-      </div>
+      </Field>
 
-      <div className="sm:col-span-2">
-        <label
-          htmlFor={`${idPrefix}-address2`}
-          className="block text-sm font-medium text-gray-700"
-        >
+      <Field className="sm:col-span-2">
+        <FieldLabel htmlFor={`${idPrefix}-address2`}>
           Apartment, suite, etc. (optional)
-        </label>
-        <input
+        </FieldLabel>
+        <Input
           type="text"
           id={`${idPrefix}-address2`}
           value={address.address2}
           onChange={(e) => onChange("address2", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         />
-      </div>
+      </Field>
 
-      <div>
-        <label
-          htmlFor={`${idPrefix}-city`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          City
-        </label>
-        <input
+      <Field>
+        <FieldLabel htmlFor={`${idPrefix}-city`}>City</FieldLabel>
+        <Input
           type="text"
           id={`${idPrefix}-city`}
           required
           value={address.city}
           onChange={(e) => onChange("city", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         />
-      </div>
+      </Field>
 
-      <div>
-        <label
-          htmlFor={`${idPrefix}-country`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          Country
-        </label>
-        <select
-          id={`${idPrefix}-country`}
+      <Field>
+        <FieldLabel>Country</FieldLabel>
+        <Select
+          value={address.country_iso || undefined}
+          onValueChange={(value) => onChange("country_iso", value)}
           required
-          value={address.country_iso}
-          onChange={(e) => onChange("country_iso", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         >
-          <option value="">Select a country</option>
-          {countries.map((country) => (
-            <option key={country.iso} value={country.iso}>
-              {country.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label
-          htmlFor={`${idPrefix}-state`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          State / Province
-        </label>
-        {loadingStates ? (
-          <div className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-400">
-            Loading...
-          </div>
-        ) : hasStates ? (
-          <select
-            id={`${idPrefix}-state`}
-            required
-            value={address.state_abbr}
-            onChange={(e) => onChange("state_abbr", e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
-          >
-            <option value="">Select a state</option>
-            {states.map((state) => (
-              <option key={state.abbr} value={state.abbr}>
-                {state.name}
-              </option>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a country" />
+          </SelectTrigger>
+          <SelectContent>
+            {countries.map((country) => (
+              <SelectItem key={country.iso} value={country.iso}>
+                {country.name}
+              </SelectItem>
             ))}
-          </select>
+          </SelectContent>
+        </Select>
+      </Field>
+
+      <Field>
+        <FieldLabel>State / Province</FieldLabel>
+        {loadingStates ? (
+          <Select disabled>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Loading..." />
+            </SelectTrigger>
+            <SelectContent />
+          </Select>
+        ) : hasStates ? (
+          <Select
+            value={address.state_abbr || undefined}
+            onValueChange={(value) => onChange("state_abbr", value)}
+            required
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a state" />
+            </SelectTrigger>
+            <SelectContent>
+              {states.map((state) => (
+                <SelectItem key={state.abbr} value={state.abbr}>
+                  {state.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         ) : (
-          <input
+          <Input
             type="text"
             id={`${idPrefix}-state`}
             value={address.state_name}
             onChange={(e) => onChange("state_name", e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
             placeholder="State or province"
           />
         )}
-      </div>
+      </Field>
 
-      <div>
-        <label
-          htmlFor={`${idPrefix}-zipcode`}
-          className="block text-sm font-medium text-gray-700"
-        >
+      <Field>
+        <FieldLabel htmlFor={`${idPrefix}-zipcode`}>
           ZIP / Postal code
-        </label>
-        <input
+        </FieldLabel>
+        <Input
           type="text"
           id={`${idPrefix}-zipcode`}
           required
           value={address.zipcode}
           onChange={(e) => onChange("zipcode", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         />
-      </div>
+      </Field>
 
-      <div className="sm:col-span-2">
-        <label
-          htmlFor={`${idPrefix}-phone`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          Phone (optional)
-        </label>
-        <input
+      <Field className="sm:col-span-2">
+        <FieldLabel htmlFor={`${idPrefix}-phone`}>Phone (optional)</FieldLabel>
+        <Input
           type="tel"
           id={`${idPrefix}-phone`}
           value={address.phone}
           onChange={(e) => onChange("phone", e.target.value)}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
         />
-      </div>
+      </Field>
     </div>
   );
 }

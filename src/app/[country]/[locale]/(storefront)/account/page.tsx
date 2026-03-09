@@ -1,16 +1,19 @@
 "use client";
 
+import {
+  CreditCard,
+  Eye,
+  EyeOff,
+  MapPin,
+  ShoppingBag,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import {
-  CreditCardIcon,
-  EyeIcon,
-  EyeSlashIcon,
-  MapPinIcon,
-  ShoppingBagIcon,
-  UserIcon,
-} from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { extractBasePath } from "@/lib/utils/path";
 
@@ -79,68 +82,61 @@ export default function AccountPage() {
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <input
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
                 type="email"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
                 placeholder="you@example.com"
               />
-            </div>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
               <div className="relative">
-                <input
+                <Input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="mt-1 block w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
                   placeholder="••••••••"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeSlashIcon className="w-5 h-5" />
-                  ) : (
-                    <EyeIcon className="w-5 h-5" />
-                  )}
-                </button>
+                <div className="absolute right-1 top-1/2 -translate-y-1/2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
               </div>
+            </Field>
+
+            <div className="w-full">
+              <Button type="submit" disabled={loading} size="lg">
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary-500 text-white py-2 px-4 rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
           </form>
 
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-500">Don&apos;t have an account? </span>
             <Link
               href={`${basePath}/account/register`}
-              className="text-primary-500 hover:text-primary-700 font-medium"
+              className="text-primary hover:text-primary font-medium"
             >
               Sign up
             </Link>
@@ -163,8 +159,8 @@ export default function AccountPage() {
           className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary-100 rounded-xl">
-              <ShoppingBagIcon className="w-6 h-6 text-primary-500" />
+            <div className="p-3 bg-gray-100 rounded-xl">
+              <ShoppingBag className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h2 className="text-lg font-medium text-gray-900">
@@ -182,8 +178,8 @@ export default function AccountPage() {
           className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary-100 rounded-xl">
-              <MapPinIcon className="w-6 h-6 text-primary-500" />
+            <div className="p-3 bg-gray-100 rounded-xl">
+              <MapPin className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h2 className="text-lg font-medium text-gray-900">Addresses</h2>
@@ -199,8 +195,8 @@ export default function AccountPage() {
           className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary-100 rounded-xl">
-              <CreditCardIcon className="w-6 h-6 text-primary-500" />
+            <div className="p-3 bg-gray-100 rounded-xl">
+              <CreditCard className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h2 className="text-lg font-medium text-gray-900">
@@ -218,8 +214,8 @@ export default function AccountPage() {
           className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary-100 rounded-xl">
-              <UserIcon className="w-6 h-6 text-primary-500" />
+            <div className="p-3 bg-gray-100 rounded-xl">
+              <User className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h2 className="text-lg font-medium text-gray-900">Profile</h2>

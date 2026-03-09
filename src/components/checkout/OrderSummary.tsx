@@ -1,8 +1,8 @@
 "use client";
 
 import type { Order } from "@spree/sdk";
+import { ImageIcon as ImagePlaceholder } from "lucide-react";
 import Image from "next/image";
-import { ImagePlaceholderIcon } from "@/components/icons";
 
 interface OrderSummaryProps {
   order: Order;
@@ -31,7 +31,7 @@ export function OrderSummary({ order }: OrderSummaryProps) {
                 />
               ) : (
                 <div className="w-full h-full bg-gray-100 rounded-xl flex items-center justify-center">
-                  <ImagePlaceholderIcon
+                  <ImagePlaceholder
                     className="w-6 h-6 text-gray-400"
                     strokeWidth={2}
                   />

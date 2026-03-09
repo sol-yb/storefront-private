@@ -6,9 +6,9 @@ import type {
   PriceRangeFilter,
   ProductFiltersResponse,
 } from "@spree/sdk";
+import { SlidersHorizontal } from "lucide-react";
 import type { JSX } from "react";
 import { memo, useCallback, useMemo, useState } from "react";
-import { FilterIcon } from "@/components/icons";
 import { AvailabilityDropdownContent } from "@/components/products/filters/AvailabilityDropdownContent";
 import { FilterChips } from "@/components/products/filters/FilterChips";
 import { FilterDropdown } from "@/components/products/filters/FilterDropdown";
@@ -232,14 +232,14 @@ export const FilterBar = memo(function FilterBar({
           onClick={() => setShowMobileDrawer(true)}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
             hasActiveFilters
-              ? "border-primary-500 bg-primary-50 text-primary-700"
+              ? "border-gray-500 bg-gray-50 text-primary"
               : "border-gray-300 text-gray-700"
           }`}
         >
-          <FilterIcon className="w-4 h-4" />
+          <SlidersHorizontal className="w-4 h-4" />
           <span>Filters</span>
           {hasActiveFilters && (
-            <span className="flex items-center justify-center w-5 h-5 text-xs bg-primary-500 text-white rounded-lg">
+            <span className="flex items-center justify-center w-5 h-5 text-xs bg-primary text-white rounded-lg">
               {totalActiveFilters}
             </span>
           )}

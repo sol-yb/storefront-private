@@ -1,7 +1,8 @@
 "use client";
 
 import type { OptionFilter, ProductFiltersResponse } from "@spree/sdk";
-import { CloseIcon } from "@/components/icons";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { AVAILABILITY_LABELS } from "@/lib/utils/filters";
 import {
   findMatchingBucket,
@@ -82,24 +83,21 @@ export function FilterChips({
       {chips.map((chip) => (
         <span
           key={chip.key}
-          className="inline-flex items-center gap-1.5 px-3 py-1 text-sm bg-primary-50 text-primary-700 rounded-lg"
+          className="inline-flex items-center gap-1.5 px-3 py-1 text-sm bg-gray-50 text-primary rounded-lg"
         >
           <span>{chip.label}</span>
           <button
             onClick={chip.onRemove}
-            className="p-0.5 text-primary-400 hover:text-primary-600 transition-colors"
+            className="p-0.5 text-primary hover:text-primary transition-colors"
             aria-label={`Remove ${chip.label}`}
           >
-            <CloseIcon className="w-3.5 h-3.5" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </span>
       ))}
-      <button
-        onClick={onClearAll}
-        className="text-sm text-gray-500 hover:text-gray-700 ml-1 transition-colors"
-      >
+      <Button variant="link" size="sm" onClick={onClearAll}>
         Clear all
-      </button>
+      </Button>
     </div>
   );
 }

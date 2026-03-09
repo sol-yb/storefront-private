@@ -1,10 +1,10 @@
 "use client";
 
 import type { Product } from "@spree/sdk";
+import { ImageIcon as ImagePlaceholder } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
-import { ImagePlaceholderIcon } from "@/components/icons";
 import { useStore } from "@/contexts/StoreContext";
 import { trackSelectItem } from "@/lib/analytics/gtm";
 
@@ -59,11 +59,11 @@ export const ProductCard = memo(function ProductCard({
   return (
     <Link
       href={`${basePath}/products/${product.slug}`}
-      className="group block rounded-xl overflow-hidden transition-colors"
+      className="group block"
       onClick={handleClick}
     >
       {/* Image */}
-      <div className="relative aspect-square bg-gray-100">
+      <div className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -74,7 +74,7 @@ export const ProductCard = memo(function ProductCard({
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-            <ImagePlaceholderIcon className="w-16 h-16" />
+            <ImagePlaceholder className="w-16 h-16" />
           </div>
         )}
         {onSale && (
@@ -86,7 +86,7 @@ export const ProductCard = memo(function ProductCard({
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-sm font-medium text-gray-900 group-hover:text-primary-500 transition-colors line-clamp-2">
+        <h3 className="text-sm font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
           {product.name}
         </h3>
 

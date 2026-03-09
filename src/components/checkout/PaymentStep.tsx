@@ -3,13 +3,16 @@
 import type {
   AddressParams,
   Country,
-  CreditCard,
   Order,
+  CreditCard as SpreeCreditCard,
   State,
 } from "@spree/sdk";
+import { CreditCard } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { PaymentIcon } from "react-svg-credit-card-payment-icons";
-import { CreditCardIcon } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { getCreditCards } from "@/lib/data/credit-cards";
 import { createCheckoutPaymentSession } from "@/lib/data/payment";
 import {
@@ -66,7 +69,7 @@ export function PaymentStep({
   const [isPendingBill, startTransitionBill] = useTransition();
 
   // Saved cards state
-  const [savedCards, setSavedCards] = useState<CreditCard[]>([]);
+  const [savedCards, setSavedCards] = useState<SpreeCreditCard[]>([]);
   // null = "add new payment method", string = gateway_payment_profile_id of selected card
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
@@ -283,13 +286,9 @@ export function PaymentStep({
             <h2 className="text-lg font-semibold text-gray-900">
               Shipping Address
             </h2>
-            <button
-              type="button"
-              onClick={onBack}
-              className="text-sm text-primary-500 hover:text-primary-700"
-            >
+            <Button variant="link" size="sm" onClick={onBack}>
               Edit
-            </button>
+            </Button>
           </div>
           <div className="text-sm text-gray-600">
             <p className="font-medium text-gray-900">
@@ -316,17 +315,18 @@ export function PaymentStep({
           Billing Address
         </h2>
         <div className="mb-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
+          <Field orientation="horizontal">
+            <Checkbox
+              id="use-shipping-billing"
               checked={useShippingForBilling}
-              onChange={(e) => handleUseShippingChange(e.target.checked)}
-              className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+              onCheckedChange={(checked) =>
+                handleUseShippingChange(checked === true)
+              }
             />
-            <span className="ml-2 text-sm text-gray-600">
+            <FieldLabel htmlFor="use-shipping-billing">
               Same as shipping address
-            </span>
-          </label>
+            </FieldLabel>
+          </Field>
         </div>
 
         {!useShippingForBilling && (
@@ -355,7 +355,7 @@ export function PaymentStep({
                 key={card.id}
                 className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${
                   selectedCardId === card.gateway_payment_profile_id
-                    ? "border-primary-600 bg-primary-50"
+                    ? "border-gray-600 bg-gray-50"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
@@ -366,7 +366,7 @@ export function PaymentStep({
                   onChange={() =>
                     handleCardSelect(card.gateway_payment_profile_id)
                   }
-                  className="w-4 h-4 text-primary-500 border-gray-300 focus:ring-primary-500"
+                  className="w-4 h-4 text-primary border-gray-300 focus:ring-gray-500"
                 />
                 <PaymentIcon
                   type={getCardIconType(card.cc_type)}
@@ -382,7 +382,7 @@ export function PaymentStep({
                   </span>
                 </div>
                 {card.default && (
-                  <span className="text-xs font-medium text-primary-500 bg-primary-100 px-2 py-0.5 rounded-lg">
+                  <span className="text-xs font-medium text-primary bg-gray-100 px-2 py-0.5 rounded-lg">
                     Default
                   </span>
                 )}
@@ -393,7 +393,7 @@ export function PaymentStep({
             <label
               className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${
                 isAddingNew
-                  ? "border-primary-600 bg-primary-50"
+                  ? "border-gray-600 bg-gray-50"
                   : "border-gray-200 hover:border-gray-300"
               }`}
             >
@@ -402,12 +402,9 @@ export function PaymentStep({
                 name="payment_source"
                 checked={isAddingNew}
                 onChange={() => handleCardSelect(null)}
-                className="w-4 h-4 text-primary-500 border-gray-300 focus:ring-primary-500"
+                className="w-4 h-4 text-primary border-gray-300 focus:ring-gray-500"
               />
-              <CreditCardIcon
-                className="w-5 h-5 text-gray-400"
-                strokeWidth={1.5}
-              />
+              <CreditCard className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
               <span className="text-sm font-medium text-gray-900">
                 Add new payment method
               </span>
@@ -417,7 +414,7 @@ export function PaymentStep({
 
         {loading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-lg h-8 w-8 border-b-2 border-primary-600" />
+            <div className="animate-spin rounded-lg h-8 w-8 border-b-2 border-gray-600" />
             <span className="ml-3 text-sm text-gray-500">
               Loading payment form...
             </span>
@@ -440,7 +437,7 @@ export function PaymentStep({
 
         {!sessionPaymentMethod && !loading && (
           <div className="bg-gray-50 rounded-xl p-8 text-center">
-            <CreditCardIcon
+            <CreditCard
               className="w-12 h-12 text-gray-400 mx-auto mb-4"
               strokeWidth={1.5}
             />
@@ -453,16 +450,17 @@ export function PaymentStep({
 
       {/* Actions */}
       <div className="flex justify-between">
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="lg"
           onClick={onBack}
           disabled={processing}
-          className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
+          size="lg"
           disabled={
             processing ||
             loading ||
@@ -470,10 +468,9 @@ export function PaymentStep({
             !clientSecret ||
             (isAddingNew && !gatewayReady)
           }
-          className="px-6 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {processing ? "Processing..." : "Pay Now"}
-        </button>
+        </Button>
       </div>
     </form>
   );

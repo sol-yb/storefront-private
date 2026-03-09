@@ -5,8 +5,10 @@ import type {
   OptionFilter,
   ProductFiltersResponse,
 } from "@spree/sdk";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { CheckIcon, CloseIcon } from "@/components/icons";
+import { Check, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { isColorOption, resolveColor } from "@/lib/utils/color-map";
 import { AVAILABILITY_LABELS, getActiveFilterCount } from "@/lib/utils/filters";
 import type { PriceBucket } from "@/lib/utils/price-buckets";
@@ -16,9 +18,6 @@ import {
   type AvailabilityStatus,
   isAvailabilityStatus,
 } from "@/types/filters";
-
-const FOCUSABLE_SELECTOR =
-  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 interface MobileFilterDrawerProps {
   isOpen: boolean;
@@ -37,21 +36,12 @@ export function MobileFilterDrawer({
   priceBuckets,
   onApply,
 }: MobileFilterDrawerProps) {
-  const drawerRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const triggerRef = useRef<Element | null>(null);
-
   const [stagedFilters, setStagedFilters] =
     useState<ActiveFilters>(activeFilters);
 
   useEffect(() => {
     if (isOpen) {
       setStagedFilters(activeFilters);
-      triggerRef.current = document.activeElement;
-      closeButtonRef.current?.focus();
-    } else if (triggerRef.current instanceof HTMLElement) {
-      triggerRef.current.focus();
-      triggerRef.current = null;
     }
   }, [isOpen, activeFilters]);
 
@@ -87,60 +77,31 @@ export function MobileFilterDrawer({
     onClose();
   }, [stagedFilters, onApply, onClose]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (e.key !== "Tab" || !drawerRef.current) return;
-
-      const focusable = drawerRef.current.querySelectorAll(FOCUSABLE_SELECTOR);
-      if (focusable.length === 0) return;
-
-      const first = focusable[0] as HTMLElement;
-      const last = focusable[focusable.length - 1] as HTMLElement;
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    },
-    [onClose],
-  );
-
-  if (!isOpen) return null;
-
   const stagedCount = getActiveFilterCount(stagedFilters);
 
   return (
-    <div
-      className="fixed inset-0 z-50 md:hidden"
-      onKeyDown={handleKeyDown}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Filters"
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
     >
-      <div
-        className="fixed inset-0 bg-black/50 transition-opacity"
-        onClick={onClose}
-      />
-      <div
-        ref={drawerRef}
-        className="fixed inset-y-0 left-0 w-full max-w-sm bg-white flex flex-col animate-slide-in-left"
+      <SheetContent
+        side="left"
+        className="w-full max-w-sm flex flex-col p-0 gap-0"
+        showCloseButton={false}
       >
+        <SheetTitle className="sr-only">Filters</SheetTitle>
+
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <button
-            ref={closeButtonRef}
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-700 transition-colors"
             aria-label="Close filters"
           >
-            <CloseIcon className="w-6 h-6" />
-          </button>
+            <X className="w-6 h-6" />
+          </Button>
           <h2 className="text-lg font-semibold uppercase">Filters</h2>
           <div className="w-10" />
         </div>
@@ -183,22 +144,14 @@ export function MobileFilterDrawer({
 
         <div className="border-t border-gray-200 p-4 space-y-2">
           {stagedCount > 0 && (
-            <button
-              onClick={handleClearAll}
-              className="w-full py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
-            >
+            <Button variant="ghost" onClick={handleClearAll}>
               Clear all filters ({stagedCount})
-            </button>
+            </Button>
           )}
-          <button
-            onClick={handleApply}
-            className="w-full py-3 text-sm font-medium text-white bg-primary-500 rounded-xl hover:bg-primary-700 transition-colors"
-          >
-            Show results
-          </button>
+          <Button onClick={handleApply}>Show results</Button>
         </div>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -229,13 +182,13 @@ function MobileOptionSection({
                 aria-pressed={isSelected}
                 onClick={() => onToggle(option.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
-                  isSelected ? "bg-primary-50" : "hover:bg-gray-50"
+                  isSelected ? "bg-gray-50" : "hover:bg-gray-50"
                 }`}
               >
                 <span
                   className={`w-7 h-7 rounded-lg shrink-0 border-2 transition-colors ${
                     isSelected
-                      ? "border-primary-500 ring-2 ring-primary-200"
+                      ? "border-gray-500 ring-2 ring-primary-200"
                       : "border-gray-200"
                   }`}
                   style={{
@@ -249,7 +202,7 @@ function MobileOptionSection({
                 </span>
                 <span className="text-xs text-gray-400">({option.count})</span>
                 {isSelected && (
-                  <CheckIcon className="w-4 h-4 text-primary-500 shrink-0" />
+                  <Check className="w-4 h-4 text-primary shrink-0" />
                 )}
               </button>
             );
@@ -267,7 +220,7 @@ function MobileOptionSection({
                 onClick={() => onToggle(option.id)}
                 className={`px-3.5 py-2 text-sm rounded-xl border transition-colors ${
                   isSelected
-                    ? "border-primary-500 bg-primary-500 text-white"
+                    ? "border-gray-500 bg-primary text-white"
                     : "border-gray-300 text-gray-700 hover:border-gray-400"
                 }`}
               >
@@ -320,13 +273,13 @@ function MobilePriceSection({
               }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl transition-colors ${
                 isSelected
-                  ? "bg-primary-50 font-medium text-gray-900"
+                  ? "bg-gray-50 font-medium text-gray-900"
                   : "text-gray-700 hover:bg-gray-50"
               }`}
             >
               <span className="flex-1 text-left">{bucket.label}</span>
               {isSelected && (
-                <CheckIcon className="w-4 h-4 text-primary-500 shrink-0" />
+                <Check className="w-4 h-4 text-primary shrink-0" />
               )}
             </button>
           );
@@ -367,7 +320,7 @@ function MobileAvailabilitySection({
               }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl transition-colors ${
                 isSelected
-                  ? "bg-primary-50 font-medium text-gray-900"
+                  ? "bg-gray-50 font-medium text-gray-900"
                   : "text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -376,7 +329,7 @@ function MobileAvailabilitySection({
               </span>
               <span className="text-xs text-gray-400">({option.count})</span>
               {isSelected && (
-                <CheckIcon className="w-4 h-4 text-primary-500 shrink-0" />
+                <Check className="w-4 h-4 text-primary shrink-0" />
               )}
             </button>
           );

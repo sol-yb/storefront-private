@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { updateCustomer } from "@/lib/data/customer";
 
@@ -66,51 +69,34 @@ function ProfileForm({
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  htmlFor="first_name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  First Name
-                </label>
-                <input
+              <Field>
+                <FieldLabel htmlFor="first_name">First Name</FieldLabel>
+                <Input
                   type="text"
                   id="first_name"
                   value={formData.first_name}
                   onChange={(e) =>
                     setFormData({ ...formData, first_name: e.target.value })
                   }
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:border-primary-500 focus:outline-primary-500"
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label
-                  htmlFor="last_name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Last Name
-                </label>
-                <input
+              <Field>
+                <FieldLabel htmlFor="last_name">Last Name</FieldLabel>
+                <Input
                   type="text"
                   id="last_name"
                   value={formData.last_name}
                   onChange={(e) =>
                     setFormData({ ...formData, last_name: e.target.value })
                   }
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:border-primary-500 focus:outline-primary-500"
                 />
-              </div>
+              </Field>
             </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email Address
-              </label>
-              <input
+            <Field>
+              <FieldLabel htmlFor="email">Email Address</FieldLabel>
+              <Input
                 type="email"
                 id="email"
                 required
@@ -118,19 +104,14 @@ function ProfileForm({
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:border-primary-500 focus:outline-primary-500"
               />
-            </div>
+            </Field>
           </div>
 
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <Button type="submit" disabled={saving}>
               {saving ? "Saving..." : "Save Changes"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

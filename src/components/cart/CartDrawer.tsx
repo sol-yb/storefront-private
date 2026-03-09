@@ -1,15 +1,18 @@
 "use client";
 
+import { Minus, Plus, ShoppingBag, Trash, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
 import {
-  CloseIcon,
-  MinusIcon,
-  PlusIcon,
-  ShoppingBagIcon,
-} from "@/components/icons";
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
 import { trackRemoveFromCart, trackViewCart } from "@/lib/analytics/gtm";
 import { extractBasePath } from "@/lib/utils/path";
@@ -27,24 +30,8 @@ export function CartDrawer() {
   } = useCart();
   const pathname = usePathname();
   const basePath = extractBasePath(pathname);
-  const drawerRef = useRef<HTMLDivElement>(null);
   const viewCartFiredRef = useRef(false);
   const prevPathnameRef = useRef(pathname);
-
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeCart();
-    };
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    }
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, closeCart]);
 
   // Close when navigating
   useEffect(() => {
@@ -65,45 +52,38 @@ export function CartDrawer() {
     }
   }, [isOpen, cart]);
 
-  if (!isOpen) return null;
-
   const lineItems = cart?.line_items || [];
   const isEmpty = lineItems.length === 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 transition-opacity"
-        onClick={closeCart}
-      />
-
-      {/* Drawer */}
-      <div
-        ref={drawerRef}
-        className="relative w-full max-w-md bg-white flex flex-col animate-slide-in-right"
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) closeCart();
+      }}
+    >
+      <SheetContent
+        side="right"
+        className="w-full max-w-md flex flex-col p-0 gap-0"
+        showCloseButton={false}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <button
+        <SheetHeader className="flex flex-row gap-2 items-center justify-between border-b">
+          <SheetTitle className="flex flex-row gap-2 items-center">
+            <ShoppingBag className="w-6 h-6 text-gray-600" />
+            <span>Cart</span>
+            {itemCount > 0 && (
+              <span className="text-gray-600">({itemCount} items)</span>
+            )}
+          </SheetTitle>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={closeCart}
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-700 transition-colors"
             aria-label="Close cart"
           >
-            <CloseIcon className="w-6 h-6" />
-          </button>
-          <h2 className="text-lg font-semibold uppercase">Cart</h2>
-          <div className="relative w-6 h-6">
-            <ShoppingBagIcon className="w-6 h-6 text-gray-600" />
-            {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-primary-500 text-white text-xs font-bold rounded-lg h-5 w-5 flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Content */}
+            <X className="w-6 h-6" />
+          </Button>
+        </SheetHeader>
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="p-4 space-y-4">
@@ -119,14 +99,14 @@ export function CartDrawer() {
             </div>
           ) : isEmpty ? (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-              <ShoppingBagIcon
+              <ShoppingBag
                 className="w-16 h-16 text-gray-300 mb-4"
                 strokeWidth={1}
               />
               <p className="text-gray-500 mb-4">Your cart is empty</p>
               <Link
                 href={`${basePath}/products`}
-                className="text-primary-500 hover:text-primary-700 font-medium"
+                className="text-primary hover:text-primary font-medium"
                 onClick={closeCart}
               >
                 Continue Shopping
@@ -157,12 +137,14 @@ export function CartDrawer() {
                       <div className="flex justify-between items-start">
                         <Link
                           href={`${basePath}/products/${item.slug}`}
-                          className="font-medium text-gray-900 hover:text-primary-500 line-clamp-2"
+                          className="font-medium text-gray-900 hover:text-primary line-clamp-2"
                           onClick={closeCart}
                         >
                           {item.name}
                         </Link>
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon-xs"
                           onClick={async () => {
                             await removeItem(item.id);
                             if (cart) {
@@ -170,11 +152,10 @@ export function CartDrawer() {
                             }
                           }}
                           disabled={updating}
-                          className="p-1 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
                           aria-label="Remove item"
                         >
-                          <CloseIcon className="w-4 h-4" />
-                        </button>
+                          <Trash className="w-4 h-4" />
+                        </Button>
                       </div>
 
                       {/* Price */}
@@ -207,7 +188,9 @@ export function CartDrawer() {
                       {/* Quantity */}
                       <div className="mt-3 flex items-center">
                         <div className="flex items-center border border-gray-300 rounded">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() =>
                               updateItem(
                                 item.id,
@@ -215,24 +198,24 @@ export function CartDrawer() {
                               )
                             }
                             disabled={updating || item.quantity <= 1}
-                            className="px-3 py-1 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Decrease quantity"
                           >
-                            <MinusIcon className="w-3 h-3" />
-                          </button>
+                            <Minus className="w-3 h-3" />
+                          </Button>
                           <span className="px-3 py-1 text-sm font-medium min-w-[2rem] text-center">
                             {item.quantity}
                           </span>
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() =>
                               updateItem(item.id, item.quantity + 1)
                             }
                             disabled={updating}
-                            className="px-3 py-1 text-gray-600 hover:text-gray-900 disabled:opacity-50"
                             aria-label="Increase quantity"
                           >
-                            <PlusIcon className="w-3 h-3" />
-                          </button>
+                            <Plus className="w-3 h-3" />
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -245,14 +228,11 @@ export function CartDrawer() {
 
         {/* Footer */}
         {!isEmpty && !loading && (
-          <div className="border-t border-gray-200 p-4 space-y-4">
+          <SheetFooter className="border-t border-gray-200 p-4 space-y-4">
             {/* Summary */}
             <div className="space-y-2">
-              <p className="text-sm text-gray-500 text-center">
-                Shipping and taxes calculated at checkout
-              </p>
-              <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Total</span>
+              <div className="flex justify-between items-center">
+                <span>Subtotal</span>
                 <span>{cart?.display_item_total}</span>
               </div>
               {cart?.promo_total && parseFloat(cart.promo_total) < 0 && (
@@ -261,35 +241,38 @@ export function CartDrawer() {
                   <span>{cart.display_promo_total}</span>
                 </div>
               )}
+              <div className="flex justify-between items-center">
+                <span>Shipping</span>
+                <span className="text-gray-500">Ccalculated on checkout</span>
+              </div>
             </div>
 
             {/* Actions */}
             <div className="space-y-2">
-              <Link
-                href={`${basePath}/checkout/${cart?.id}`}
-                className="block w-full bg-primary-500 text-white text-center py-3 px-4 rounded-xl font-medium hover:bg-primary-700 transition-colors"
-                onClick={closeCart}
-              >
-                Checkout
-              </Link>
-              <Link
-                href={`${basePath}/cart`}
-                className="block w-full text-center text-primary-500 hover:text-primary-700 font-medium py-2"
-                onClick={closeCart}
-              >
-                View Cart
-              </Link>
+              <Button size="lg" className="w-full" asChild>
+                <Link
+                  href={`${basePath}/checkout/${cart?.id}`}
+                  onClick={closeCart}
+                >
+                  Checkout
+                </Link>
+              </Button>
+              <Button size="lg" className="w-full" variant="link" asChild>
+                <Link href={`${basePath}/cart`} onClick={closeCart}>
+                  View Cart
+                </Link>
+              </Button>
             </div>
-          </div>
+          </SheetFooter>
         )}
 
         {/* Loading overlay */}
         {updating && (
           <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-lg animate-spin" />
+            <div className="w-8 h-8 border-4 border-gray-600 border-t-transparent rounded-lg animate-spin" />
           </div>
         )}
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }

@@ -7,7 +7,7 @@ import { Navigation } from "swiper/modules";
 import { Swiper as SwiperComponent, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
-import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/products/ProductCard";
 import { useCarouselProducts } from "@/hooks/useCarouselProducts";
 
@@ -83,7 +83,7 @@ export function ProductCarousel({
         disabled={isBeginning}
         className={`${NAV_BUTTON_BASE} -left-5 ${isBeginning ? "opacity-0" : ""}`}
       >
-        <ChevronLeftIcon className="w-5 h-5" />
+        <ChevronLeft className="w-5 h-5" />
       </button>
       <button
         ref={nextRef}
@@ -92,7 +92,7 @@ export function ProductCarousel({
         disabled={isEnd}
         className={`${NAV_BUTTON_BASE} -right-5 ${isEnd ? "opacity-0" : ""}`}
       >
-        <ChevronRightIcon className="w-5 h-5" />
+        <ChevronRight className="w-5 h-5" />
       </button>
       <SwiperComponent
         modules={[Navigation]}

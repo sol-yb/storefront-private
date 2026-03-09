@@ -1,13 +1,9 @@
 "use client";
 
 import type { GiftCard } from "@spree/sdk";
+import { Check, ClipboardCopy, Gift, Info } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  CheckIcon,
-  ClipboardCopyIcon,
-  GiftIcon,
-  InfoCircleIcon,
-} from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import { getGiftCards } from "@/lib/data/gift-cards";
 
 function getStateColor(state: string, expired: boolean): string {
@@ -75,23 +71,24 @@ function CopyButton({ code }: { code: string }) {
   };
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={handleCopy}
-      className="inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
       title="Copy code to clipboard"
     >
       {copied ? (
         <>
-          <CheckIcon className="w-4 h-4 text-green-600" />
+          <Check className="w-4 h-4 text-green-600" />
           <span className="text-green-600">Copied!</span>
         </>
       ) : (
         <>
-          <ClipboardCopyIcon className="w-4 h-4" />
+          <ClipboardCopy className="w-4 h-4" />
           <span>Copy</span>
         </>
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -141,7 +138,7 @@ function GiftCardItem({ card }: { card: GiftCard }) {
         <div className="w-full bg-gray-200 rounded-lg h-2">
           <div
             className={`h-2 rounded-lg transition-all ${
-              usagePercentage >= 100 ? "bg-gray-400" : "bg-primary-500"
+              usagePercentage >= 100 ? "bg-gray-400" : "bg-primary"
             }`}
             style={{ width: `${Math.min(usagePercentage, 100)}%` }}
           />
@@ -205,7 +202,7 @@ export default function GiftCardsPage() {
 
       {cards.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <GiftIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             No gift cards
           </h3>
@@ -247,7 +244,7 @@ export default function GiftCardsPage() {
 
       <div className="mt-6 p-4 bg-gray-50 rounded-xl">
         <p className="text-sm text-gray-600">
-          <InfoCircleIcon className="w-4 h-4 inline mr-1" />
+          <Info className="w-4 h-4 inline mr-1" />
           Gift cards can be used during checkout to pay for your orders. The
           remaining balance will be saved for future purchases.
         </p>

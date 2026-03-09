@@ -1,6 +1,6 @@
 import type { Taxon } from "@spree/sdk";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { ChevronRightIcon } from "@/components/icons";
 
 interface BreadcrumbsProps {
   taxon: Taxon;
@@ -39,7 +39,7 @@ export function Breadcrumbs({ taxon, basePath }: BreadcrumbsProps) {
           return (
             <li key={index} className="flex items-center">
               {index > 0 && (
-                <ChevronRightIcon className="w-4 h-4 text-gray-400 mx-2" />
+                <ChevronRight className="w-4 h-4 text-gray-400 mx-2" />
               )}
               {isLast ? (
                 <span className="text-gray-500" aria-current="page">
@@ -48,7 +48,7 @@ export function Breadcrumbs({ taxon, basePath }: BreadcrumbsProps) {
               ) : (
                 <Link
                   href={item.href}
-                  className="text-primary-500 hover:text-primary-700"
+                  className="text-primary hover:text-primary"
                 >
                   {item.name}
                 </Link>

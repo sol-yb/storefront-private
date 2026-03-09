@@ -1,10 +1,11 @@
 "use client";
 
 import type { Product } from "@spree/sdk";
+import { ImageIcon as ImagePlaceholder, Search } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ImagePlaceholderIcon, SearchIcon } from "@/components/icons";
+import { Input } from "@/components/ui/input";
 import { useStore } from "@/contexts/StoreContext";
 import { trackQuickSearch, trackSelectItem } from "@/lib/analytics/gtm";
 import { getProducts } from "@/lib/data/products";
@@ -141,7 +142,7 @@ export function SearchBar({ basePath }: SearchBarProps) {
     <div ref={containerRef} className="relative">
       <form onSubmit={handleSubmit}>
         <div className="relative">
-          <input
+          <Input
             ref={inputRef}
             type="search"
             value={query}
@@ -153,7 +154,6 @@ export function SearchBar({ basePath }: SearchBarProps) {
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder="Search..."
-            className="w-full sm:w-64 pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500"
             role="combobox"
             aria-expanded={showSuggestions}
             aria-controls="search-suggestions"
@@ -162,7 +162,7 @@ export function SearchBar({ basePath }: SearchBarProps) {
             }
             aria-autocomplete="list"
           />
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         </div>
       </form>
 
@@ -203,7 +203,7 @@ export function SearchBar({ basePath }: SearchBarProps) {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300">
-                          <ImagePlaceholderIcon className="w-5 h-5" />
+                          <ImagePlaceholder className="w-5 h-5" />
                         </div>
                       )}
                     </div>
@@ -232,7 +232,7 @@ export function SearchBar({ basePath }: SearchBarProps) {
                       );
                       setIsOpen(false);
                     }}
-                    className="w-full p-3 text-sm text-primary-500 hover:bg-gray-50 text-center font-medium"
+                    className="w-full p-3 text-sm text-primary hover:bg-gray-50 text-center font-medium"
                   >
                     View all results for &ldquo;{query}&rdquo;
                   </button>

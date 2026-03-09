@@ -1,9 +1,11 @@
 "use client";
 
+import { ShoppingBag, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingBagIcon, UserIcon } from "@/components/icons";
 import { SearchBar } from "@/components/search/SearchBar";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { extractBasePath } from "@/lib/utils/path";
 import { CountrySwitcher } from "./CountrySwitcher";
@@ -19,7 +21,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href={basePath || "/"} className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-gray-900">Spree Store</span>
+            <Image src="/spree.png" alt="Spree Store" width={60} height={24} />
           </Link>
 
           {/* Search */}
@@ -43,18 +45,20 @@ export function Header() {
             <CountrySwitcher />
 
             {/* Cart */}
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={openCart}
-              className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors"
               aria-label="Open cart"
+              className="relative"
             >
-              <ShoppingBagIcon className="w-6 h-6" />
+              <ShoppingBag className="w-6 h-6" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary-500 text-white text-xs font-medium rounded-lg h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center">
                   {itemCount}
                 </span>
               )}
-            </button>
+            </Button>
 
             {/* Account */}
             <Link
@@ -62,7 +66,7 @@ export function Header() {
               className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
               aria-label="Account"
             >
-              <UserIcon className="w-6 h-6" />
+              <User className="w-6 h-6" />
             </Link>
           </div>
         </div>

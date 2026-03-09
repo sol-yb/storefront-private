@@ -1,17 +1,18 @@
 "use client";
 
 import type { Product, Image as SpreeImage, Variant } from "@spree/sdk";
-import { useMemo, useState } from "react";
 import {
-  CheckCircleSolidIcon,
-  MinusIcon,
-  PlusIcon,
-  ShoppingBagIcon,
-  SpinnerIcon,
-  XCircleSolidIcon,
-} from "@/components/icons";
+  CircleCheckBig,
+  CircleX,
+  Loader2,
+  Minus,
+  Plus,
+  ShoppingBag,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { MediaGallery } from "@/components/products/MediaGallery";
 import { VariantPicker } from "@/components/products/VariantPicker";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useStore } from "@/contexts/StoreContext";
 import { trackAddToCart } from "@/lib/analytics/gtm";
@@ -150,12 +151,12 @@ export function ProductDetails({ product, basePath }: ProductDetailsProps) {
           <div className="mt-4">
             {inStock ? (
               <span className="inline-flex items-center gap-1.5 text-green-600">
-                <CheckCircleSolidIcon className="w-5 h-5" />
+                <CircleCheckBig className="w-5 h-5" />
                 In Stock
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 text-red-600">
-                <XCircleSolidIcon className="w-5 h-5" />
+                <CircleX className="w-5 h-5" />
                 Out of Stock
               </span>
             )}
@@ -178,53 +179,47 @@ export function ProductDetails({ product, basePath }: ProductDetailsProps) {
             <div className="flex gap-4">
               {/* Quantity Selector */}
               <div className="flex items-center border border-gray-300 rounded-xl">
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-4 py-3 text-gray-600 hover:text-gray-900 transition-colors"
                   aria-label="Decrease quantity"
                 >
-                  <MinusIcon className="w-4 h-4" />
-                </button>
+                  <Minus className="w-4 h-4" />
+                </Button>
                 <span className="px-4 py-3 font-medium min-w-[3rem] text-center">
                   {quantity}
                 </span>
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-4 py-3 text-gray-600 hover:text-gray-900 transition-colors"
                   aria-label="Increase quantity"
                 >
-                  <PlusIcon className="w-4 h-4" />
-                </button>
+                  <Plus className="w-4 h-4" />
+                </Button>
               </div>
 
               {/* Add to Cart Button */}
-              <button
+              <Button
+                size="lg"
                 onClick={handleAddToCart}
                 disabled={loading || !isPurchasable}
-                className={`
-                  flex-1 py-3 px-6 rounded-xl font-medium transition-colors flex items-center justify-center gap-2
-                  ${
-                    isPurchasable
-                      ? "bg-primary-500 text-white hover:bg-primary-700"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                `}
               >
                 {loading ? (
                   <>
-                    <SpinnerIcon className="animate-spin h-5 w-5" />
+                    <Loader2 className="animate-spin h-5 w-5" />
                     Adding...
                   </>
                 ) : isPurchasable ? (
                   <>
-                    <ShoppingBagIcon className="w-5 h-5" />
+                    <ShoppingBag className="w-5 h-5" />
                     Add to Cart
                   </>
                 ) : (
                   "Out of Stock"
                 )}
-              </button>
+              </Button>
             </div>
           </div>
 

@@ -8,19 +8,6 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@spree/next", "@spree/sdk"],
   turbopack: {
     root: __dirname,
-    rules: {
-      "*.svg": {
-        loaders: ["@svgr/webpack"],
-        as: "*.js",
-      },
-    },
-  },
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ["@svgr/webpack"],
-    });
-    return config;
   },
   images: {
     qualities: [25, 50, 75, 100],

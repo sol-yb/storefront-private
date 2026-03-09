@@ -1,7 +1,7 @@
 import type { Taxon, Taxonomy } from "@spree/sdk";
+import { LayoutGrid } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { GridIcon } from "@/components/icons";
 import { getTaxonomies } from "@/lib/data/taxonomies";
 
 export const revalidate = 60;
@@ -65,7 +65,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
                           href={`${basePath}/t/${taxon.permalink}`}
                           className="group"
                         >
-                          <div className="relative aspect-square bg-white border border-gray-200 rounded-xl overflow-hidden mb-3 group-hover:ring-2 group-hover:ring-primary-500 transition-all">
+                          <div className="relative aspect-square bg-white border border-gray-200 rounded-xl overflow-hidden mb-3 group-hover:ring-2 group-hover:ring-gray-500 transition-all">
                             {imageSrc ? (
                               <Image
                                 src={imageSrc}
@@ -76,11 +76,11 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <GridIcon className="w-12 h-12 text-gray-400" />
+                                <LayoutGrid className="w-12 h-12 text-gray-400" />
                               </div>
                             )}
                           </div>
-                          <h3 className="font-medium text-gray-900 group-hover:text-primary-500 transition-colors">
+                          <h3 className="font-medium text-gray-900 group-hover:text-primary transition-colors">
                             {taxon.name}
                           </h3>
                           {taxon.children_count > 0 && (

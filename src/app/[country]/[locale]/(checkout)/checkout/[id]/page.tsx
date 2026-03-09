@@ -499,7 +499,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         <p className="text-gray-600 mb-6">{error}</p>
         <Link
           href={`${basePath}/cart`}
-          className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-700"
+          className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-700"
         >
           Return to Cart
         </Link>
@@ -521,7 +521,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         </p>
         <Link
           href={`${basePath}/products`}
-          className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-700"
+          className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-700"
         >
           Continue Shopping
         </Link>
@@ -558,9 +558,9 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium ${
                       index < currentStepIndex
-                        ? "bg-primary-500 text-white"
+                        ? "bg-black text-white"
                         : index === currentStepIndex
-                          ? "bg-primary-500 text-white"
+                          ? "bg-primary text-white"
                           : "bg-gray-200 text-gray-500"
                     }`}
                   >
@@ -569,7 +569,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
                   <span
                     className={`ml-2 text-sm font-medium ${
                       index === currentStepIndex
-                        ? "text-primary-500"
+                        ? "text-primary"
                         : index < currentStepIndex
                           ? "text-gray-900"
                           : "text-gray-500"
@@ -581,7 +581,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
                 {index < steps.length - 1 && (
                   <div className="w-full h-0.5 bg-gray-200">
                     <div
-                      className={`h-full ${index < currentStepIndex ? "bg-primary-500" : "bg-gray-200"}`}
+                      className={`h-full ${index < currentStepIndex ? "bg-primary" : "bg-gray-200"}`}
                       style={{
                         width: index < currentStepIndex ? "100%" : "0%",
                       }}

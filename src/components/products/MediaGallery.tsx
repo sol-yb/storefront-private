@@ -1,15 +1,15 @@
 "use client";
 
 import type { Image as SpreeImage } from "@spree/sdk";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon as ImagePlaceholder,
+  X,
+  ZoomIn,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CloseIcon,
-  ImagePlaceholderIcon,
-  SearchPlusIcon,
-} from "@/components/icons";
 
 /** Tiny 10×10 neutral gray PNG used as a blur placeholder while images load. */
 const BLUR_PLACEHOLDER =
@@ -56,13 +56,13 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-            <ImagePlaceholderIcon className="w-24 h-24" />
+            <ImagePlaceholder className="w-24 h-24" />
           </div>
         )}
         {/* Zoom hint */}
         {mainImageUrl && (
           <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm text-gray-600 flex items-center gap-1.5">
-            <SearchPlusIcon className="w-4 h-4" />
+            <ZoomIn className="w-4 h-4" />
             Click to zoom
           </div>
         )}
@@ -79,7 +79,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                 onClick={() => setSelectedIndex(index)}
                 className={`relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-colors bg-gray-100 ${
                   index === selectedIndex
-                    ? "border-primary-600"
+                    ? "border-gray-600"
                     : "border-transparent hover:border-gray-300"
                 }`}
               >
@@ -93,7 +93,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                    <ImagePlaceholderIcon className="w-8 h-8" />
+                    <ImagePlaceholder className="w-8 h-8" />
                   </div>
                 )}
               </button>
@@ -113,7 +113,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
             onClick={() => setIsZoomed(false)}
             aria-label="Close lightbox"
           >
-            <CloseIcon className="w-8 h-8" />
+            <X className="w-8 h-8" />
           </button>
 
           {/* Navigation arrows */}
@@ -129,7 +129,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                 }}
                 aria-label="Previous image"
               >
-                <ChevronLeftIcon className="w-8 h-8" />
+                <ChevronLeft className="w-8 h-8" />
               </button>
               <button
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -141,7 +141,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                 }}
                 aria-label="Next image"
               >
-                <ChevronRightIcon className="w-8 h-8" />
+                <ChevronRight className="w-8 h-8" />
               </button>
             </>
           )}

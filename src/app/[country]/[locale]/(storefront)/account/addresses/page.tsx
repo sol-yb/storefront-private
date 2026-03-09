@@ -1,9 +1,10 @@
 "use client";
 
 import type { Address, AddressParams, Country } from "@spree/sdk";
+import { MapPin, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { AddressEditModal } from "@/components/checkout/AddressEditModal";
-import { MapPinIcon, PlusIcon } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import {
   createAddress,
   deleteAddress,
@@ -51,19 +52,17 @@ function AddressCard({
           )}
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={onEdit}
-            className="text-sm text-primary-500 hover:text-primary-700 font-medium"
-          >
+          <Button variant="link" size="sm" onClick={onEdit}>
             Edit
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
             onClick={handleDelete}
             disabled={deleting}
-            className="text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
           >
             {deleting ? "Deleting..." : "Delete"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -164,30 +163,22 @@ export default function AddressesPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Addresses</h1>
-        <button
-          onClick={handleAdd}
-          className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors text-sm"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />
+        <Button onClick={handleAdd}>
+          <Plus className="w-4 h-4 mr-2" />
           Add Address
-        </button>
+        </Button>
       </div>
 
       {addresses.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <MapPinIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             No addresses saved
           </h3>
           <p className="text-gray-500 mb-6">
             Add an address for faster checkout.
           </p>
-          <button
-            onClick={handleAdd}
-            className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
-          >
-            Add Your First Address
-          </button>
+          <Button onClick={handleAdd}>Add Your First Address</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

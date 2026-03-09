@@ -2,6 +2,7 @@
 
 import type { OptionType, Variant } from "@spree/sdk";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { isColorOption, resolveColor } from "@/lib/utils/color-map";
 
 interface VariantPickerProps {
@@ -167,7 +168,7 @@ export function VariantPicker({
                       title={optionValue?.presentation || value}
                       className={`
                         w-10 h-10 rounded-lg border-2 transition-all relative
-                        ${isSelected ? "border-primary-600 ring-2 ring-primary-600 ring-offset-2" : "border-gray-200"}
+                        ${isSelected ? "border-gray-600 ring-2 ring-primary-600 ring-offset-2" : "border-gray-200"}
                         ${!isAvailable ? "opacity-30 cursor-not-allowed" : "cursor-pointer hover:border-gray-400"}
                         ${!isPurchasable && isAvailable ? "opacity-50" : ""}
                       `}
@@ -199,20 +200,11 @@ export function VariantPicker({
                   );
 
                   return (
-                    <button
+                    <Button
                       key={value}
+                      variant={isSelected ? "secondary" : "outline"}
                       onClick={() => handleOptionSelect(optionType.id, value)}
                       disabled={!isAvailable}
-                      className={`
-                        px-4 py-2 text-sm font-medium rounded-xl border transition-all relative
-                        ${
-                          isSelected
-                            ? "border-primary-600 bg-primary-50 text-primary-500"
-                            : "border-gray-200 text-gray-700 hover:border-gray-400"
-                        }
-                        ${!isAvailable ? "opacity-30 cursor-not-allowed line-through" : "cursor-pointer"}
-                        ${!isPurchasable && isAvailable ? "opacity-50" : ""}
-                      `}
                     >
                       {optionValue?.presentation || value}
                       {!isPurchasable && isAvailable && (
@@ -220,7 +212,7 @@ export function VariantPicker({
                           (Out of stock)
                         </span>
                       )}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
