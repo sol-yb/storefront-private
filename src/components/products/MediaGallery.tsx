@@ -61,7 +61,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
         )}
         {/* Zoom hint */}
         {mainImageUrl && (
-          <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-gray-600 flex items-center gap-1.5">
+          <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm text-gray-600 flex items-center gap-1.5">
             <SearchPlusIcon className="w-4 h-4" />
             Click to zoom
           </div>
@@ -109,7 +109,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
           onClick={() => setIsZoomed(false)}
         >
           <button
-            className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+            className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
             onClick={() => setIsZoomed(false)}
             aria-label="Close lightbox"
           >
@@ -120,7 +120,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
           {images.length > 1 && (
             <>
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedIndex((prev) =>
@@ -132,7 +132,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                 <ChevronLeftIcon className="w-8 h-8" />
               </button>
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedIndex((prev) =>
@@ -159,7 +159,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
 
           {/* Image counter */}
           {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-3 py-1 rounded-full text-sm">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-3 py-1 rounded-lg text-sm">
               {selectedIndex + 1} / {images.length}
             </div>
           )}

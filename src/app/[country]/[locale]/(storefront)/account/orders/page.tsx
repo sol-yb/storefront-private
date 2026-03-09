@@ -143,14 +143,14 @@ export default function OrdersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPaymentStatusColor(order.payment_state)}`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium capitalize ${getPaymentStatusColor(order.payment_state)}`}
                       >
                         {order.payment_state?.replace("_", " ") || "N/A"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getShipmentStatusColor(order.shipment_state)}`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium capitalize ${getShipmentStatusColor(order.shipment_state)}`}
                       >
                         {order.shipment_state || "N/A"}
                       </span>

@@ -94,7 +94,7 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
   if (loading) {
     return (
       <div className="animate-pulse space-y-6 py-12">
-        <div className="h-12 w-12 bg-gray-200 rounded-full mx-auto" />
+        <div className="h-12 w-12 bg-gray-200 rounded-lg mx-auto" />
         <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto" />
         <div className="h-4 bg-gray-200 rounded w-1/3 mx-auto" />
         <div className="h-64 bg-gray-200 rounded mt-8" />

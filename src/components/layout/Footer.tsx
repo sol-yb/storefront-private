@@ -8,7 +8,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <span className="text-xl font-bold text-white">Spree Store</span>
-            <p className="mt-4 text-sm">
+            <p className="mt-4 text-sm text-neutral-400">
               A modern e-commerce storefront powered by Spree Commerce and
               Next.js.
             </p>
@@ -16,14 +16,14 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
+            <h3 className="text-sm font-medium text-neutral-300 uppercase tracking-wider">
               Shop
             </h3>
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-3">
               <li>
                 <Link
                   href="/products"
-                  className="hover:text-white transition-colors"
+                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
                 >
                   All Products
                 </Link>
@@ -31,7 +31,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/taxonomies"
-                  className="hover:text-white transition-colors"
+                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
                 >
                   Categories
                 </Link>
@@ -41,14 +41,14 @@ export function Footer() {
 
           {/* Account */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
+            <h3 className="text-sm font-medium text-neutral-300 uppercase tracking-wider">
               Account
             </h3>
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-3">
               <li>
                 <Link
                   href="/account"
-                  className="hover:text-white transition-colors"
+                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
                 >
                   My Account
                 </Link>
@@ -56,7 +56,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/account/orders"
-                  className="hover:text-white transition-colors"
+                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
                 >
                   Order History
                 </Link>
@@ -64,7 +64,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/cart"
-                  className="hover:text-white transition-colors"
+                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
                 >
                   Cart
                 </Link>
@@ -73,7 +73,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-gray-800 text-sm text-center">
+        <div className="mt-8 pt-8 border-t border-neutral-800 text-xs text-neutral-500 text-center">
           <p>
             &copy; {new Date().getFullYear()} Spree Store. Powered by Spree
             Commerce.

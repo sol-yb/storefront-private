@@ -382,7 +382,7 @@ export function PaymentStep({
                   </span>
                 </div>
                 {card.default && (
-                  <span className="text-xs font-medium text-primary-500 bg-primary-100 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-medium text-primary-500 bg-primary-100 px-2 py-0.5 rounded-lg">
                     Default
                   </span>
                 )}
@@ -417,7 +417,7 @@ export function PaymentStep({
 
         {loading && (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+            <div className="animate-spin rounded-lg h-8 w-8 border-b-2 border-primary-600" />
             <span className="ml-3 text-sm text-gray-500">
               Loading payment form...
             </span>

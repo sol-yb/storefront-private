@@ -556,7 +556,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
               >
                 <div className="flex items-center pr-2">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium ${
                       index < currentStepIndex
                         ? "bg-primary-500 text-white"
                         : index === currentStepIndex

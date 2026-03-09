@@ -160,7 +160,7 @@ export default function AccountPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Link
           href={`${basePath}/account/orders`}
-          className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
             <div className="p-3 bg-primary-100 rounded-xl">
@@ -179,7 +179,7 @@ export default function AccountPage() {
 
         <Link
           href={`${basePath}/account/addresses`}
-          className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
             <div className="p-3 bg-primary-100 rounded-xl">
@@ -196,7 +196,7 @@ export default function AccountPage() {
 
         <Link
           href={`${basePath}/account/credit-cards`}
-          className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
             <div className="p-3 bg-primary-100 rounded-xl">
@@ -215,7 +215,7 @@ export default function AccountPage() {
 
         <Link
           href={`${basePath}/account/profile`}
-          className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          className="bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 transition-colors"
         >
           <div className="flex items-center gap-4">
             <div className="p-3 bg-primary-100 rounded-xl">

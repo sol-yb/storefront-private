@@ -34,7 +34,7 @@ export function OptionDropdownContent({
               >
                 {isColorFilter && (
                   <span
-                    className="w-5 h-5 rounded-full border border-gray-200 shrink-0"
+                    className="w-5 h-5 rounded-lg border border-gray-200 shrink-0"
                     style={{
                       backgroundColor: resolveColor(option.presentation),
                     }}

@@ -130,7 +130,7 @@ export function MobileFilterDrawer({
       />
       <div
         ref={drawerRef}
-        className="fixed inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl flex flex-col animate-slide-in-left"
+        className="fixed inset-y-0 left-0 w-full max-w-sm bg-white flex flex-col animate-slide-in-left"
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <button
@@ -233,7 +233,7 @@ function MobileOptionSection({
                 }`}
               >
                 <span
-                  className={`w-7 h-7 rounded-full shrink-0 border-2 transition-colors ${
+                  className={`w-7 h-7 rounded-lg shrink-0 border-2 transition-colors ${
                     isSelected
                       ? "border-primary-500 ring-2 ring-primary-200"
                       : "border-gray-200"

@@ -82,7 +82,7 @@ export function FilterChips({
       {chips.map((chip) => (
         <span
           key={chip.key}
-          className="inline-flex items-center gap-1.5 px-3 py-1 text-sm bg-primary-50 text-primary-700 rounded-full"
+          className="inline-flex items-center gap-1.5 px-3 py-1 text-sm bg-primary-50 text-primary-700 rounded-lg"
         >
           <span>{chip.label}</span>
           <button

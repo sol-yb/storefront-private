@@ -37,7 +37,7 @@ export function OrderSummary({ order }: OrderSummaryProps) {
                   />
                 </div>
               )}
-              <div className="absolute -top-2 -right-2 w-5 h-5 bg-gray-500 text-white text-xs rounded-full flex items-center justify-center">
+              <div className="absolute -top-2 -right-2 w-5 h-5 bg-gray-500 text-white text-xs rounded-lg flex items-center justify-center">
                 {item.quantity}
               </div>
             </div>

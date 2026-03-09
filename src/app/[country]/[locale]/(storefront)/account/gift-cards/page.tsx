@@ -111,7 +111,7 @@ function GiftCardItem({ card }: { card: GiftCard }) {
             </span>
             <CopyButton code={card.code} />
             <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStateColor(card.state, card.expired)}`}
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium ${getStateColor(card.state, card.expired)}`}
             >
               {getStateLabel(card.state)}
             </span>
@@ -138,9 +138,9 @@ function GiftCardItem({ card }: { card: GiftCard }) {
           </span>
           <span className="text-gray-600">Total: {card.display_amount}</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-gray-200 rounded-lg h-2">
           <div
-            className={`h-2 rounded-full transition-all ${
+            className={`h-2 rounded-lg transition-all ${
               usagePercentage >= 100 ? "bg-gray-400" : "bg-primary-500"
             }`}
             style={{ width: `${Math.min(usagePercentage, 100)}%` }}

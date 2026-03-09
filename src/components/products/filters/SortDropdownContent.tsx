@@ -28,7 +28,7 @@ export function SortDropdownContent({
               }`}
             >
               <span
-                className={`w-1.5 h-1.5 rounded-full shrink-0 ${isActive ? "bg-primary-500" : "bg-transparent"}`}
+                className={`w-1.5 h-1.5 rounded-lg shrink-0 ${isActive ? "bg-primary-500" : "bg-transparent"}`}
               />
               {getSortLabel(option.id)}
             </button>

@@ -46,7 +46,7 @@ export function FilterDropdown({
     <div className="relative" ref={containerRef}>
       <button
         onClick={onToggle}
-        className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${
+        className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
           hasActive
             ? "border-primary-500 bg-primary-50 text-primary-700"
             : isOpen
@@ -58,7 +58,7 @@ export function FilterDropdown({
       >
         <span>{label}</span>
         {hasActive && (
-          <span className="flex items-center justify-center w-5 h-5 text-xs bg-primary-500 text-white rounded-full">
+          <span className="flex items-center justify-center w-5 h-5 text-xs bg-primary-500 text-white rounded-lg">
             {badgeCount}
           </span>
         )}
@@ -69,7 +69,7 @@ export function FilterDropdown({
 
       {isOpen && (
         <div
-          className={`absolute top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-3 px-4 z-40 min-w-[220px] ${
+          className={`absolute top-full mt-2 bg-white rounded-xl border border-gray-200 py-3 px-4 z-40 min-w-[220px] ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >

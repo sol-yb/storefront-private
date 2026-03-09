@@ -59,7 +59,7 @@ export const ProductCard = memo(function ProductCard({
   return (
     <Link
       href={`${basePath}/products/${product.slug}`}
-      className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      className="group block rounded-xl overflow-hidden transition-colors"
       onClick={handleClick}
     >
       {/* Image */}
@@ -73,7 +73,7 @@ export const ProductCard = memo(function ProductCard({
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+          <div className="absolute inset-0 flex items-center justify-center text-gray-300">
             <ImagePlaceholderIcon className="w-16 h-16" />
           </div>
         )}

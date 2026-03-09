@@ -81,7 +81,7 @@ export function CartDrawer() {
       {/* Drawer */}
       <div
         ref={drawerRef}
-        className="relative w-full max-w-md bg-white shadow-xl flex flex-col animate-slide-in-right"
+        className="relative w-full max-w-md bg-white flex flex-col animate-slide-in-right"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -96,7 +96,7 @@ export function CartDrawer() {
           <div className="relative w-6 h-6">
             <ShoppingBagIcon className="w-6 h-6 text-gray-600" />
             {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-primary-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-primary-500 text-white text-xs font-bold rounded-lg h-5 w-5 flex items-center justify-center">
                 {itemCount}
               </span>
             )}
@@ -286,7 +286,7 @@ export function CartDrawer() {
         {/* Loading overlay */}
         {updating && (
           <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-lg animate-spin" />
           </div>
         )}
       </div>

@@ -134,10 +134,10 @@ export const FilterBar = memo(function FilterBar({
   if (filtersLoading) {
     return (
       <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
-        <div className="h-10 w-20 bg-gray-200 rounded-full animate-pulse" />
-        <div className="h-10 w-16 bg-gray-200 rounded-full animate-pulse" />
-        <div className="h-10 w-16 bg-gray-200 rounded-full animate-pulse" />
-        <div className="ml-auto h-10 w-24 bg-gray-200 rounded-full animate-pulse" />
+        <div className="h-10 w-20 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="h-10 w-16 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="h-10 w-16 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="ml-auto h-10 w-24 bg-gray-200 rounded-lg animate-pulse" />
       </div>
     );
   }
@@ -230,7 +230,7 @@ export const FilterBar = memo(function FilterBar({
         <button
           type="button"
           onClick={() => setShowMobileDrawer(true)}
-          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
             hasActiveFilters
               ? "border-primary-500 bg-primary-50 text-primary-700"
               : "border-gray-300 text-gray-700"
@@ -239,7 +239,7 @@ export const FilterBar = memo(function FilterBar({
           <FilterIcon className="w-4 h-4" />
           <span>Filters</span>
           {hasActiveFilters && (
-            <span className="flex items-center justify-center w-5 h-5 text-xs bg-primary-500 text-white rounded-full">
+            <span className="flex items-center justify-center w-5 h-5 text-xs bg-primary-500 text-white rounded-lg">
               {totalActiveFilters}
             </span>
           )}

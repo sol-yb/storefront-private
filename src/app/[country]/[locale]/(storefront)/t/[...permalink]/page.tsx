@@ -48,7 +48,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           />
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
               {taxon.name}
             </h1>
           </div>
@@ -81,7 +81,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 <a
                   key={child.id}
                   href={`${basePath}/t/${child.permalink}`}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition-colors"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 transition-colors"
                 >
                   {child.name}
                   {child.children_count > 0 && (

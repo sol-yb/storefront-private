@@ -166,7 +166,7 @@ export function VariantPicker({
                       disabled={!isAvailable}
                       title={optionValue?.presentation || value}
                       className={`
-                        w-10 h-10 rounded-full border-2 transition-all relative
+                        w-10 h-10 rounded-lg border-2 transition-all relative
                         ${isSelected ? "border-primary-600 ring-2 ring-primary-600 ring-offset-2" : "border-gray-200"}
                         ${!isAvailable ? "opacity-30 cursor-not-allowed" : "cursor-pointer hover:border-gray-400"}
                         ${!isPurchasable && isAvailable ? "opacity-50" : ""}

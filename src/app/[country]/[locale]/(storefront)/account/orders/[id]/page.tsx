@@ -209,7 +209,7 @@ function ShipmentBlock({
                 </p>
               )}
               <span
-                className={`inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getShipmentStatusColor(shipment.state)}`}
+                className={`inline-flex items-center mt-2 px-2.5 py-0.5 rounded-lg text-xs font-medium capitalize ${getShipmentStatusColor(shipment.state)}`}
               >
                 {shipment.state}
               </span>

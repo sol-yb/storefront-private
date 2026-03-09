@@ -74,7 +74,7 @@ export function CountrySwitcher() {
   if (loading) {
     return (
       <div className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400">
-        <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+        <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-lg animate-spin" />
       </div>
     );
   }
@@ -97,7 +97,7 @@ export function CountrySwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+        <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl border border-gray-200 py-2 z-50">
           <div className="px-3 py-2 border-b border-gray-100">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
               Select Country

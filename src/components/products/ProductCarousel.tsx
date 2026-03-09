@@ -18,7 +18,7 @@ interface ProductCarouselProps {
 }
 
 const NAV_BUTTON_BASE =
-  "absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center cursor-pointer rounded-full bg-white border border-gray-300 text-gray-600 shadow-md hover:bg-gray-100 hover:text-gray-900 transition-colors";
+  "absolute top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center cursor-pointer rounded-lg bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors";
 
 export function ProductCarousel({
   taxonId,
