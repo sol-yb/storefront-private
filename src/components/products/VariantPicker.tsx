@@ -2,6 +2,7 @@
 
 import type { OptionType, Variant } from "@spree/sdk";
 import { useMemo } from "react";
+import { isColorOption, resolveColor } from "@/lib/utils/color-map";
 
 interface VariantPickerProps {
   variants: Variant[];
@@ -16,7 +17,6 @@ export function VariantPicker({
   selectedVariant,
   onVariantChange,
 }: VariantPickerProps) {
-  // Build option values map by option type
   const optionValuesMap = useMemo(() => {
     const map: Record<string, Set<string>> = {};
 
@@ -35,7 +35,6 @@ export function VariantPicker({
     return map;
   }, [variants, optionTypes]);
 
-  // Get selected options from current variant
   const selectedOptions = useMemo(() => {
     const options: Record<string, string> = {};
     if (selectedVariant) {
@@ -46,7 +45,6 @@ export function VariantPicker({
     return options;
   }, [selectedVariant]);
 
-  // Precompute variant lookup structures to avoid O(n) iteration per option value
   const { variantOptionMaps, optionValueDetailsMap } = useMemo(() => {
     const maps = variants.map((variant) => {
       const optionsMap: Record<string, string> = {};
@@ -56,7 +54,6 @@ export function VariantPicker({
       return { variant, optionsMap };
     });
 
-    // Build option value details index: "typeId:name" -> option value object
     const detailsMap: Record<string, (typeof variants)[0]["option_values"][0]> =
       {};
     for (const variant of variants) {
@@ -71,7 +68,6 @@ export function VariantPicker({
     return { variantOptionMaps: maps, optionValueDetailsMap: detailsMap };
   }, [variants]);
 
-  // Find variant matching selected options
   const findVariant = (newOptions: Record<string, string>): Variant | null => {
     const optionCount = Object.keys(newOptions).length;
     return (
@@ -85,7 +81,6 @@ export function VariantPicker({
     );
   };
 
-  // Check if an option value is available given current selections
   const isOptionAvailable = (
     optionTypeId: string,
     optionValue: string,
@@ -98,7 +93,6 @@ export function VariantPicker({
     );
   };
 
-  // Check if a variant with these options is purchasable
   const isOptionPurchasable = (
     optionTypeId: string,
     optionValue: string,
@@ -119,7 +113,6 @@ export function VariantPicker({
     onVariantChange(newVariant);
   };
 
-  // Get option value details from precomputed map (O(1) lookup)
   const getOptionValueDetails = (
     optionTypeId: string,
     optionValueName: string,
@@ -136,7 +129,7 @@ export function VariantPicker({
       {optionTypes.map((optionType) => {
         const values = Array.from(optionValuesMap[optionType.id] || []);
         const selectedValue = selectedOptions[optionType.id];
-        const isColorOption = optionType.name.toLowerCase() === "color";
+        const isColor = isColorOption(optionType.name);
 
         return (
           <div key={optionType.id}>
@@ -152,8 +145,7 @@ export function VariantPicker({
               )}
             </div>
 
-            {isColorOption ? (
-              // Color swatches
+            {isColor ? (
               <div className="flex flex-wrap gap-2">
                 {values.map((value) => {
                   const optionValue = getOptionValueDetails(
@@ -180,9 +172,7 @@ export function VariantPicker({
                         ${!isPurchasable && isAvailable ? "opacity-50" : ""}
                       `}
                       style={{
-                        backgroundColor: value
-                          .toLowerCase()
-                          .replace(/\s+/g, ""),
+                        backgroundColor: resolveColor(value),
                       }}
                     >
                       {!isPurchasable && isAvailable && (
@@ -195,7 +185,6 @@ export function VariantPicker({
                 })}
               </div>
             ) : (
-              // Regular option buttons
               <div className="flex flex-wrap gap-2">
                 {values.map((value) => {
                   const optionValue = getOptionValueDetails(
