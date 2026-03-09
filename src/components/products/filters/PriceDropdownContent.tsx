@@ -25,7 +25,6 @@ export function PriceDropdownContent({
 
   return (
     <>
-      <DropdownMenuLabel>Price Range</DropdownMenuLabel>
       {priceBuckets.map((bucket) => {
         const isSelected = selectedBucket?.id === bucket.id;
         return (

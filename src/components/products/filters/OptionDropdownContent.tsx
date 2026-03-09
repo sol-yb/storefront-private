@@ -20,7 +20,6 @@ export function OptionDropdownContent({
 
   return (
     <>
-      <DropdownMenuLabel>{filter.presentation}</DropdownMenuLabel>
       {filter.options.map((option) => {
         const isSelected = selectedValues.includes(option.id);
         return (

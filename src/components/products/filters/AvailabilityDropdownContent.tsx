@@ -19,7 +19,6 @@ export function AvailabilityDropdownContent({
 }: AvailabilityDropdownContentProps) {
   return (
     <>
-      <DropdownMenuLabel>Availability</DropdownMenuLabel>
       {filter.options.map((option) => {
         const isSelected = selected === option.id;
         return (
