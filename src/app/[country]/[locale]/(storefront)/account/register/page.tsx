@@ -16,6 +16,8 @@ export default function RegisterPage() {
   const basePath = extractBasePath(pathname);
   const { register, isAuthenticated } = useAuth();
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -52,7 +54,13 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    const result = await register(email, password, passwordConfirmation);
+    const result = await register({
+      email,
+      password,
+      password_confirmation: passwordConfirmation,
+      ...(firstName && { first_name: firstName }),
+      ...(lastName && { last_name: lastName }),
+    });
     if (result.success) {
       router.push(`${basePath}/account`);
     } else {
@@ -75,6 +83,30 @@ export default function RegisterPage() {
               {error}
             </div>
           )}
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field>
+              <FieldLabel htmlFor="firstName">First name</FieldLabel>
+              <Input
+                type="text"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="John"
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="lastName">Last name</FieldLabel>
+              <Input
+                type="text"
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Doe"
+              />
+            </Field>
+          </div>
 
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
