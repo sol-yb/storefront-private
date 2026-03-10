@@ -4,6 +4,17 @@ import type { CreditCard as SpreeCreditCard } from "@spree/sdk";
 import { CreditCard, Lock } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { PaymentIcon } from "react-svg-credit-card-payment-icons";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { deleteCreditCard, getCreditCards } from "@/lib/data/credit-cards";
 import { getCardIconType, getCardLabel } from "@/lib/utils/credit-card";
@@ -18,7 +29,6 @@ function CreditCardItem({
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to remove this card?")) return;
     setDeleting(true);
     try {
       await onDelete();
@@ -54,14 +64,29 @@ function CreditCardItem({
               Default
             </span>
           )}
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={deleting}
-          >
-            {deleting ? "Removing..." : "Remove"}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" disabled={deleting}>
+                {deleting ? "Removing..." : "Remove"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Remove payment method?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will remove the {getCardLabel(card.cc_type)} ending in{" "}
+                  {card.last_digits} from your account. This action cannot be
+                  undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={handleDelete}>
+                  Remove
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>

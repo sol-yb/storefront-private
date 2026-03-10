@@ -7,6 +7,7 @@ import type {
   Order,
   Shipment,
 } from "@spree/sdk";
+import { CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useRef, useState } from "react";
@@ -15,6 +16,7 @@ import { CouponCode } from "@/components/checkout/CouponCode";
 import { DeliveryStep } from "@/components/checkout/DeliveryStep";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { PaymentStep } from "@/components/checkout/PaymentStep";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useCheckout } from "@/contexts/CheckoutContext";
 import {
   trackAddPaymentInfo,
@@ -596,9 +598,10 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
 
       {/* Error banner */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
-          {error}
-        </div>
+        <Alert variant="destructive" className="mb-6">
+          <CircleAlert />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {/* Main content */}

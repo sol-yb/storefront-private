@@ -1,7 +1,9 @@
 "use client";
 
 import type { Country, State } from "@spree/sdk";
+import { CircleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -51,7 +53,7 @@ export function AddressEditModal({
   const [states, setStates] = useState<State[]>([]);
   const [loadingStates, setLoadingStates] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   // Load states when country changes
   useEffect(() => {
@@ -92,7 +94,7 @@ export function AddressEditModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError(null);
     setSaving(true);
 
     try {
@@ -123,9 +125,10 @@ export function AddressEditModal({
             </DialogTitle>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-                {error}
-              </div>
+              <Alert variant="destructive">
+                <CircleAlert />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             )}
 
             <AddressFormFields

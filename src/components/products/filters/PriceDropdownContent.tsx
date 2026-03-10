@@ -1,5 +1,4 @@
 import {
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
@@ -25,30 +24,28 @@ export function PriceDropdownContent({
   );
 
   return (
-    <>
-      <DropdownMenuRadioGroup
-        value={selectedBucket?.id ?? ""}
-        onValueChange={(value) => {
-          if (!value) {
-            onPriceChange(undefined, undefined);
-          } else {
-            const bucket = priceBuckets.find((b) => b.id === value);
-            if (bucket) {
-              onPriceChange(bucket.min, bucket.max);
-            }
+    <DropdownMenuRadioGroup
+      value={selectedBucket?.id ?? ""}
+      onValueChange={(value) => {
+        if (!value) {
+          onPriceChange(undefined, undefined);
+        } else {
+          const bucket = priceBuckets.find((b) => b.id === value);
+          if (bucket) {
+            onPriceChange(bucket.min, bucket.max);
           }
-        }}
-      >
-        {priceBuckets.map((bucket) => (
-          <DropdownMenuRadioItem
-            key={bucket.id}
-            value={bucket.id}
-            onSelect={(e) => e.preventDefault()}
-          >
-            {bucket.label}
-          </DropdownMenuRadioItem>
-        ))}
-      </DropdownMenuRadioGroup>
-    </>
+        }
+      }}
+    >
+      {priceBuckets.map((bucket) => (
+        <DropdownMenuRadioItem
+          key={bucket.id}
+          value={bucket.id}
+          onSelect={(e) => e.preventDefault()}
+        >
+          {bucket.label}
+        </DropdownMenuRadioItem>
+      ))}
+    </DropdownMenuRadioGroup>
   );
 }

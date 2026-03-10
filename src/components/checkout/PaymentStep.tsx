@@ -7,9 +7,10 @@ import type {
   CreditCard as SpreeCreditCard,
   State,
 } from "@spree/sdk";
-import { CreditCard, Loader2 } from "lucide-react";
+import { CircleAlert, CreditCard, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { PaymentIcon } from "react-svg-credit-card-payment-icons";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -422,9 +423,10 @@ export function PaymentStep({
         )}
 
         {gatewayError && !loading && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 mb-4">
-            {gatewayError}
-          </div>
+          <Alert variant="destructive">
+            <CircleAlert />
+            <AlertDescription>{gatewayError}</AlertDescription>
+          </Alert>
         )}
 
         {clientSecret && !loading && isAddingNew && (

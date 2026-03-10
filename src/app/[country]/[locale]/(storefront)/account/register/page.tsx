@@ -1,9 +1,10 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { CircleAlert, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -24,8 +25,8 @@ export default function RegisterPage() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
-  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Redirect if already authenticated
   // useEffect is needed here to prevent rendering issues.
@@ -40,7 +41,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError(null);
 
     if (password !== passwordConfirmation) {
       setError("Passwords do not match");
@@ -79,9 +80,10 @@ export default function RegisterPage() {
       <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-              {error}
-            </div>
+            <Alert variant="destructive">
+              <CircleAlert />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
 
           <div className="grid grid-cols-2 gap-4">

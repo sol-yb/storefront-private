@@ -8,11 +8,12 @@ import type {
   Shipment,
   StoreCredit,
 } from "@spree/sdk";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { PaymentIcon } from "react-svg-credit-card-payment-icons";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ProductImage } from "@/components/ui/product-image";
 import { getOrder } from "@/lib/data/orders";
@@ -227,9 +228,12 @@ function ShipmentBlock({
         </div>
 
         {shipment.state === "canceled" && !shipment.shipped_at && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-            <strong>Shipment canceled</strong> — a refund has been issued.
-          </div>
+          <Alert variant="destructive" className="mt-3">
+            <CircleAlert />
+            <AlertDescription>
+              <strong>Shipment canceled</strong> — a refund has been issued.
+            </AlertDescription>
+          </Alert>
         )}
         {shipment.state !== "canceled" &&
           shipment.state !== "shipped" &&

@@ -1,8 +1,5 @@
 import type { OptionFilter } from "@spree/sdk";
-import {
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 import { isColorOption, resolveColor } from "@/lib/utils/color-map";
 
 interface OptionDropdownContentProps {

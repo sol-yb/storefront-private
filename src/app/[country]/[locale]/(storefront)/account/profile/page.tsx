@@ -1,6 +1,9 @@
 "use client";
 
+import { CircleAlert } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -27,21 +30,18 @@ function ProfileForm({
     email: user.email || "",
   });
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess(false);
+    setError(null);
     setSaving(true);
 
     const result = await updateCustomer(formData);
 
     if (result.success) {
-      setSuccess(true);
+      toast.success("Profile updated successfully!");
       await refreshUser();
-      setTimeout(() => setSuccess(false), 3000);
     } else {
       setError(result.error || "Failed to update profile");
     }
@@ -57,17 +57,11 @@ function ProfileForm({
         <form onSubmit={handleSubmit}>
           <div className="p-6 space-y-6">
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-                {error}
-              </div>
+              <Alert variant="destructive">
+                <CircleAlert />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             )}
-
-            {success && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
-                Profile updated successfully!
-              </div>
-            )}
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Field>
                 <FieldLabel htmlFor="first_name">First Name</FieldLabel>
