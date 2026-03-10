@@ -18,7 +18,9 @@ interface MediaGalleryProps {
 export function MediaGallery({ images, productName }: MediaGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [mainImageError, setMainImageError] = useState(false);
+  const [mainImageErrorUrl, setMainImageErrorUrl] = useState<string | null>(
+    null,
+  );
 
   if (images.length === 0) {
     return (
@@ -35,12 +37,13 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
 
   const selectImage = (index: number | ((prev: number) => number)) => {
     setSelectedIndex(index);
-    setMainImageError(false);
+    setMainImageErrorUrl(null);
   };
 
-  const selectedImage = images[selectedIndex];
+  const safeIndex = Math.max(0, Math.min(selectedIndex, images.length - 1));
+  const selectedImage = images[safeIndex];
   const mainImageUrl = selectedImage?.original_url || null;
-  const showMainImage = mainImageUrl && !mainImageError;
+  const showMainImage = mainImageUrl && mainImageErrorUrl !== mainImageUrl;
 
   return (
     <div className="flex flex-col gap-4">
@@ -53,7 +56,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
         disabled={!showMainImage}
       >
         <ProductImage
-          key={selectedIndex}
+          key={safeIndex}
           src={mainImageUrl}
           alt={selectedImage?.alt || productName}
           fill
@@ -64,7 +67,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
           placeholder="blur"
           blurDataURL={BLUR_PLACEHOLDER}
           iconClassName="w-24 h-24"
-          onError={() => setMainImageError(true)}
+          onError={() => mainImageUrl && setMainImageErrorUrl(mainImageUrl)}
         />
         {/* Zoom hint */}
         {showMainImage && (
@@ -86,7 +89,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                 key={image.id}
                 onClick={() => selectImage(index)}
                 className={`relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-colors bg-gray-100 ${
-                  index === selectedIndex
+                  index === safeIndex
                     ? "border-gray-600"
                     : "border-transparent hover:border-gray-300"
                 }`}
@@ -165,7 +168,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
           {/* Image counter */}
           {images.length > 1 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-3 py-1 rounded-lg text-sm">
-              {selectedIndex + 1} / {images.length}
+              {safeIndex + 1} / {images.length}
             </div>
           )}
         </div>

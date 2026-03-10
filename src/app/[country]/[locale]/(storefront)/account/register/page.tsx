@@ -55,19 +55,24 @@ export default function RegisterPage() {
 
     setSubmitting(true);
 
-    const result = await register({
-      email,
-      password,
-      password_confirmation: passwordConfirmation,
-      ...(firstName && { first_name: firstName }),
-      ...(lastName && { last_name: lastName }),
-    });
-    if (result.success) {
-      router.push(`${basePath}/account`);
-    } else {
-      setError(result.error || "Registration failed. Please try again.");
+    try {
+      const result = await register({
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+        ...(firstName && { first_name: firstName }),
+        ...(lastName && { last_name: lastName }),
+      });
+      if (result.success) {
+        router.push(`${basePath}/account`);
+      } else {
+        setError(result.error || "Registration failed. Please try again.");
+      }
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   return (

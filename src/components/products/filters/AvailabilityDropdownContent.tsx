@@ -28,6 +28,7 @@ export function AvailabilityDropdownContent({
         }
       }}
     >
+      <DropdownMenuRadioItem value="">Any availability</DropdownMenuRadioItem>
       {filter.options.map((option) => (
         <DropdownMenuRadioItem
           key={option.id}
