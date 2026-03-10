@@ -1,7 +1,8 @@
 import type { AvailabilityFilter } from "@spree/sdk";
 import {
-  DropdownMenuCheckboxItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { AVAILABILITY_LABELS } from "@/lib/utils/filters";
 import { type AvailabilityStatus, isAvailabilityStatus } from "@/types/filters";
@@ -20,19 +21,20 @@ export function AvailabilityDropdownContent({
   return (
     <>
       <DropdownMenuLabel>Availability</DropdownMenuLabel>
-      {filter.options.map((option) => {
-        const isSelected = selected === option.id;
-        return (
-          <DropdownMenuCheckboxItem
+      <DropdownMenuRadioGroup
+        value={selected ?? ""}
+        onValueChange={(value) => {
+          if (!value || !isAvailabilityStatus(value)) {
+            onChange(undefined);
+          } else {
+            onChange(value);
+          }
+        }}
+      >
+        {filter.options.map((option) => (
+          <DropdownMenuRadioItem
             key={option.id}
-            checked={isSelected}
-            onCheckedChange={() => {
-              if (isSelected) {
-                onChange(undefined);
-              } else if (isAvailabilityStatus(option.id)) {
-                onChange(option.id);
-              }
-            }}
+            value={option.id}
             onSelect={(e) => e.preventDefault()}
           >
             <span className="flex-1">
@@ -41,9 +43,9 @@ export function AvailabilityDropdownContent({
             <span className="text-xs text-muted-foreground">
               ({option.count})
             </span>
-          </DropdownMenuCheckboxItem>
-        );
-      })}
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
     </>
   );
 }

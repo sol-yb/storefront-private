@@ -1,6 +1,7 @@
 import {
-  DropdownMenuCheckboxItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import type { PriceBucket } from "@/lib/utils/price-buckets";
 import { findMatchingBucket } from "@/lib/utils/price-buckets";
@@ -26,25 +27,29 @@ export function PriceDropdownContent({
   return (
     <>
       <DropdownMenuLabel>Price Range</DropdownMenuLabel>
-      {priceBuckets.map((bucket) => {
-        const isSelected = selectedBucket?.id === bucket.id;
-        return (
-          <DropdownMenuCheckboxItem
+      <DropdownMenuRadioGroup
+        value={selectedBucket?.id ?? ""}
+        onValueChange={(value) => {
+          if (!value) {
+            onPriceChange(undefined, undefined);
+          } else {
+            const bucket = priceBuckets.find((b) => b.id === value);
+            if (bucket) {
+              onPriceChange(bucket.min, bucket.max);
+            }
+          }
+        }}
+      >
+        {priceBuckets.map((bucket) => (
+          <DropdownMenuRadioItem
             key={bucket.id}
-            checked={isSelected}
-            onCheckedChange={() => {
-              if (isSelected) {
-                onPriceChange(undefined, undefined);
-              } else {
-                onPriceChange(bucket.min, bucket.max);
-              }
-            }}
+            value={bucket.id}
             onSelect={(e) => e.preventDefault()}
           >
             {bucket.label}
-          </DropdownMenuCheckboxItem>
-        );
-      })}
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
     </>
   );
 }
