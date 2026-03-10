@@ -7,8 +7,9 @@ import { Navigation } from "swiper/modules";
 import { Swiper as SwiperComponent, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
-import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/products/ProductCard";
+import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { useCarouselProducts } from "@/hooks/useCarouselProducts";
 
 interface ProductCarouselProps {
@@ -48,11 +49,7 @@ export function ProductCarousel({
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="aspect-square bg-gray-200 rounded-xl mb-4" />
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-            <div className="h-4 bg-gray-200 rounded w-1/4" />
-          </div>
+          <ProductCardSkeleton key={i} />
         ))}
       </div>
     );
@@ -83,7 +80,7 @@ export function ProductCarousel({
         disabled={isBeginning}
         className={`${NAV_BUTTON_BASE} -left-5 ${isBeginning ? "opacity-0" : ""}`}
       >
-        <ChevronLeftIcon className="w-5 h-5" />
+        <ChevronLeft className="w-5 h-5" />
       </button>
       <button
         ref={nextRef}
@@ -92,7 +89,7 @@ export function ProductCarousel({
         disabled={isEnd}
         className={`${NAV_BUTTON_BASE} -right-5 ${isEnd ? "opacity-0" : ""}`}
       >
-        <ChevronRightIcon className="w-5 h-5" />
+        <ChevronRight className="w-5 h-5" />
       </button>
       <SwiperComponent
         modules={[Navigation]}

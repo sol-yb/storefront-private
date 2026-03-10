@@ -8,12 +8,14 @@ import type {
   Shipment,
   StoreCredit,
 } from "@spree/sdk";
-import Image from "next/image";
+import { ChevronLeft, CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { PaymentIcon } from "react-svg-credit-card-payment-icons";
-import { ChevronLeftIcon, ImagePlaceholderIcon } from "@/components/icons";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { ProductImage } from "@/components/ui/product-image";
 import { getOrder } from "@/lib/data/orders";
 import { getCardIconType, getCardLabel } from "@/lib/utils/credit-card";
 import { extractBasePath } from "@/lib/utils/path";
@@ -124,29 +126,20 @@ function LineItemCard({
         href={`${basePath}/products/${item.slug}`}
         className="relative w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0"
       >
-        {item.thumbnail_url ? (
-          <Image
-            src={item.thumbnail_url}
-            alt={item.name}
-            fill
-            className="object-cover"
-            sizes="96px"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <ImagePlaceholderIcon
-              className="w-8 h-8 text-gray-400"
-              strokeWidth={2}
-            />
-          </div>
-        )}
+        <ProductImage
+          src={item.thumbnail_url}
+          alt={item.name}
+          fill
+          className="object-cover"
+          sizes="96px"
+        />
       </Link>
 
       {/* Details */}
       <div className="flex-1 min-w-0">
         <Link
           href={`${basePath}/products/${item.slug}`}
-          className="text-sm font-medium text-gray-900 hover:text-primary-500 transition-colors line-clamp-2"
+          className="text-sm font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2"
         >
           {item.name}
         </Link>
@@ -157,7 +150,7 @@ function LineItemCard({
         <p className="mt-1 text-xs text-gray-500">Qty: {item.quantity}</p>
         <Link
           href={`${basePath}/products/${item.slug}`}
-          className="mt-2 inline-block text-sm text-primary-500 hover:text-primary-700 font-medium"
+          className="mt-2 inline-block text-sm text-primary hover:text-primary font-medium"
         >
           Order again
         </Link>
@@ -216,31 +209,31 @@ function ShipmentBlock({
             </div>
             <div className="mt-4 lg:mt-0">
               {shipment.state === "shipped" && shipment.tracking_url ? (
-                <a
-                  href={shipment.tracking_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors"
-                >
-                  Track Items
-                </a>
+                <Button size="sm" asChild>
+                  <a
+                    href={shipment.tracking_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Track Items
+                  </a>
+                </Button>
               ) : (
-                <button
-                  type="button"
-                  className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-400 rounded-xl text-sm font-medium cursor-not-allowed"
-                  disabled
-                >
+                <Button variant="outline" size="sm" disabled>
                   Track Items
-                </button>
+                </Button>
               )}
             </div>
           </div>
         </div>
 
         {shipment.state === "canceled" && !shipment.shipped_at && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-            <strong>Shipment canceled</strong> — a refund has been issued.
-          </div>
+          <Alert variant="destructive" className="mt-3">
+            <CircleAlert />
+            <AlertDescription>
+              <strong>Shipment canceled</strong> — a refund has been issued.
+            </AlertDescription>
+          </Alert>
         )}
         {shipment.state !== "canceled" &&
           shipment.state !== "shipped" &&
@@ -311,7 +304,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         </p>
         <Link
           href={`${basePath}/account/orders`}
-          className="text-primary-500 hover:text-primary-700 font-medium"
+          className="text-primary hover:text-primary font-medium"
         >
           Back to orders
         </Link>
@@ -328,7 +321,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         href={`${basePath}/account/orders`}
         className="text-sm text-gray-500 hover:text-gray-700 mb-4 inline-flex items-center gap-1"
       >
-        <ChevronLeftIcon className="w-4 h-4" />
+        <ChevronLeft className="w-4 h-4" />
         Back to orders
       </Link>
 

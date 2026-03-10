@@ -1,3 +1,7 @@
+import {
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "@/components/ui/dropdown-menu";
 import { getSortLabel } from "@/lib/utils/filters";
 
 interface SortDropdownContentProps {
@@ -12,29 +16,12 @@ export function SortDropdownContent({
   onSortChange,
 }: SortDropdownContentProps) {
   return (
-    <ul className="space-y-1">
-      {sortOptions.map((option) => {
-        const isActive = activeSortBy === option.id;
-        return (
-          <li key={option.id}>
-            <button
-              type="button"
-              aria-pressed={isActive}
-              onClick={() => onSortChange(option.id)}
-              className={`w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg transition-colors whitespace-nowrap ${
-                isActive
-                  ? "text-primary-700 font-medium"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-lg shrink-0 ${isActive ? "bg-primary-500" : "bg-transparent"}`}
-              />
-              {getSortLabel(option.id)}
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+    <DropdownMenuRadioGroup value={activeSortBy} onValueChange={onSortChange}>
+      {sortOptions.map((option) => (
+        <DropdownMenuRadioItem key={option.id} value={option.id}>
+          {getSortLabel(option.id)}
+        </DropdownMenuRadioItem>
+      ))}
+    </DropdownMenuRadioGroup>
   );
 }

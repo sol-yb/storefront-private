@@ -22,7 +22,7 @@ export function getActiveFilterCount(filters: ActiveFilters): number {
 }
 
 const SORT_LABELS_CANONICAL: Record<string, string> = {
-  manual: "Manual",
+  manual: "Relevance",
   best_selling: "Best Selling",
   price: "Price: Low to High",
   "-price": "Price: High to Low",

@@ -3,6 +3,9 @@
 import type { Address, AddressParams, Country, Order, State } from "@spree/sdk";
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   type AddressFormData,
   addressToFormData,
@@ -138,29 +141,23 @@ export function AddressStep({
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Contact Information
           </h2>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email address
-            </label>
-            <input
+          <Field>
+            <FieldLabel htmlFor="email">Email address</FieldLabel>
+            <Input
               type="email"
               id="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isAuthenticated}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
               placeholder="you@example.com"
             />
             {isAuthenticated && (
-              <p className="mt-1 text-xs text-gray-500">
+              <FieldDescription>
                 Using your account email address
-              </p>
+              </FieldDescription>
             )}
-          </div>
+          </Field>
         </div>
 
         {/* Shipping Address */}
@@ -198,13 +195,9 @@ export function AddressStep({
 
         {/* Submit */}
         <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={processing}
-            className="px-6 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <Button type="submit" disabled={processing}>
             {processing ? "Saving..." : "Continue to Delivery"}
-          </button>
+          </Button>
         </div>
       </form>
 

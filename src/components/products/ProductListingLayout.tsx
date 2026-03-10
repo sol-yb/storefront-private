@@ -1,9 +1,9 @@
 "use client";
 
 import type { Product, ProductFiltersResponse } from "@spree/sdk";
+import { Loader2, Search } from "lucide-react";
 import type React from "react";
 import type { RefObject } from "react";
-import { SearchIcon, SpinnerIcon } from "@/components/icons";
 import { FilterBar } from "@/components/products/filters";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { ProductGridSkeleton } from "@/components/products/ProductGridSkeleton";
@@ -56,7 +56,7 @@ export function ProductListingLayout({
         <ProductGridSkeleton />
       ) : products.length === 0 ? (
         <div className="text-center py-12">
-          <SearchIcon
+          <Search
             className="mx-auto h-12 w-12 text-gray-400"
             strokeWidth={1.5}
           />
@@ -80,7 +80,7 @@ export function ProductListingLayout({
           >
             {loadingMore && (
               <div className="flex items-center gap-2 text-gray-500">
-                <SpinnerIcon className="animate-spin h-5 w-5" />
+                <Loader2 className="animate-spin h-5 w-5" />
                 Loading more...
               </div>
             )}

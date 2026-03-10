@@ -1,11 +1,12 @@
 "use client";
 
 import type { Order } from "@spree/sdk";
-import Image from "next/image";
+import { CircleCheckBig } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
-import { CheckCircleSolidIcon, ImagePlaceholderIcon } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import { ProductImage } from "@/components/ui/product-image";
 import { useCheckout } from "@/contexts/CheckoutContext";
 import { trackPurchase } from "@/lib/analytics/gtm";
 import { getCheckoutOrder } from "@/lib/data/checkout";
@@ -108,12 +109,9 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           {error || "Order not found"}
         </h1>
-        <Link
-          href={`${basePath}/`}
-          className="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-700"
-        >
-          Continue Shopping
-        </Link>
+        <Button asChild>
+          <Link href={`${basePath}/`}>Continue Shopping</Link>
+        </Button>
       </div>
     );
   }
@@ -125,7 +123,7 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
     <div className="py-8 max-w-2xl mx-auto">
       {/* Success Header */}
       <div className="text-center mb-10">
-        <CheckCircleSolidIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <CircleCheckBig className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           Thanks for your order
           {customerName ? `, ${customerName.split(" ")[0]}` : ""}!
@@ -144,20 +142,14 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
         <ul className="divide-y divide-gray-200">
           {order.line_items?.map((item) => (
             <li key={item.id} className="px-6 py-4 flex gap-4">
-              <div className="w-14 h-14 bg-gray-100 rounded-xl flex-shrink-0 overflow-hidden">
-                {item.thumbnail_url ? (
-                  <Image
-                    src={item.thumbnail_url}
-                    alt={item.name}
-                    width={56}
-                    height={56}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <ImagePlaceholderIcon className="w-6 h-6" strokeWidth={2} />
-                  </div>
-                )}
+              <div className="relative w-14 h-14 bg-gray-100 rounded-xl flex-shrink-0 overflow-hidden">
+                <ProductImage
+                  src={item.thumbnail_url}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                  iconClassName="w-6 h-6"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-gray-900">
@@ -277,12 +269,9 @@ export default function OrderPlacedPage({ params }: OrderPlacedPageProps) {
 
       {/* Actions */}
       <div className="text-center">
-        <Link
-          href={`${basePath}/`}
-          className="inline-flex items-center px-6 py-3 bg-primary-500 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
-        >
-          Continue Shopping
-        </Link>
+        <Button size="lg" asChild>
+          <Link href={`${basePath}/`}>Continue Shopping</Link>
+        </Button>
       </div>
     </div>
   );
