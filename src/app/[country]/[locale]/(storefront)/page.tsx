@@ -1,12 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCarousel } from "@/components/products/ProductCarousel";
 import { Button } from "@/components/ui/button";
+import { generateHomeMetadata } from "@/lib/metadata/home";
+import { getStoreDescription, getStoreName } from "@/lib/seo";
 
 interface HomePageProps {
   params: Promise<{
     country: string;
     locale: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: HomePageProps): Promise<Metadata> {
+  const { country, locale } = await params;
+  return generateHomeMetadata({ country, locale });
 }
 
 export default async function HomePage({ params }: HomePageProps) {
@@ -20,11 +30,10 @@ export default async function HomePage({ params }: HomePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-              Welcome to Spree Store
+              Welcome to {getStoreName()}
             </h1>
             <p className="mt-4 text-xl text-gray-500 max-w-2xl mx-auto">
-              Discover amazing products with our modern e-commerce experience
-              powered by Spree Commerce.
+              {getStoreDescription()}
             </p>
             <div className="mt-8 flex justify-center gap-4">
               <Button size="lg" asChild>
