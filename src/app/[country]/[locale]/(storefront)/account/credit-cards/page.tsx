@@ -47,11 +47,11 @@ function CreditCardItem({
             width={48}
           />
           <div>
-            <p className="font-medium text-gray-900">
+            <p className="text-sm font-medium text-gray-900">
               {getCardLabel(card.cc_type)} ending in {card.last_digits}
             </p>
-            <p className="text-sm text-gray-500">
-              Expires {String(card.month).padStart(2, "0")}/{card.year}
+            <p className="text-xs text-gray-500">
+              Exp {String(card.month).padStart(2, "0")}/{card.year}
             </p>
             {card.name && (
               <p className="text-sm text-gray-500 mt-1">{card.name}</p>
@@ -60,7 +60,7 @@ function CreditCardItem({
         </div>
         <div className="flex items-center gap-3">
           {card.default && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-green-100 text-green-800">
+            <span className="text-[11px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
               Default
             </span>
           )}

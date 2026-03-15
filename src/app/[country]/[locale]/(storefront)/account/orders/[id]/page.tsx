@@ -92,22 +92,16 @@ function PaymentSourceInfo({ payment }: { payment: Payment }) {
 
 function AddressBlock({ address }: { address: Address }) {
   return (
-    <div>
-      <p className="font-medium text-gray-900">{address.full_name}</p>
-      {address.company && (
-        <p className="text-sm text-gray-500">{address.company}</p>
-      )}
-      <p className="text-sm text-gray-500 mt-1">{address.address1}</p>
-      {address.address2 && (
-        <p className="text-sm text-gray-500">{address.address2}</p>
-      )}
-      <p className="text-sm text-gray-500">
+    <div className="text-sm text-gray-600 space-y-0.5">
+      <p className="font-medium text-gray-800">{address.full_name}</p>
+      {address.company && <p>{address.company}</p>}
+      <p>{address.address1}</p>
+      {address.address2 && <p>{address.address2}</p>}
+      <p>
         {address.city}, {address.state_text} {address.zipcode}
       </p>
-      <p className="text-sm text-gray-500">{address.country_name}</p>
-      {address.phone && (
-        <p className="text-sm text-gray-500 mt-2">{address.phone}</p>
-      )}
+      <p>{address.country_name}</p>
+      {address.phone && <p className="mt-1">{address.phone}</p>}
     </div>
   );
 }
@@ -182,7 +176,7 @@ function ShipmentBlock({
         <div className="flex flex-col lg:flex-row lg:gap-6 gap-4">
           {shipAddress && (
             <div className="lg:w-1/2">
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 Delivery Address
               </h3>
               <AddressBlock address={shipAddress} />
@@ -190,7 +184,7 @@ function ShipmentBlock({
           )}
           <div className="lg:w-1/2 lg:flex justify-between">
             <div>
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 Shipping Method
               </h3>
               <p className="text-sm text-gray-900">
@@ -359,7 +353,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
       {/* Special instructions */}
       {order.special_instructions && (
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4">
-          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">
             Special Instructions
           </h3>
           <p className="text-sm text-gray-900">{order.special_instructions}</p>
@@ -371,7 +365,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
           {order.bill_address && (
             <div className="px-6 py-4">
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 Billing Address
               </h3>
               <AddressBlock address={order.bill_address} />
@@ -379,7 +373,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
           )}
           {order.payments && order.payments.length > 0 && (
             <div className="px-6 py-4">
-              <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 Payment Information
               </h3>
               {order.payments
@@ -401,16 +395,16 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal</span>
+            <span className="text-gray-500">Subtotal</span>
             <span className="text-gray-900">{order.display_item_total}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Shipping</span>
+            <span className="text-gray-500">Shipping</span>
             <span className="text-gray-900">{order.display_ship_total}</span>
           </div>
           {order.promo_total && Number.parseFloat(order.promo_total) !== 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Discount</span>
+              <span className="text-gray-500">Discount</span>
               <span className="text-green-600">
                 {order.display_promo_total}
               </span>
@@ -418,13 +412,15 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
           )}
           {Number.parseFloat(order.tax_total) > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Tax</span>
+              <span className="text-gray-500">Tax</span>
               <span className="text-gray-900">{order.display_tax_total}</span>
             </div>
           )}
-          <div className="flex justify-between text-base font-semibold pt-2 border-t border-gray-200">
-            <span className="text-gray-900">Total</span>
-            <span className="text-gray-900">{order.display_total}</span>
+          <div className="flex justify-between pt-2 border-t border-gray-200">
+            <span className="font-semibold text-gray-900">Total</span>
+            <span className="font-semibold text-gray-900">
+              {order.display_total}
+            </span>
           </div>
         </div>
       </div>
