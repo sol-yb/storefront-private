@@ -2,7 +2,6 @@
 
 import type { Cart } from "@spree/sdk";
 import { X } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,6 @@ interface CouponCodeProps {
 }
 
 export function CouponCode({ cart, onApply, onRemove }: CouponCodeProps) {
-  const t = useTranslations("coupon");
   const [code, setCode] = useState("");
   const [applying, setApplying] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
@@ -36,7 +34,7 @@ export function CouponCode({ cart, onApply, onRemove }: CouponCodeProps) {
     if (result.success) {
       setCode("");
     } else {
-      setError(result.error || t("invalidCode"));
+      setError(result.error || "Invalid coupon code");
     }
 
     setApplying(false);
@@ -48,7 +46,7 @@ export function CouponCode({ cart, onApply, onRemove }: CouponCodeProps) {
 
     const result = await onRemove(code);
     if (!result.success) {
-      setError(result.error || t("failedToRemove"));
+      setError(result.error || "Failed to remove coupon code");
     }
 
     setRemoving(null);
@@ -78,9 +76,7 @@ export function CouponCode({ cart, onApply, onRemove }: CouponCodeProps) {
                 <button
                   onClick={() => handleRemove(promotion.code)}
                   disabled={removing === promotion.code}
-                  aria-label={t("removeCoupon", {
-                    code: promotion.code || promotion.name,
-                  })}
+                  aria-label={`Remove code ${promotion.code}`}
                   className="text-gray-400 hover:text-gray-600 p-0.5"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -101,13 +97,13 @@ export function CouponCode({ cart, onApply, onRemove }: CouponCodeProps) {
               setCode(e.target.value);
               setError(null);
             }}
-            placeholder={t("placeholder")}
-            aria-label={t("placeholder")}
+            placeholder="Discount code or gift card"
+            aria-label="Discount code or gift card"
             aria-invalid={!!error}
             className="flex-1"
           />
           <Button type="submit" disabled={applying || !code.trim()}>
-            {applying ? t("applying") : t("apply")}
+            {applying ? "..." : "Apply"}
           </Button>
         </form>
       )}

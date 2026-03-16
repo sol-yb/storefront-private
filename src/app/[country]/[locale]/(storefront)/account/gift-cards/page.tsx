@@ -2,7 +2,6 @@
 
 import type { GiftCard } from "@spree/sdk";
 import { Check, ClipboardCopy, Gift, Info } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getGiftCards } from "@/lib/data/gift-cards";
@@ -23,10 +22,27 @@ function getStateColor(state: string, expired: boolean): string {
   }
 }
 
-function formatDate(dateString: string | null, locale: string): string {
-  if (!dateString) return "";
+function getStateLabel(state: string): string {
+  switch (state) {
+    case "active":
+      return "Active";
+    case "partially_redeemed":
+      return "Partially Used";
+    case "redeemed":
+      return "Fully Redeemed";
+    case "canceled":
+      return "Canceled";
+    case "expired":
+      return "Expired";
+    default:
+      return state;
+  }
+}
+
+function formatDate(dateString: string | null): string {
+  if (!dateString) return "No expiration";
   const date = new Date(dateString);
-  return date.toLocaleDateString(locale, {
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -34,7 +50,6 @@ function formatDate(dateString: string | null, locale: string): string {
 }
 
 function CopyButton({ code }: { code: string }) {
-  const t = useTranslations("giftCards");
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -60,17 +75,17 @@ function CopyButton({ code }: { code: string }) {
       variant="ghost"
       size="sm"
       onClick={handleCopy}
-      title={t("copyCodeToClipboard")}
+      title="Copy code to clipboard"
     >
       {copied ? (
         <>
           <Check className="w-4 h-4 text-green-600" />
-          <span className="text-green-600">{t("copied")}</span>
+          <span className="text-green-600">Copied!</span>
         </>
       ) : (
         <>
           <ClipboardCopy className="w-4 h-4" />
-          <span>{t("copy")}</span>
+          <span>Copy</span>
         </>
       )}
     </Button>
@@ -78,30 +93,10 @@ function CopyButton({ code }: { code: string }) {
 }
 
 function GiftCardItem({ card }: { card: GiftCard }) {
-  const t = useTranslations("giftCards");
-  const locale = useLocale();
   const usagePercentage =
     Number(card.amount) > 0
       ? Math.round((Number(card.amount_used) / Number(card.amount)) * 100)
       : 0;
-
-  function getStateLabel(state: string, expired?: boolean): string {
-    if (expired) return t("expired");
-    switch (state) {
-      case "active":
-        return t("active");
-      case "partially_redeemed":
-        return t("partiallyUsed");
-      case "redeemed":
-        return t("fullyRedeemed");
-      case "canceled":
-        return t("canceled");
-      case "expired":
-        return t("expired");
-      default:
-        return state;
-    }
-  }
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -115,20 +110,20 @@ function GiftCardItem({ card }: { card: GiftCard }) {
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium ${getStateColor(card.state, card.expired)}`}
             >
-              {getStateLabel(card.state, card.expired)}
+              {getStateLabel(card.state)}
             </span>
           </div>
           <p className="text-sm text-gray-500 mt-1">
             {card.expires_at
-              ? t("expiresOn", { date: formatDate(card.expires_at, locale) })
-              : t("noExpiration")}
+              ? `Expires ${formatDate(card.expires_at)}`
+              : "No expiration date"}
           </p>
         </div>
         <div className="text-right">
           <p className="text-2xl font-bold text-gray-900">
             {card.display_amount_remaining}
           </p>
-          <p className="text-sm text-gray-500">{t("remaining")}</p>
+          <p className="text-sm text-gray-500">remaining</p>
         </div>
       </div>
 
@@ -136,11 +131,9 @@ function GiftCardItem({ card }: { card: GiftCard }) {
       <div className="mb-4">
         <div className="flex justify-between text-sm mb-1">
           <span className="text-gray-600">
-            {t("usedAmount", { amount: card.display_amount_used })}
+            Used: {card.display_amount_used}
           </span>
-          <span className="text-gray-600">
-            {t("totalAmountWithValue", { amount: card.display_amount })}
-          </span>
+          <span className="text-gray-600">Total: {card.display_amount}</span>
         </div>
         <div className="w-full bg-gray-200 rounded-lg h-2">
           <div
@@ -150,23 +143,15 @@ function GiftCardItem({ card }: { card: GiftCard }) {
             style={{ width: `${Math.min(usagePercentage, 100)}%` }}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-1">
-          {t("percentUsed", { percent: usagePercentage })}
-        </p>
+        <p className="text-xs text-gray-500 mt-1">{usagePercentage}% used</p>
       </div>
 
       {/* Additional info */}
       <div className="pt-4 border-t border-gray-100">
         <div className="flex justify-between text-sm text-gray-500">
-          <span>
-            {t("addedOnDate", { date: formatDate(card.created_at, locale) })}
-          </span>
+          <span>Added on {formatDate(card.created_at)}</span>
           {card.redeemed_at && (
-            <span>
-              {t("fullyRedeemedOnDate", {
-                date: formatDate(card.redeemed_at, locale),
-              })}
-            </span>
+            <span>Fully redeemed on {formatDate(card.redeemed_at)}</span>
           )}
         </div>
       </div>
@@ -175,7 +160,6 @@ function GiftCardItem({ card }: { card: GiftCard }) {
 }
 
 export default function GiftCardsPage() {
-  const t = useTranslations("giftCards");
   const [cards, setCards] = useState<GiftCard[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -191,9 +175,7 @@ export default function GiftCardsPage() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          {t("giftCards")}
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Gift Cards</h1>
         <div className="animate-pulse space-y-4">
           {[1, 2].map((i) => (
             <div
@@ -216,17 +198,17 @@ export default function GiftCardsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
-        {t("giftCards")}
-      </h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Gift Cards</h1>
 
       {cards.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {t("noGiftCards")}
+            No gift cards
           </h3>
-          <p className="text-gray-500">{t("noGiftCardsDescription")}</p>
+          <p className="text-gray-500">
+            You don&apos;t have any gift cards associated with your account yet.
+          </p>
         </div>
       ) : (
         <>
@@ -234,7 +216,7 @@ export default function GiftCardsPage() {
           {activeCards.length > 0 && (
             <div className="mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                {t("activeGiftCards")} ({activeCards.length})
+                Active Gift Cards ({activeCards.length})
               </h2>
               <div className="space-y-4">
                 {activeCards.map((card) => (
@@ -248,7 +230,7 @@ export default function GiftCardsPage() {
           {inactiveCards.length > 0 && (
             <div>
               <h2 className="text-lg font-semibold text-gray-500 mb-4">
-                {t("expiredRedeemed")} ({inactiveCards.length})
+                Expired / Redeemed ({inactiveCards.length})
               </h2>
               <div className="space-y-4 opacity-75">
                 {inactiveCards.map((card) => (
@@ -263,7 +245,8 @@ export default function GiftCardsPage() {
       <div className="mt-6 p-4 bg-gray-50 rounded-xl">
         <p className="text-sm text-gray-600">
           <Info className="w-4 h-4 inline mr-1" />
-          {t("giftCardsHelpText")}
+          Gift cards can be used during checkout to pay for your orders. The
+          remaining balance will be saved for future purchases.
         </p>
       </div>
     </div>

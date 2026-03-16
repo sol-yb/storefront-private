@@ -2,7 +2,6 @@
 
 import type { Country, State } from "@spree/sdk";
 import { CircleAlert } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -50,8 +49,6 @@ export function AddressEditModal({
   onClose,
   title,
 }: AddressEditModalProps) {
-  const t = useTranslations("address");
-  const tc = useTranslations("common");
   const [formData, setFormData] = useState<AddressFormData>(
     address ? addressToFormData(address) : { ...emptyAddress },
   );
@@ -75,14 +72,14 @@ export function AddressEditModal({
       await onSave(formDataToAddress(formData), address?.id);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("failedToSave"));
+      setError(err instanceof Error ? err.message : "Failed to save address");
     } finally {
       setSaving(false);
     }
   };
 
   const modalTitle =
-    title ?? (address?.id ? t("editAddress") : t("addNewAddress"));
+    title ?? (address?.id ? "Edit Address" : "Add New Address");
 
   return (
     <Dialog
@@ -117,10 +114,10 @@ export function AddressEditModal({
 
           <div className="border-t border-gray-200 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-3">
             <Button type="submit" disabled={saving}>
-              {saving ? tc("saving") : t("saveAddress")}
+              {saving ? "Saving..." : "Save Address"}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>
-              {tc("cancel")}
+              Cancel
             </Button>
           </div>
         </form>

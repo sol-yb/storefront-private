@@ -3,7 +3,6 @@
 import { CircleAlert, CircleCheck, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -21,8 +20,6 @@ import { resetPassword } from "@/lib/data/customer";
 import { extractBasePath } from "@/lib/utils/path";
 
 export default function ResetPasswordPage() {
-  const t = useTranslations("resetPassword");
-  const ta = useTranslations("account");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -44,8 +41,10 @@ export default function ResetPasswordPage() {
       <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle>{t("invalidLink")}</CardTitle>
-            <CardDescription>{t("invalidLinkDescription")}</CardDescription>
+            <CardTitle>Invalid link</CardTitle>
+            <CardDescription>
+              This password reset link is invalid or has expired.
+            </CardDescription>
           </CardHeader>
 
           <CardFooter className="justify-center">
@@ -53,7 +52,7 @@ export default function ResetPasswordPage() {
               href={`${basePath}/account/forgot-password`}
               className="text-sm text-primary hover:text-primary/70 font-medium"
             >
-              {t("requestNewLink")}
+              Request a new reset link
             </Link>
           </CardFooter>
         </Card>
@@ -66,12 +65,12 @@ export default function ResetPasswordPage() {
     setError(null);
 
     if (password !== passwordConfirmation) {
-      setError(t("passwordsDontMatch"));
+      setError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      setError(t("passwordTooShort"));
+      setError("Password must be at least 6 characters");
       return;
     }
 
@@ -82,10 +81,13 @@ export default function ResetPasswordPage() {
       if (result.success) {
         setSuccess(true);
       } else {
-        setError(result.error || t("linkExpired"));
+        setError(
+          result.error ||
+            "This reset link has expired. Please request a new one.",
+        );
       }
     } catch {
-      setError(t("genericError"));
+      setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -99,8 +101,11 @@ export default function ResetPasswordPage() {
             <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
               <CircleCheck className="w-6 h-6 text-green-600" />
             </div>
-            <CardTitle>{t("success")}</CardTitle>
-            <CardDescription>{t("successDescription")}</CardDescription>
+            <CardTitle>Password reset successful</CardTitle>
+            <CardDescription>
+              Your password has been updated. You can now sign in with your new
+              password.
+            </CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -109,7 +114,7 @@ export default function ResetPasswordPage() {
               className="w-full"
               onClick={() => router.push(`${basePath}/account`)}
             >
-              {t("signIn")}
+              Sign in
             </Button>
           </CardContent>
         </Card>
@@ -121,8 +126,8 @@ export default function ResetPasswordPage() {
     <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle>{t("title")}</CardTitle>
-          <CardDescription>{t("description")}</CardDescription>
+          <CardTitle>Set a new password</CardTitle>
+          <CardDescription>Enter your new password below.</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -135,7 +140,7 @@ export default function ResetPasswordPage() {
             )}
 
             <Field>
-              <FieldLabel htmlFor="password">{t("newPassword")}</FieldLabel>
+              <FieldLabel htmlFor="password">New password</FieldLabel>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
@@ -155,7 +160,7 @@ export default function ResetPasswordPage() {
                     size="icon-sm"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={
-                      showPassword ? ta("hidePassword") : ta("showPassword")
+                      showPassword ? "Hide password" : "Show password"
                     }
                   >
                     {showPassword ? (
@@ -170,7 +175,7 @@ export default function ResetPasswordPage() {
 
             <Field>
               <FieldLabel htmlFor="passwordConfirmation">
-                {t("confirmPassword")}
+                Confirm new password
               </FieldLabel>
               <div className="relative">
                 <Input
@@ -194,8 +199,8 @@ export default function ResetPasswordPage() {
                     }
                     aria-label={
                       showPasswordConfirmation
-                        ? ta("hidePassword")
-                        : ta("showPassword")
+                        ? "Hide password"
+                        : "Show password"
                     }
                   >
                     {showPasswordConfirmation ? (
@@ -215,7 +220,7 @@ export default function ResetPasswordPage() {
                 size="lg"
                 className="w-full"
               >
-                {submitting ? t("resetting") : t("resetPassword")}
+                {submitting ? "Resetting..." : "Reset password"}
               </Button>
             </div>
           </form>
@@ -226,7 +231,7 @@ export default function ResetPasswordPage() {
             href={`${basePath}/account`}
             className="text-sm text-primary hover:text-primary/70 font-medium"
           >
-            {t("backToSignIn")}
+            Back to sign in
           </Link>
         </CardFooter>
       </Card>

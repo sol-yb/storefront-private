@@ -4,7 +4,6 @@ import type { Address, AddressParams, Cart, Country } from "@spree/sdk";
 import { CircleAlert, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { AddressSection } from "@/components/checkout/AddressSection";
 import { CouponCode } from "@/components/checkout/CouponCode";
@@ -80,8 +79,6 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
   const searchParams = useSearchParams();
   const basePath = extractBasePath(pathname);
   const { setSummaryContent } = useCheckout();
-  const t = useTranslations("checkout");
-  const tc = useTranslations("common");
 
   // Pick up payment errors from the confirm-payment redirect
   const paymentError = searchParams.get("payment_error");
@@ -106,33 +103,27 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
   const paymentRef = useRef<PaymentSectionHandle>(null);
 
   // Handle coupon code application
-  const handleApplyCoupon = useCallback(
-    async (code: string) => {
-      const currentOrder = cartRef.current;
-      if (!currentOrder) return { success: false, error: t("noOrder") };
+  const handleApplyCoupon = useCallback(async (code: string) => {
+    const currentOrder = cartRef.current;
+    if (!currentOrder) return { success: false, error: "No cart" };
 
-      const result = await applyCouponCode(currentOrder.id, code);
-      if (result.success && result.cart) {
-        setCart(result.cart);
-      }
-      return result;
-    },
-    [t],
-  );
+    const result = await applyCouponCode(currentOrder.id, code);
+    if (result.success && result.cart) {
+      setCart(result.cart);
+    }
+    return result;
+  }, []);
 
-  const handleRemoveCoupon = useCallback(
-    async (couponCode: string) => {
-      const currentOrder = cartRef.current;
-      if (!currentOrder) return { success: false, error: t("noOrder") };
+  const handleRemoveCoupon = useCallback(async (couponCode: string) => {
+    const currentOrder = cartRef.current;
+    if (!currentOrder) return { success: false, error: "No cart" };
 
-      const result = await removeCouponCode(currentOrder.id, couponCode);
-      if (result.success && result.cart) {
-        setCart(result.cart);
-      }
-      return result;
-    },
-    [t],
-  );
+    const result = await removeCouponCode(currentOrder.id, couponCode);
+    if (result.success && result.cart) {
+      setCart(result.cart);
+    }
+    return result;
+  }, []);
 
   // Track cart key for sidebar updates
   const cartKey = cart ? `${cart.id}-${cart.updated_at}` : null;
@@ -180,7 +171,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         : { data: [] as Country[] };
 
       if (!cartData) {
-        setError(t("orderNotFound"));
+        setError("Order not found or you don't have access to it.");
         setLoading(false);
         return;
       }
@@ -206,12 +197,12 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
 
       return cartData;
     } catch {
-      setError(t("failedToLoadCheckout"));
+      setError("Failed to load checkout. Please try again.");
       return null;
     } finally {
       setLoading(false);
     }
-  }, [cartId, urlCountry, basePath, router, paymentError, t]);
+  }, [cartId, urlCountry, basePath, router, paymentError]);
 
   useEffect(() => {
     loadOrder();
@@ -260,7 +251,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         });
 
         if (!updateResult.success) {
-          setError(updateResult.error || t("failedToSaveAddress"));
+          setError(updateResult.error || "Failed to save address");
           return;
         }
 
@@ -268,12 +259,12 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
           setCart(updateResult.cart);
         }
       } catch {
-        setError(t("generalError"));
+        setError("An error occurred. Please try again.");
       } finally {
         setSaving(false);
       }
     },
-    [t],
+    [],
   );
 
   // Handle shipping rate selection
@@ -295,7 +286,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
           rateId,
         );
         if (!result.success) {
-          setError(result.error || t("failedToSelectRate"));
+          setError(result.error || "Failed to select shipping rate");
         } else if (result.cart) {
           setCart(result.cart);
 
@@ -306,7 +297,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
           trackingRateName = selectedRate?.name;
         }
       } catch {
-        setError(t("generalError"));
+        setError("An error occurred. Please try again.");
       } finally {
         setProcessing(false);
       }
@@ -319,7 +310,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         }
       }
     },
-    [t],
+    [],
   );
 
   // Handle billing address update (called by PaymentSection before gateway confirmation)
@@ -336,17 +327,17 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         });
 
         if (!updateResult.success) {
-          setError(updateResult.error || t("failedToSaveBilling"));
+          setError(updateResult.error || "Failed to save billing address");
           return false;
         }
 
         return true;
       } catch {
-        setError(t("failedToSaveBillingRetry"));
+        setError("Failed to save billing address. Please try again.");
         return false;
       }
     },
-    [t],
+    [],
   );
 
   // Handle payment completion (called by PaymentSection after Stripe confirms)
@@ -364,7 +355,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         );
 
         if (!sessionResult.success) {
-          setError(sessionResult.error || t("failedToCompletePaymentSession"));
+          setError(sessionResult.error || "Failed to complete payment session");
           setProcessing(false);
           return;
         }
@@ -379,7 +370,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         // session completion, completeCheckoutOrder handles 403/422 gracefully.
         const completeResult = await completeCheckoutOrder(currentOrder.id);
         if (!completeResult.success) {
-          setError(completeResult.error || t("failedToCompleteOrder"));
+          setError(completeResult.error || "Failed to complete order");
           setProcessing(false);
           return;
         }
@@ -394,11 +385,11 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
 
         router.push(`${basePath}/order-placed/${currentOrder.id}`);
       } catch {
-        setError(t("generalError"));
+        setError("An error occurred. Please try again.");
         setProcessing(false);
       }
     },
-    [basePath, router, t],
+    [basePath, router],
   );
 
   // Fetch states for a country
@@ -417,16 +408,16 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
       const result = await updateAddress(id, data);
 
       if (!result.success) {
-        throw new Error(result.error || t("failedToSaveAddress"));
+        throw new Error(result.error || "Failed to update address");
       }
 
       if (!result.address) {
-        throw new Error(t("generalError"));
+        throw new Error("Update succeeded but address payload is missing");
       }
 
       return result.address;
     },
-    [t],
+    [],
   );
 
   // Validate and pay — single "Pay now" action
@@ -439,7 +430,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
     // Refresh cart to get latest requirements
     const freshOrder = await getCheckoutOrder(cart.id);
     if (!freshOrder) {
-      setError(t("failedToLoadCheckout"));
+      setError("Failed to load cart. Please try again.");
       return;
     }
     setCart(freshOrder);
@@ -481,7 +472,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
 
     // All requirements met — submit payment
     if (!paymentRef.current) {
-      setError(t("failedToInitPayment"));
+      setError("Payment is not ready. Please wait and try again.");
       return;
     }
 
@@ -510,14 +501,14 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          {t("checkoutError")}
+          Checkout Error
         </h1>
         <p className="text-gray-600 mb-6">{error}</p>
         <Link
           href={`${basePath}/cart`}
           className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-700"
         >
-          {t("returnToCart")}
+          Return to Cart
         </Link>
       </div>
     );
@@ -530,14 +521,16 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          {t("emptyCart")}
+          Your Cart is Empty
         </h1>
-        <p className="text-gray-600 mb-6">{t("emptyCartDescription")}</p>
+        <p className="text-gray-600 mb-6">
+          Add some items to your cart before checking out.
+        </p>
         <Link
           href={`${basePath}/products`}
           className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-700"
         >
-          {tc("continueShopping")}
+          Continue Shopping
         </Link>
       </div>
     );
@@ -611,10 +604,10 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
         {processing ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            {tc("processing")}
+            Processing...
           </>
         ) : (
-          t("payNow")
+          "Pay now"
         )}
       </button>
     </div>

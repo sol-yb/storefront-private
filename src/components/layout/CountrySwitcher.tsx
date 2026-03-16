@@ -2,7 +2,6 @@
 
 import { Check, ChevronDown } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -31,8 +30,6 @@ function countryToFlag(countryCode: string): string {
 
 export function CountrySwitcher() {
   const { country, currency, countries, setCountry, loading } = useStore();
-  const tc = useTranslations("common");
-  const currentLocale = useLocale();
   const { cart, refreshCart } = useCart();
   const router = useRouter();
   const pathname = usePathname();
@@ -59,13 +56,7 @@ export function CountrySwitcher() {
     setStoreCookies(entry.iso.toLowerCase(), newLocale);
     setCountry(entry.iso.toLowerCase());
 
-    // Hard navigation when locale changes so RootLayout re-renders
-    // with new messages from NextIntlClientProvider
-    if (newLocale !== currentLocale) {
-      window.location.href = newPath;
-    } else {
-      router.push(newPath);
-    }
+    router.push(newPath);
   };
 
   if (loading) {
@@ -89,7 +80,7 @@ export function CountrySwitcher() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel>{tc("selectCountry")}</DropdownMenuLabel>
+        <DropdownMenuLabel>Select Country</DropdownMenuLabel>
         {countries.map((c) => {
           const isSelected = c.iso.toLowerCase() === country.toLowerCase();
           return (

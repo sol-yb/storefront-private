@@ -2,7 +2,6 @@
 
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { use, useEffect, useRef } from "react";
 import { confirmPaymentAndCompleteCart } from "@/lib/data/payment";
 import { extractBasePath } from "@/lib/utils/path";
@@ -28,7 +27,6 @@ export default function ConfirmPaymentPage({
   params,
 }: ConfirmPaymentPageProps) {
   const { id: cartId } = use(params);
-  const t = useTranslations("checkout");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -59,7 +57,7 @@ export default function ConfirmPaymentPage({
         router.replace(`${basePath}/order-placed/${cartId}`);
       } else {
         const errorMessage = encodeURIComponent(
-          result.error || t("paymentError"),
+          result.error || "Payment could not be confirmed. Please try again.",
         );
         router.replace(
           `${basePath}/checkout/${cartId}?payment_error=${errorMessage}`,
@@ -68,12 +66,12 @@ export default function ConfirmPaymentPage({
     }
 
     confirmAndRedirect();
-  }, [cartId, searchParams, basePath, router, t]);
+  }, [cartId, searchParams, basePath, router]);
 
   return (
     <div className="flex flex-col items-center justify-center py-20 gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-      <p className="text-sm text-gray-500">{t("confirmingPayment")}</p>
+      <p className="text-sm text-gray-500">Confirming your payment...</p>
     </div>
   );
 }

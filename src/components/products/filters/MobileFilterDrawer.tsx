@@ -6,15 +6,11 @@ import type {
   ProductFiltersResponse,
 } from "@spree/sdk";
 import { Check, X } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { isColorOption, resolveColor } from "@/lib/utils/color-map";
-import {
-  getActiveFilterCount,
-  getAvailabilityLabel,
-} from "@/lib/utils/filters";
+import { AVAILABILITY_LABELS, getActiveFilterCount } from "@/lib/utils/filters";
 import type { PriceBucket } from "@/lib/utils/price-buckets";
 import { findMatchingBucket } from "@/lib/utils/price-buckets";
 import {
@@ -40,7 +36,6 @@ export function MobileFilterDrawer({
   priceBuckets,
   onApply,
 }: MobileFilterDrawerProps) {
-  const t = useTranslations("products");
   const [stagedFilters, setStagedFilters] =
     useState<ActiveFilters>(activeFilters);
 
@@ -98,18 +93,18 @@ export function MobileFilterDrawer({
         showCloseButton={false}
         aria-describedby={undefined}
       >
-        <SheetTitle className="sr-only">{t("filters")}</SheetTitle>
+        <SheetTitle className="sr-only">Filters</SheetTitle>
 
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label={t("closeFilters")}
+            aria-label="Close filters"
           >
             <X className="w-6 h-6" />
           </Button>
-          <h2 className="text-lg font-semibold uppercase">{t("filters")}</h2>
+          <h2 className="text-lg font-semibold uppercase">Filters</h2>
           <div className="w-10" />
         </div>
 
@@ -152,11 +147,11 @@ export function MobileFilterDrawer({
         <div className="border-t border-gray-200 p-4 space-y-2">
           {stagedCount > 0 && (
             <Button variant="ghost" className="w-full" onClick={handleClearAll}>
-              {t("clearAllFiltersCount", { count: stagedCount })}
+              Clear all filters ({stagedCount})
             </Button>
           )}
           <Button className="w-full" onClick={handleApply}>
-            {t("showResults")}
+            Show results
           </Button>
         </div>
       </SheetContent>
@@ -252,8 +247,6 @@ function MobilePriceSection({
   activeFilters: ActiveFilters;
   onPriceChange: (min?: number, max?: number) => void;
 }) {
-  const t = useTranslations("products");
-
   if (priceBuckets.length === 0) return null;
 
   const selectedBucket = findMatchingBucket(
@@ -265,7 +258,7 @@ function MobilePriceSection({
   return (
     <div>
       <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-        {t("price")}
+        Price
       </h3>
       <div className="space-y-1">
         {priceBuckets.map((bucket) => {
@@ -309,12 +302,10 @@ function MobileAvailabilitySection({
   selected?: AvailabilityStatus;
   onChange: (value?: AvailabilityStatus) => void;
 }) {
-  const t = useTranslations("products");
-
   return (
     <div>
       <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-        {t("availability")}
+        Availability
       </h3>
       <div className="space-y-1">
         {filter.options.map((option) => {
@@ -338,7 +329,7 @@ function MobileAvailabilitySection({
               }`}
             >
               <span className="flex-1 text-left">
-                {getAvailabilityLabel(option.id, t)}
+                {AVAILABILITY_LABELS[option.id] || option.id}
               </span>
               <span className="text-xs text-gray-400">({option.count})</span>
               {isSelected && (

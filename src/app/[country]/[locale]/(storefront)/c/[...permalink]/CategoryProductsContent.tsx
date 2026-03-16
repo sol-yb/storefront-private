@@ -1,7 +1,6 @@
 "use client";
 
 import type { ProductListParams } from "@spree/sdk";
-import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { ProductListingLayout } from "@/components/products/ProductListingLayout";
 import { useStore } from "@/contexts/StoreContext";
@@ -22,7 +21,6 @@ export function CategoryProductsContent({
   categoryName,
   basePath,
 }: CategoryProductsContentProps) {
-  const t = useTranslations("products");
   const { currency } = useStore();
 
   const fetchFn = useCallback(
@@ -69,7 +67,7 @@ export function CategoryProductsContent({
       onFilterChange={listing.handleFilterChange}
       listId={listId}
       listName={listName}
-      emptyMessage={t("noProductsMatchingFilters")}
+      emptyMessage="No products found matching your filters."
     />
   );
 }

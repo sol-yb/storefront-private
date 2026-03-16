@@ -3,7 +3,6 @@
 import { CircleAlert, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -24,8 +23,6 @@ export default function RegisterPage() {
   const router = useRouter();
   const pathname = usePathname();
   const basePath = extractBasePath(pathname);
-  const t = useTranslations("register");
-  const ta = useTranslations("account");
   const { register, isAuthenticated, loading: authLoading } = useAuth();
 
   const [firstName, setFirstName] = useState("");
@@ -55,12 +52,12 @@ export default function RegisterPage() {
     setError(null);
 
     if (password !== passwordConfirmation) {
-      setError(t("passwordsDontMatch"));
+      setError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      setError(t("passwordTooShort"));
+      setError("Password must be at least 6 characters");
       return;
     }
 
@@ -77,10 +74,10 @@ export default function RegisterPage() {
       if (result.success) {
         router.push(`${basePath}/account`);
       } else {
-        setError(result.error || t("registrationFailed"));
+        setError(result.error || "Registration failed. Please try again.");
       }
     } catch {
-      setError(t("unexpectedError"));
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -90,8 +87,8 @@ export default function RegisterPage() {
     <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle>{t("createAccount")}</CardTitle>
-          <CardDescription>{t("signUpDescription")}</CardDescription>
+          <CardTitle>Create Account</CardTitle>
+          <CardDescription>Sign up to start shopping with us.</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -105,7 +102,7 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="firstName">{t("firstName")}</FieldLabel>
+                <FieldLabel htmlFor="firstName">First name</FieldLabel>
                 <Input
                   type="text"
                   id="firstName"
@@ -117,7 +114,7 @@ export default function RegisterPage() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="lastName">{t("lastName")}</FieldLabel>
+                <FieldLabel htmlFor="lastName">Last name</FieldLabel>
                 <Input
                   type="text"
                   id="lastName"
@@ -130,7 +127,7 @@ export default function RegisterPage() {
             </div>
 
             <Field>
-              <FieldLabel htmlFor="email">{ta("email")}</FieldLabel>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
                 type="email"
                 id="email"
@@ -142,7 +139,7 @@ export default function RegisterPage() {
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="password">{ta("password")}</FieldLabel>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
@@ -161,7 +158,7 @@ export default function RegisterPage() {
                     size="icon-sm"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={
-                      showPassword ? ta("hidePassword") : ta("showPassword")
+                      showPassword ? "Hide password" : "Show password"
                     }
                   >
                     {showPassword ? (
@@ -176,7 +173,7 @@ export default function RegisterPage() {
 
             <Field>
               <FieldLabel htmlFor="passwordConfirmation">
-                {t("confirmPassword")}
+                Confirm Password
               </FieldLabel>
               <div className="relative">
                 <Input
@@ -199,8 +196,8 @@ export default function RegisterPage() {
                     }
                     aria-label={
                       showPasswordConfirmation
-                        ? ta("hidePassword")
-                        : ta("showPassword")
+                        ? "Hide password"
+                        : "Show password"
                     }
                   >
                     {showPasswordConfirmation ? (
@@ -220,7 +217,7 @@ export default function RegisterPage() {
                 size="lg"
                 className="w-full"
               >
-                {submitting ? t("creatingAccount") : t("createAccount")}
+                {submitting ? "Creating account..." : "Create Account"}
               </Button>
             </div>
           </form>
@@ -228,12 +225,12 @@ export default function RegisterPage() {
 
         <CardFooter className="justify-center">
           <p className="text-sm text-muted-foreground">
-            {t("alreadyHaveAccount")}{" "}
+            Already have an account?{" "}
             <Link
               href={`${basePath}/account`}
               className="text-primary hover:text-primary/70 font-medium"
             >
-              {t("signIn")}
+              Sign in
             </Link>
           </p>
         </CardFooter>

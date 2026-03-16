@@ -3,10 +3,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ProductCard } from "@/components/products/ProductCard";
 
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-}));
-
 vi.mock("@/contexts/StoreContext", () => ({
   useStore: () => ({ currency: "USD", locale: "en", loading: false }),
 }));
@@ -102,7 +98,7 @@ describe("ProductCard", () => {
   it("shows Sale badge when on sale", () => {
     render(<ProductCard product={saleProduct} basePath="/us/en" />);
 
-    expect(screen.getByText("sale")).toBeInTheDocument();
+    expect(screen.getByText("Sale")).toBeInTheDocument();
   });
 
   it("shows strikethrough price when on sale", () => {
@@ -117,13 +113,13 @@ describe("ProductCard", () => {
   it("does not show Sale badge for regular price products", () => {
     render(<ProductCard product={baseProduct} basePath="/us/en" />);
 
-    expect(screen.queryByText("sale")).not.toBeInTheDocument();
+    expect(screen.queryByText("Sale")).not.toBeInTheDocument();
   });
 
   it("shows Out of Stock for non-purchasable products", () => {
     render(<ProductCard product={outOfStockProduct} basePath="/us/en" />);
 
-    expect(screen.getByText("outOfStock")).toBeInTheDocument();
+    expect(screen.getByText("Out of Stock")).toBeInTheDocument();
   });
 
   it("renders image when thumbnail_url is provided", () => {

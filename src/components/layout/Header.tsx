@@ -5,7 +5,6 @@ import { ShoppingBag, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { SearchBar } from "@/components/search/SearchBar";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
@@ -22,7 +21,6 @@ export function Header({ rootCategories }: HeaderProps) {
   const { storeName } = useStore();
   const pathname = usePathname();
   const basePath = extractBasePath(pathname);
-  const t = useTranslations("header");
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -74,7 +72,7 @@ export function Header({ rootCategories }: HeaderProps) {
                 variant="ghost"
                 size="icon-lg"
                 onClick={openCart}
-                aria-label={t("openCart")}
+                aria-label="Open cart"
                 className="relative"
               >
                 <ShoppingBag className="size-5" />
@@ -87,7 +85,7 @@ export function Header({ rootCategories }: HeaderProps) {
 
               {/* Account */}
               <Button variant="ghost" size="icon-lg" asChild>
-                <Link href={`${basePath}/account`} aria-label={t("account")}>
+                <Link href={`${basePath}/account`} aria-label="Account">
                   <User className="size-5" />
                 </Link>
               </Button>

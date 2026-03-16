@@ -1,13 +1,10 @@
 import { GoogleTagManager } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/contexts/CartContext";
-import { getStoreDescription, getStoreName } from "@/lib/seo";
 
 const gtmId = process.env.GTM_ID;
 
@@ -16,37 +13,34 @@ const geist = Geist({
   subsets: ["latin"],
 });
 
-const rootStoreName = getStoreName();
+const rootStoreName = process.env.NEXT_PUBLIC_STORE_NAME || "Spree Store";
 
 export const metadata: Metadata = {
   title: {
     template: `%s | ${rootStoreName}`,
     default: rootStoreName,
   },
-  description: getStoreDescription(),
+  description:
+    process.env.NEXT_PUBLIC_STORE_DESCRIPTION ||
+    "A modern e-commerce storefront powered by Spree Commerce and Next.js.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
-  const messages = await getMessages();
-
   return (
-    <html lang={locale}>
+    <html lang="en">
       {gtmId && <GoogleTagManager gtmId={gtmId} />}
       <body
         className={`${geist.variable} antialiased min-h-screen flex flex-col`}
       >
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <CartProvider>
-            {children}
-            <CartDrawer />
-            <Toaster />
-          </CartProvider>
-        </NextIntlClientProvider>
+        <CartProvider>
+          {children}
+          <CartDrawer />
+          <Toaster />
+        </CartProvider>
       </body>
     </html>
   );

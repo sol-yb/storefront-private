@@ -3,7 +3,6 @@
 import type { Media } from "@spree/sdk";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ProductImage } from "@/components/ui/product-image";
 
@@ -17,7 +16,6 @@ interface MediaGalleryProps {
 }
 
 export function MediaGallery({ images, productName }: MediaGalleryProps) {
-  const t = useTranslations("products");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [mainImageErrorUrl, setMainImageErrorUrl] = useState<string | null>(
@@ -75,7 +73,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
         {showMainImage && (
           <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm text-gray-600 flex items-center gap-1.5">
             <ZoomIn className="w-4 h-4" />
-            {t("clickToZoom")}
+            Click to zoom
           </div>
         )}
       </button>
@@ -119,7 +117,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
             type="button"
             className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
             onClick={() => setIsZoomed(false)}
-            aria-label={t("lightboxClose")}
+            aria-label="Close lightbox"
           >
             <X className="w-8 h-8" />
           </button>
@@ -136,7 +134,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                     prev === 0 ? images.length - 1 : prev - 1,
                   );
                 }}
-                aria-label={t("lightboxPrev")}
+                aria-label="Previous image"
               >
                 <ChevronLeft className="w-8 h-8" />
               </button>
@@ -149,7 +147,7 @@ export function MediaGallery({ images, productName }: MediaGalleryProps) {
                     prev === images.length - 1 ? 0 : prev + 1,
                   );
                 }}
-                aria-label={t("lightboxNext")}
+                aria-label="Next image"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>

@@ -2,7 +2,6 @@
 
 import type { ProductListParams } from "@spree/sdk";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { ProductListingLayout } from "@/components/products/ProductListingLayout";
 import { useStore } from "@/contexts/StoreContext";
@@ -17,7 +16,6 @@ interface ProductsContentProps {
 export function ProductsContent({ basePath }: ProductsContentProps) {
   const searchParams = useSearchParams();
   const { currency } = useStore();
-  const t = useTranslations("products");
   const query = searchParams.get("q") || "";
 
   const fetchFn = useCallback(
@@ -70,18 +68,17 @@ export function ProductsContent({ basePath }: ProductsContentProps) {
         {query ? (
           <>
             <h1 className="text-3xl font-bold text-gray-900">
-              {t("searchResultsFor", { query })}
+              Search results for &ldquo;{query}&rdquo;
             </h1>
             <p className="mt-2 text-gray-500">
-              {t("productsFound", { count: listing.totalCount })}
+              {listing.totalCount}{" "}
+              {listing.totalCount === 1 ? "product" : "products"} found
             </p>
           </>
         ) : (
           <>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t("allProducts")}
-            </h1>
-            <p className="mt-2 text-gray-500">{t("browseCollection")}</p>
+            <h1 className="text-3xl font-bold text-gray-900">All Products</h1>
+            <p className="mt-2 text-gray-500">Browse our complete collection</p>
           </>
         )}
       </div>
@@ -93,7 +90,9 @@ export function ProductsContent({ basePath }: ProductsContentProps) {
         listId={listId}
         listName={listName}
         emptyMessage={
-          query ? t("noMatchingProducts", { query }) : t("tryAdjustingFilters")
+          query
+            ? `We couldn't find any products matching "${query}"`
+            : "Try adjusting your filters"
         }
       />
     </div>

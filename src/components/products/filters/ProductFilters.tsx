@@ -7,7 +7,6 @@ import type {
   ProductFiltersResponse,
 } from "@spree/sdk";
 import { SlidersHorizontal } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
 import type { JSX } from "react";
 import { memo, useCallback, useMemo, useState } from "react";
 import { AvailabilityDropdownContent } from "@/components/products/filters/AvailabilityDropdownContent";
@@ -36,8 +35,6 @@ export const FilterBar = memo(function FilterBar({
   totalCount,
   onFilterChange,
 }: FilterBarProps): JSX.Element | null {
-  const t = useTranslations("products");
-  const locale = useLocale();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [showMobileDrawer, setShowMobileDrawer] = useState(false);
 
@@ -101,9 +98,8 @@ export const FilterBar = memo(function FilterBar({
       priceFilter.min,
       priceFilter.max,
       priceFilter.currency,
-      { t, locale },
     );
-  }, [filtersData, t, locale]);
+  }, [filtersData]);
 
   const optionFilters = useMemo(() => {
     if (!filtersData) return [];
@@ -180,7 +176,7 @@ export const FilterBar = memo(function FilterBar({
 
           {hasPriceFilter && (
             <FilterDropdown
-              label={t("price")}
+              label="Price"
               badgeCount={priceBadge}
               isOpen={openDropdownId === "price"}
               onToggle={() => toggleDropdown("price")}
@@ -196,7 +192,7 @@ export const FilterBar = memo(function FilterBar({
 
           {availabilityFilter && (
             <FilterDropdown
-              label={t("availability")}
+              label="Availability"
               badgeCount={availabilityBadge}
               isOpen={openDropdownId === "availability"}
               onToggle={() => toggleDropdown("availability")}
@@ -213,10 +209,10 @@ export const FilterBar = memo(function FilterBar({
 
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">
-            {t("productCount", { count: totalCount })}
+            {totalCount} {totalCount === 1 ? "product" : "products"}
           </span>
           <FilterDropdown
-            label={t("sort")}
+            label="Sort"
             isOpen={openDropdownId === "sort"}
             onToggle={() => toggleDropdown("sort")}
             onClose={closeDropdown}
@@ -242,7 +238,7 @@ export const FilterBar = memo(function FilterBar({
           }`}
         >
           <SlidersHorizontal className="w-4 h-4" />
-          <span>{t("filters")}</span>
+          <span>Filters</span>
           {hasActiveFilters && (
             <span className="flex items-center justify-center w-5 h-5 text-xs bg-primary text-white rounded-lg">
               {totalActiveFilters}
@@ -252,7 +248,7 @@ export const FilterBar = memo(function FilterBar({
 
         <div className="ml-auto">
           <FilterDropdown
-            label={t("sort")}
+            label="Sort"
             isOpen={openDropdownId === "sort-mobile"}
             onToggle={() => toggleDropdown("sort-mobile")}
             onClose={closeDropdown}

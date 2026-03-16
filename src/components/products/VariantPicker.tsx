@@ -1,7 +1,6 @@
 "use client";
 
 import type { OptionType, Variant } from "@spree/sdk";
-import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { isColorOption, resolveColor } from "@/lib/utils/color-map";
@@ -19,7 +18,6 @@ export function VariantPicker({
   selectedVariant,
   onVariantChange,
 }: VariantPickerProps) {
-  const t = useTranslations("products");
   const optionValuesMap = useMemo(() => {
     const map: Record<string, Set<string>> = {};
 
@@ -218,7 +216,7 @@ export function VariantPicker({
                       {optionValue?.presentation || value}
                       {!isPurchasable && isAvailable && (
                         <span className="ml-1 text-xs text-gray-400">
-                          {t("outOfStockVariant")}
+                          (Out of stock)
                         </span>
                       )}
                     </Button>

@@ -1,6 +1,3 @@
-"use client";
-
-import { useTranslations } from "next-intl";
 import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -18,13 +15,11 @@ export function SortDropdownContent({
   activeSortBy,
   onSortChange,
 }: SortDropdownContentProps) {
-  const t = useTranslations("products");
-
   return (
     <DropdownMenuRadioGroup value={activeSortBy} onValueChange={onSortChange}>
       {sortOptions.map((option) => (
         <DropdownMenuRadioItem key={option.id} value={option.id}>
-          {getSortLabel(option.id, t)}
+          {getSortLabel(option.id)}
         </DropdownMenuRadioItem>
       ))}
     </DropdownMenuRadioGroup>

@@ -3,7 +3,6 @@
 import type { Address, AddressParams, Cart, Country, State } from "@spree/sdk";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AddressEditModal } from "@/components/checkout/AddressEditModal";
 import { AddressFormFields } from "@/components/checkout/AddressFormFields";
@@ -76,10 +75,6 @@ export function AddressSection({
   saving,
   processing,
 }: AddressSectionProps) {
-  const t = useTranslations("checkout");
-  const tc = useTranslations("common");
-  const ta = useTranslations("address");
-
   // Determine initial saved address: use the first saved address when the
   // cart doesn't have a shipping address yet (authenticated users).
   const initialSavedAddress =
@@ -234,15 +229,13 @@ export function AddressSection({
       {/* Contact section */}
       <div className="mb-6">
         <div className="flex items-baseline justify-between mb-3">
-          <h2 className="text-lg font-bold text-gray-900">
-            {t("contactInformation")}
-          </h2>
+          <h2 className="text-lg font-bold text-gray-900">Contact</h2>
           {!isAuthenticated && (
             <Link
               href={signInUrl}
               className="text-[13px] text-gray-700 underline underline-offset-2 hover:text-black"
             >
-              {t("signIn")}
+              Sign in
             </Link>
           )}
         </div>
@@ -254,11 +247,11 @@ export function AddressSection({
           onChange={(e) => setEmail(e.target.value)}
           onBlur={handleEmailBlur}
           disabled={isAuthenticated}
-          placeholder={t("emailAddress")}
+          placeholder="Email"
         />
         {isAuthenticated && (
           <p className="text-xs text-gray-500 mt-1.5">
-            {t("usingAccountEmail")}
+            Using your account email address
           </p>
         )}
       </div>
@@ -266,13 +259,11 @@ export function AddressSection({
       {/* Delivery section */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-gray-900">
-            {t("shippingAddress")}
-          </h2>
+          <h2 className="text-lg font-bold text-gray-900">Delivery</h2>
           {saving && (
             <span className="flex items-center gap-1.5 text-xs text-gray-400">
               <Loader2 className="h-3 w-3 animate-spin" />
-              {tc("saving")}
+              Saving
             </span>
           )}
         </div>
@@ -315,7 +306,7 @@ export function AddressSection({
           fetchStates={fetchStates}
           onSave={handleSaveEditedAddress}
           onClose={() => setEditingAddress(null)}
-          title={ta("editAddress")}
+          title="Edit Address"
         />
       )}
     </>

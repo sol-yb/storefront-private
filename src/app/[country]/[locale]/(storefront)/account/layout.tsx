@@ -12,30 +12,27 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { extractBasePath } from "@/lib/utils/path";
 
-function getNavItems(t: ReturnType<typeof useTranslations<"account">>): {
+const navItems: {
   href: string;
   label: string;
   icon: LucideIcon;
-}[] {
-  return [
-    { href: "/account", label: t("overview"), icon: Home },
-    { href: "/account/orders", label: t("orders"), icon: ShoppingBag },
-    { href: "/account/addresses", label: t("addresses"), icon: MapPin },
-    {
-      href: "/account/credit-cards",
-      label: t("paymentMethods"),
-      icon: CreditCard,
-    },
-    { href: "/account/gift-cards", label: t("giftCards"), icon: Gift },
-    { href: "/account/profile", label: t("profile"), icon: User },
-  ];
-}
+}[] = [
+  { href: "/account", label: "Overview", icon: Home },
+  { href: "/account/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/account/addresses", label: "Addresses", icon: MapPin },
+  {
+    href: "/account/credit-cards",
+    label: "Payment Methods",
+    icon: CreditCard,
+  },
+  { href: "/account/gift-cards", label: "Gift Cards", icon: Gift },
+  { href: "/account/profile", label: "Profile", icon: User },
+];
 
 function ContentSkeleton() {
   return (
@@ -69,8 +66,6 @@ function AccountShell({
   onLogout,
   isLoading,
 }: AccountShellProps) {
-  const t = useTranslations("account");
-  const navItems = getNavItems(t);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col lg:flex-row gap-8">
@@ -89,7 +84,7 @@ function AccountShell({
                   <p className="font-medium text-gray-900">
                     {user?.first_name
                       ? `${user.first_name} ${user.last_name || ""}`.trim()
-                      : t("myAccount")}
+                      : "My Account"}
                   </p>
                   <p className="text-sm text-gray-500 truncate">
                     {user?.email}
@@ -130,7 +125,7 @@ function AccountShell({
             <div className="p-2 border-t border-gray-200">
               <Button variant="ghost" onClick={onLogout} disabled={isLoading}>
                 <LogOut className="w-5 h-5" />
-                {t("signOut")}
+                Sign Out
               </Button>
             </div>
           </div>

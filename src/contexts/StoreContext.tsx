@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { getStoreName } from "@/lib/seo";
 import { setStoreCookies } from "@/lib/utils/cookies";
 import { getPathWithoutPrefix } from "@/lib/utils/path";
 
@@ -22,10 +21,14 @@ export interface CountryWithMarket extends Country {
   marketId: string | null;
 }
 
-const storeName = getStoreName();
+const storeName = process.env.NEXT_PUBLIC_STORE_NAME || "Spree Store";
+const storeDescription =
+  process.env.NEXT_PUBLIC_STORE_DESCRIPTION ||
+  "A modern e-commerce storefront powered by Spree Commerce and Next.js.";
 
 interface StoreContextValue {
   storeName: string;
+  storeDescription: string;
   country: string;
   locale: string;
   currency: string;
@@ -180,6 +183,7 @@ export function StoreProvider({
   const value = useMemo<StoreContextValue>(
     () => ({
       storeName,
+      storeDescription,
       country,
       locale,
       currency,
