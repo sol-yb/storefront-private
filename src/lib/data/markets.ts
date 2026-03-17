@@ -6,6 +6,7 @@ import {
   listMarkets as _listMarkets,
   resolveMarket as _resolveMarket,
 } from "@spree/next";
+import type { Market } from "@spree/sdk";
 import { cacheLife, cacheTag } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -44,9 +45,11 @@ async function cachedListMarketCountries(
   return _listMarketCountries(marketId, options);
 }
 
-export async function getMarkets() {
-  const options = await getLocaleOptions();
-  return cachedListMarkets(options);
+export async function getMarkets(
+  options?: SpreeNextOptions,
+): Promise<{ data: Market[] }> {
+  const resolvedOptions = options ?? (await getLocaleOptions());
+  return cachedListMarkets(resolvedOptions);
 }
 
 export async function resolveMarket(country: string) {
