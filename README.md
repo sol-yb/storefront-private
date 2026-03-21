@@ -1,8 +1,27 @@
 # Spree Storefront
 
-A modern, headless e-commerce storefront built with Next.js 16, React 19, and the [Spree API v3](https://spreecommerce.org/docs/api-reference).
+A modern, headless e-commerce storefront built with Next.js 16, React 19, and [Spree API v3](https://spreecommerce.org/docs/api-reference).
 
-## Tech Stack
+## Features
+
+- **Product Catalog** - Browse, search, filter products by categories, and use faceted navigation. Search and facet filtering powered by [Meilisearch](https://spreecommerce.org/docs/integrations/search/meilisearch)
+- **Product Details** - View product information with variant selection and media
+- **Shopping Cart** - Add, update, and remove items with server-side state
+- **One-page Checkout** - Guest visitors and signed-in users supported, multi-shipments supported natively, Coupon Codes, Gift Cards, Store Credit
+- **Stripe payments** - native Stripe payment support with Stripe SDKs, PCI-Compliant, 3DS-Secure, use Credit Cards, Apple Pay, Google Pay, Klarna, Affirm, SEPA payments, and all other payment methods provided by [Spree Stripe integration](https://github.com/spree/spree_stripe)
+- **Customer Account** - Full account management:
+  - Profile management
+  - Order history with detailed order view
+  - Address book (create, edit, delete)
+  - Gift Cards and Store Credit
+  - Saved payment methods
+- **Multi-Region Support** - Country, currency, and language switching via URL segments, powered by [Spree Markets](https://spreecommerce.org/docs/developer/core-concepts/markets)
+- **Responsive Design** - Mobile-first Tailwind CSS styling
+- **Google Tag Mananager** and **Google Analytics 4 Ecommerce events** tracking supported natively
+- **SEO-ready** - meta tags, JSON-LD, OpenGraph - all built in!
+- **Error Tracking** - Sentry integration for both server-side and client-side error monitoring with source maps
+
+## Technology
 
 - **Next.js 16** - App Router, Server Actions, Turbopack
 - **React 19** - Latest React with improved Server Components
@@ -12,31 +31,11 @@ A modern, headless e-commerce storefront built with Next.js 16, React 19, and th
 - [@spree/sdk](https://spreecommerce.org/docs/developer/sdk/quickstart) - Official Spree Commerce SDK
 - [@spree/next](https://spreecommerce.org/docs/developer/storefront/nextjs/spree-next-package) - Server actions, caching, and cookie-based auth
 
-## Features
-
-- **Server-First Architecture** - All API calls happen server-side using Next.js Server Actions
-- **Secure Authentication** - JWT tokens stored in httpOnly cookies (not localStorage)
-- **Product Catalog** - Browse, search, filter products by categories and with faceted navigation
-- **Product Details** - View product information with variant selection and images
-- **Shopping Cart** - Add, update, and remove items with server-side state
-- **One-page Checkout** - Guest visitors and signed-in users supported, multi-shipments supported natively, Coupon Codes, Gift Cards, Store Credit
-- **Stripe payments** - native Stripe payment support with Stripe SDKs, PCI-Compliant, 3DS-Secure, use Credit Cards, Apple Pay, Google Pay, Klarna, Affirm, SEPA payments and all other payment methods provided by [Spree Stripe integration](https://github.com/spree/spree_stripe)
-- **Google Tag Mananager** and **Google Analytics 4 Ecommerce events** tracking supported natively
-- **Customer Account** - Full account management:
-  - Profile management
-  - Order history with detailed order view
-  - Address book (create, edit, delete)
-  - Gift Cards and Store Credit
-  - Saved payment methods
-- **Multi-Region Support** - Country and currency switching via URL segments
-- **Responsive Design** - Mobile-first Tailwind CSS styling
-- **Error Tracking** - Sentry integration for both server-side and client-side error monitoring with source maps
-
 ## Architecture
 
 This starter follows a **server-first pattern**:
 
-1. **Server Actions** (`src/lib/data/`) - All API calls are made server-side
+1. **Server-First Architecture** - All API calls happen server-side using Next.js Server Actions
 2. **httpOnly Cookies** - Auth tokens and cart tokens are stored securely
 3. **No Client-Side API Calls** - The Spree API key is never exposed to the browser
 4. **Cache Revalidation** - Uses Next.js cache tags for efficient updates
@@ -211,12 +210,12 @@ export async function setAuthToken(token: string) {
 The storefront supports multiple countries and currencies via URL segments:
 
 ```
-/us/en/products          # US store, English
-/de/de/products          # German store, German
-/uk/en/products          # UK store, English
+/us/en/products          # US Market, English language
+/de/de/products          # European Market, German language
+/uk/en/products          # UK Market, English
 ```
 
-Use the `CountrySwitcher` component to change regions.
+Use the `CountrySwitcher` component to change [Markets](https://spreecommerce.org/docs/developer/core-concepts/markets).
 
 ## Customization
 
