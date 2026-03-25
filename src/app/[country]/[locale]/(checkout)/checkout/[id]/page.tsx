@@ -22,9 +22,10 @@ import {
 } from "@/lib/analytics/gtm";
 import { getAddresses, updateAddress } from "@/lib/data/addresses";
 import {
-  applyCouponCode,
+  applyCode,
   getCheckoutOrder,
-  removeCouponCode,
+  removeDiscountCode,
+  removeGiftCard,
   selectDeliveryRate,
   updateOrderAddresses,
 } from "@/lib/data/checkout";
@@ -48,15 +49,17 @@ interface CheckoutPageProps {
 // Sidebar summary component
 function CheckoutSidebar({
   cart,
-  onApplyCoupon,
-  onRemoveCoupon,
+  onApplyCode,
+  onRemoveDiscount,
+  onRemoveGiftCard,
 }: {
   cart: Cart;
-  onApplyCoupon: (
+  onApplyCode: (code: string) => Promise<{ success: boolean; error?: string }>;
+  onRemoveDiscount: (
     code: string,
   ) => Promise<{ success: boolean; error?: string }>;
-  onRemoveCoupon: (
-    code: string,
+  onRemoveGiftCard: (
+    giftCardId: string,
   ) => Promise<{ success: boolean; error?: string }>;
 }) {
   return (
@@ -65,8 +68,9 @@ function CheckoutSidebar({
       <div className="mt-6 pt-6 border-t border-gray-200">
         <CouponCode
           cart={cart}
-          onApply={onApplyCoupon}
-          onRemove={onRemoveCoupon}
+          onApply={onApplyCode}
+          onRemoveDiscount={onRemoveDiscount}
+          onRemoveGiftCard={onRemoveGiftCard}
         />
       </div>
     </>
@@ -104,23 +108,34 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
   const beginCheckoutFiredRef = useRef(false);
   const paymentRef = useRef<PaymentSectionHandle>(null);
 
-  // Handle coupon code application
-  const handleApplyCoupon = useCallback(async (code: string) => {
+  // Handle code application (discount code or gift card — single input field)
+  const handleApplyCode = useCallback(async (code: string) => {
     const currentOrder = cartRef.current;
     if (!currentOrder) return { success: false, error: "No cart" };
 
-    const result = await applyCouponCode(currentOrder.id, code);
+    const result = await applyCode(currentOrder.id, code);
     if (result.success && result.cart) {
       setCart(result.cart);
     }
     return result;
   }, []);
 
-  const handleRemoveCoupon = useCallback(async (couponCode: string) => {
+  const handleRemoveDiscount = useCallback(async (discountCode: string) => {
     const currentOrder = cartRef.current;
     if (!currentOrder) return { success: false, error: "No cart" };
 
-    const result = await removeCouponCode(currentOrder.id, couponCode);
+    const result = await removeDiscountCode(currentOrder.id, discountCode);
+    if (result.success && result.cart) {
+      setCart(result.cart);
+    }
+    return result;
+  }, []);
+
+  const handleRemoveGiftCard = useCallback(async (giftCardId: string) => {
+    const currentOrder = cartRef.current;
+    if (!currentOrder) return { success: false, error: "No cart" };
+
+    const result = await removeGiftCard(currentOrder.id, giftCardId);
     if (result.success && result.cart) {
       setCart(result.cart);
     }
@@ -144,14 +159,22 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
       setSummaryContent(
         <CheckoutSidebar
           cart={cart}
-          onApplyCoupon={handleApplyCoupon}
-          onRemoveCoupon={handleRemoveCoupon}
+          onApplyCode={handleApplyCode}
+          onRemoveDiscount={handleRemoveDiscount}
+          onRemoveGiftCard={handleRemoveGiftCard}
         />,
       );
     } else {
       setSummaryContent(null);
     }
-  }, [cart, cartKey, setSummaryContent, handleApplyCoupon, handleRemoveCoupon]);
+  }, [
+    cart,
+    cartKey,
+    setSummaryContent,
+    handleApplyCode,
+    handleRemoveDiscount,
+    handleRemoveGiftCard,
+  ]);
 
   // Load cart and market-scoped countries
   const loadOrder = useCallback(async () => {
