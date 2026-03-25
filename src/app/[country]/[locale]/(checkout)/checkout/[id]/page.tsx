@@ -13,6 +13,7 @@ import {
   type PaymentSectionHandle,
 } from "@/components/checkout/PaymentSection";
 import { Summary } from "@/components/checkout/Summary";
+import { useAuth } from "@/contexts/AuthContext";
 import { useCheckout } from "@/contexts/CheckoutContext";
 import {
   trackAddPaymentInfo,
@@ -79,6 +80,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
   const searchParams = useSearchParams();
   const basePath = extractBasePath(pathname);
   const { setSummaryContent } = useCheckout();
+  const { user, loading: authLoading } = useAuth();
 
   // Pick up payment errors from the confirm-payment redirect
   const paymentError = searchParams.get("payment_error");
@@ -488,7 +490,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
   };
 
   // Loading state
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="animate-pulse space-y-6">
         <div className="h-8 bg-gray-200 rounded w-1/3" />
@@ -571,6 +573,7 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
           errors={sectionErrors.address}
           saving={saving}
           processing={processing}
+          user={user}
         />
       </div>
 

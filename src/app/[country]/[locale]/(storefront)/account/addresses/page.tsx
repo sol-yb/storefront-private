@@ -1,17 +1,28 @@
 import { MapPin } from "lucide-react";
 import { AddressManagement } from "@/components/addresses/AddressManagement";
+import type { User } from "@/contexts/AuthContext";
 import { getAddresses } from "@/lib/data/addresses";
 import { getCountries } from "@/lib/data/countries";
+import { getCustomer } from "@/lib/data/customer";
 
 export default async function AddressesPage() {
   // Fetch data in parallel on the server
-  const [addressResponse, countriesResponse] = await Promise.all([
+  const [addressResponse, countriesResponse, customer] = await Promise.all([
     getAddresses(),
     getCountries(),
+    getCustomer().catch(() => null),
   ]);
 
   const addresses = addressResponse.data;
   const countries = countriesResponse.data;
+  const user: User | undefined = customer
+    ? {
+        id: customer.id,
+        email: customer.email,
+        first_name: customer.first_name,
+        last_name: customer.last_name,
+      }
+    : undefined;
 
   return (
     <div>
@@ -33,6 +44,7 @@ export default async function AddressesPage() {
             countries={countries}
             showAddButton={true}
             emptyState={true}
+            user={user}
           />
         </div>
       ) : (
@@ -41,6 +53,7 @@ export default async function AddressesPage() {
           countries={countries}
           showAddButton={true}
           emptyState={false}
+          user={user}
         />
       )}
     </div>
