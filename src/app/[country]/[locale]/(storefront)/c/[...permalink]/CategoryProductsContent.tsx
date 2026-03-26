@@ -27,7 +27,7 @@ export function CategoryProductsContent({
   );
 
   const filterParams = useMemo(
-    () => ({ category_id: categoryId }),
+    () => ({ in_category: categoryId }),
     [categoryId],
   );
 
