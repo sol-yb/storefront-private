@@ -2,6 +2,8 @@
 
 A modern, headless e-commerce storefront built with Next.js 16, React 19, and [Spree API v3](https://spreecommerce.org/docs/api-reference).
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspree%2Fstorefront&env=SPREE_API_URL&envDefaults=%7B%22SPREE_API_URL%22%3A%22SPREE_PUBLISHABLE_KEY%22%7D)
+
 ## Features
 
 - **Product Catalog** - Browse, search, filter products by categories, and use faceted navigation. Search and facet filtering powered by [Meilisearch](https://spreecommerce.org/docs/integrations/search/meilisearch)
