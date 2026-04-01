@@ -13,6 +13,8 @@ import {
   type PaymentSectionHandle,
 } from "@/components/checkout/PaymentSection";
 import { Summary } from "@/components/checkout/Summary";
+import { PolicyConsent } from "@/components/policy/PolicyConsent";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCheckout } from "@/contexts/CheckoutContext";
 import {
@@ -100,6 +102,8 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
   const [sectionErrors, setSectionErrors] = useState<Record<string, string[]>>(
     {},
   );
+  const [policyConsent, setPolicyConsent] = useState(false);
+  const [policyError, setPolicyError] = useState(false);
 
   const fulfillments = cart?.fulfillments ?? [];
 
@@ -460,6 +464,18 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
     setSectionErrors({});
     setError(null);
 
+    if (!isAuthenticated && !policyConsent) {
+      setPolicyError(true);
+      setError(
+        "You must agree to the store policies before placing your order",
+      );
+      document
+        .getElementById("policy-consent")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document.getElementById("policy-consent")?.focus();
+      return;
+    }
+
     // Refresh cart to get latest requirements
     const freshOrder = await getCheckoutOrder(cart.id);
     if (!freshOrder) {
@@ -573,12 +589,10 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
     <div>
       {/* Error banner */}
       {error && (
-        <div className="rounded-sm border border-red-300 bg-red-50 px-4 py-3 mb-6">
-          <p className="text-sm text-red-700 flex items-center gap-2">
-            <CircleAlert className="h-4 w-4 flex-shrink-0" />
-            {error}
-          </p>
-        </div>
+        <Alert variant="destructive" className="mb-6">
+          <CircleAlert />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {/* Contact + Delivery */}
@@ -627,6 +641,20 @@ export default function CheckoutPage({ params }: CheckoutPageProps) {
           errors={sectionErrors.payment}
         />
       </div>
+
+      {/* Policy consent — guests only, authenticated users accepted at registration */}
+      {!isAuthenticated && (
+        <div className="mt-6">
+          <PolicyConsent
+            checked={policyConsent}
+            onCheckedChange={(checked) => {
+              setPolicyConsent(checked);
+              if (checked) setPolicyError(false);
+            }}
+            error={policyError}
+          />
+        </div>
+      )}
 
       {/* Pay now button — Shopify: black, tall, minimal radius, bold */}
       <button

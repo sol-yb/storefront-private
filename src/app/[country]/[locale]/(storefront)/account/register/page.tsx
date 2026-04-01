@@ -4,6 +4,7 @@ import { CircleAlert, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PolicyConsent } from "@/components/policy/PolicyConsent";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,8 @@ export default function RegisterPage() {
     useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [policyConsent, setPolicyConsent] = useState(false);
+  const [policyError, setPolicyError] = useState(false);
 
   // Redirect if already authenticated
   // useEffect is needed here to prevent rendering issues.
@@ -58,6 +61,16 @@ export default function RegisterPage() {
 
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
+      return;
+    }
+
+    if (!policyConsent) {
+      setPolicyError(true);
+      setError("You must agree to the store policies to create an account");
+      document
+        .getElementById("policy-consent")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document.getElementById("policy-consent")?.focus();
       return;
     }
 
@@ -209,6 +222,15 @@ export default function RegisterPage() {
                 </div>
               </div>
             </Field>
+
+            <PolicyConsent
+              checked={policyConsent}
+              onCheckedChange={(checked) => {
+                setPolicyConsent(checked);
+                if (checked) setPolicyError(false);
+              }}
+              error={policyError}
+            />
 
             <div className="w-full">
               <Button

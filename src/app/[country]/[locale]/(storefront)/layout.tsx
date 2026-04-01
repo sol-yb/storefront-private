@@ -41,7 +41,7 @@ export default async function StorefrontLayout({
     expand: ["children.children"],
   })
     .then((res) => res.data)
-    .catch(() => []);
+    .catch(() => [] as Category[]);
 
   return (
     <>
