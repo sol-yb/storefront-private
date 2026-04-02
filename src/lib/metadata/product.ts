@@ -35,17 +35,22 @@ export async function generateProductMetadata({
       )
     : undefined;
 
-  const ogImages = (product.media || [])
-    .filter((img) => img.og_image_url || img.original_url)
-    .map((img) => ({
-      url: (img.og_image_url || img.original_url)!,
-      alt: img.alt || product.name,
-    }));
-
-  // Fall back to thumbnail_url if no media from expand
-  if (ogImages.length === 0 && product.thumbnail_url) {
-    ogImages.push({ url: product.thumbnail_url, alt: product.name });
-  }
+  const firstMedia = (product.media || [])[0];
+  const ogSrc =
+    firstMedia?.og_image_url ||
+    firstMedia?.original_url ||
+    product.thumbnail_url ||
+    null;
+  const ogImage =
+    ogSrc && storeUrl
+      ? {
+          url: `${storeUrl}/_next/image?url=${encodeURIComponent(ogSrc)}&w=1200&q=75`,
+          ...(firstMedia?.og_image_url ? { width: 1200, height: 630 } : {}),
+          alt: firstMedia?.alt || product.name,
+        }
+      : ogSrc
+        ? { url: ogSrc, alt: firstMedia?.alt || product.name }
+        : null;
 
   return {
     title,
@@ -57,7 +62,7 @@ export async function generateProductMetadata({
       description,
       ...(canonicalUrl ? { url: canonicalUrl } : {}),
       type: "website",
-      ...(ogImages.length > 0 ? { images: ogImages } : {}),
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
     other: {
       ...(product.price?.amount
