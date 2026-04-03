@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
+import { ensureProtocol, getStoreUrl } from "@/lib/seo";
 import { generateSitemaps } from "./sitemap";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "");
+  const baseUrl = ensureProtocol(getStoreUrl() || "").replace(/\/$/, "");
   const sitemaps = await generateSitemaps();
 
   return {
