@@ -27,7 +27,8 @@ export async function cachedListProducts(
 
 export async function getProducts(params?: ProductListParams) {
   const options = await getLocaleOptions();
-  return getClient().products.list(params, options);
+  const userToken = await getAccessToken();
+  return cachedListProducts(params, options, userToken);
 }
 
 /**
@@ -60,7 +61,19 @@ export async function getProduct(
   return cachedGetProduct(slugOrId, params?.expand ?? [], options, userToken);
 }
 
+async function cachedGetProductFilters(
+  params: Record<string, unknown> | undefined,
+  options: { locale?: string; country?: string },
+  _userToken?: string,
+) {
+  "use cache: remote";
+  cacheLife("tenMinutes");
+  cacheTag("product-filters");
+  return getClient().products.filters(params, options);
+}
+
 export async function getProductFilters(params?: Record<string, unknown>) {
   const options = await getLocaleOptions();
-  return getClient().products.filters(params, options);
+  const userToken = await getAccessToken();
+  return cachedGetProductFilters(params, options, userToken);
 }

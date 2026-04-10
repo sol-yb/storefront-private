@@ -3,6 +3,7 @@
 import type { Product } from "@spree/sdk";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { memo } from "react";
 import { ProductImage } from "@/components/ui/product-image";
 import { trackSelectItem } from "@/lib/analytics/gtm";
 
@@ -18,7 +19,7 @@ interface ProductCardProps {
   currency?: string;
 }
 
-export function ProductCard({
+export const ProductCard = memo(function ProductCard({
   product,
   basePath = "",
   categoryId,
@@ -107,4 +108,4 @@ export function ProductCard({
       </div>
     </Link>
   );
-}
+});
