@@ -10,7 +10,7 @@ import { type ReactElement, Suspense } from "react";
 import { InfiniteProductList } from "@/components/products/InfiniteProductList";
 import { ListingAnalytics } from "@/components/products/ListingAnalytics";
 import { ListingFilterBar } from "@/components/products/ListingFilterBar";
-import { ProductGridSkeleton } from "@/components/products/ProductGridSkeleton";
+import { ProductListingSkeleton } from "@/components/products/ProductListingSkeleton";
 import {
   type ListingSearchParams,
   listingKey,
@@ -64,7 +64,10 @@ interface ProductListingProps {
  */
 export function ProductListing(props: ProductListingProps): ReactElement {
   return (
-    <Suspense key={listingKey(props.state)} fallback={<ProductGridSkeleton />}>
+    <Suspense
+      key={listingKey(props.state)}
+      fallback={<ProductListingSkeleton />}
+    >
       <ProductListingInner {...props} />
     </Suspense>
   );
