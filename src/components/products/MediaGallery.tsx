@@ -17,7 +17,14 @@ const LazyMediaLightbox = dynamic(
     import("@/components/products/MediaLightbox").then((mod) => ({
       default: mod.MediaLightbox,
     })),
-  { ssr: false },
+  {
+    ssr: false,
+    // Minimal fullscreen overlay so the zoom click gives immediate
+    // feedback on slow networks while the chunk downloads.
+    loading: () => (
+      <div className="fixed inset-0 z-50 bg-black/90" aria-hidden="true" />
+    ),
+  },
 );
 
 interface MediaGalleryProps {

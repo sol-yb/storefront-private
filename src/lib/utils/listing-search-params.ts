@@ -145,15 +145,18 @@ export function buildListingSearchParams(
  * Serialize listing params into a stable key string. Used for analytics
  * dedup and as the Suspense boundary key — not for the Next cache, which
  * keys on function arguments automatically.
+ *
+ * Uses JSON.stringify rather than a delimiter-joined string so that
+ * values containing special characters (e.g. a search query with a
+ * pipe) can't produce colliding keys for different filter states.
  */
 export function listingKey(state: ListingSearchParams): string {
-  const sorted = [...state.filters.optionValues].sort().join(",");
-  return [
-    state.query ?? "",
-    state.filters.sortBy ?? "",
-    state.filters.priceMin ?? "",
-    state.filters.priceMax ?? "",
-    state.filters.availability ?? "",
-    sorted,
-  ].join("|");
+  return JSON.stringify({
+    q: state.query ?? "",
+    s: state.filters.sortBy ?? "",
+    pMin: state.filters.priceMin ?? "",
+    pMax: state.filters.priceMax ?? "",
+    a: state.filters.availability ?? "",
+    o: [...state.filters.optionValues].sort(),
+  });
 }

@@ -4,7 +4,7 @@ import type { Media } from "@spree/sdk";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 interface MediaLightboxProps {
   images: Media[];
@@ -18,6 +18,11 @@ interface MediaLightboxProps {
  * Fullscreen image lightbox. Lazy-loaded from MediaGallery so its
  * keyboard handlers, navigation UI, and next/image full-size render
  * don't ship in the initial product page bundle.
+ *
+ * Exposed as a real modal dialog (role="dialog", aria-modal="true") with
+ * focus moved to the close button on open and restored on close so
+ * screen-reader and keyboard users can't get stuck in the page behind
+ * the overlay.
  */
 export function MediaLightbox({
   images,
@@ -25,10 +30,12 @@ export function MediaLightbox({
   productName,
   onClose,
   onNavigate,
-}: MediaLightboxProps) {
+}: MediaLightboxProps): React.ReactElement | null {
   const t = useTranslations("products");
   const current = images[activeIndex];
-  const src = current?.xlarge_url || current?.original_url || null;
+  const src =
+    current?.xlarge_url || current?.large_url || current?.original_url || null;
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const goPrev = useCallback(() => {
     onNavigate(activeIndex === 0 ? images.length - 1 : activeIndex - 1);
@@ -48,14 +55,29 @@ export function MediaLightbox({
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose, goPrev, goNext]);
 
+  // Focus management: capture the previously focused element when the
+  // lightbox mounts, move focus into the dialog, then restore it on
+  // unmount so keyboard users return to the element that opened it.
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+    return () => {
+      previouslyFocused?.focus?.();
+    };
+  }, []);
+
   if (!src) return null;
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t("openImageZoom")}
       className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
       onClick={onClose}
     >
       <button
+        ref={closeButtonRef}
         type="button"
         className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
         onClick={onClose}

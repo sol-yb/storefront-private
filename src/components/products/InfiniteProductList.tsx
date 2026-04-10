@@ -17,8 +17,10 @@ interface InfiniteProductListProps {
   initialProducts: Product[];
   initialPage: number;
   totalPages: number;
-  pageSize: number;
-  /** SDK list params describing the current filter/sort/query state. */
+  /**
+   * SDK list params describing the current filter/sort/query state,
+   * including the `limit` that the next-page fetch should reuse.
+   */
   listParams: ProductListParams;
   /**
    * Server action fetching one page of products. Already bound to any
@@ -47,7 +49,6 @@ export function InfiniteProductList({
   initialProducts,
   initialPage,
   totalPages,
-  pageSize: _pageSize,
   listParams,
   fetchPage,
   basePath,

@@ -6,7 +6,7 @@ import type {
 } from "@spree/sdk";
 import { Search } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { Suspense } from "react";
+import { type ReactElement, Suspense } from "react";
 import { InfiniteProductList } from "@/components/products/InfiniteProductList";
 import { ListingAnalytics } from "@/components/products/ListingAnalytics";
 import { ListingFilterBar } from "@/components/products/ListingFilterBar";
@@ -62,7 +62,7 @@ interface ProductListingProps {
  * same server action on scroll. Filter changes unmount the island (via
  * the Suspense boundary key) so accumulated state resets cleanly.
  */
-export function ProductListing(props: ProductListingProps) {
+export function ProductListing(props: ProductListingProps): ReactElement {
   return (
     <Suspense key={listingKey(props.state)} fallback={<ProductGridSkeleton />}>
       <ProductListingInner {...props} />
@@ -82,7 +82,7 @@ async function ProductListingInner({
   fetchProducts,
   fetchFilters,
   emptyMessage,
-}: ProductListingProps) {
+}: ProductListingProps): Promise<ReactElement> {
   const t = await getTranslations({ locale, namespace: "products" });
 
   const queryParams = buildProductQueryParams(state.filters, state.query);
@@ -102,20 +102,22 @@ async function ProductListingInner({
     ...baseParams,
   });
 
+  // Products fetch intentionally un-caught: a failure here is a real
+  // error (backend down, bad params) and should bubble to the route
+  // error boundary rather than masquerade as a legitimate empty
+  // results page. Filters fetch is cosmetic (facet counts) so we fall
+  // back to a bare filter bar on failure.
   const [productsResponse, filtersResponse] = await Promise.all([
-    fetchProducts({ ...listParams, page: 1 }).catch((error) => {
-      console.error("ProductListing: products fetch failed", error);
-      return null;
-    }),
+    fetchProducts({ ...listParams, page: 1 }),
     fetchFilters(filterFetchParams).catch((error) => {
       console.error("ProductListing: filters fetch failed", error);
       return null;
     }),
   ]);
 
-  const products = productsResponse?.data ?? [];
-  const totalCount = productsResponse?.meta.count ?? 0;
-  const totalPages = productsResponse?.meta.pages ?? 0;
+  const products = productsResponse.data;
+  const totalCount = productsResponse.meta.count;
+  const totalPages = productsResponse.meta.pages;
 
   const hasResults = products.length > 0;
 
@@ -133,7 +135,6 @@ async function ProductListingInner({
             initialProducts={products}
             initialPage={1}
             totalPages={totalPages}
-            pageSize={PAGE_SIZE}
             listParams={listParams}
             fetchPage={fetchProducts}
             basePath={basePath}
