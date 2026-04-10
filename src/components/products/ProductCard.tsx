@@ -3,9 +3,7 @@
 import type { Product } from "@spree/sdk";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { memo } from "react";
 import { ProductImage } from "@/components/ui/product-image";
-import { useStore } from "@/contexts/StoreContext";
 import { trackSelectItem } from "@/lib/analytics/gtm";
 
 interface ProductCardProps {
@@ -16,9 +14,11 @@ interface ProductCardProps {
   listId?: string;
   listName?: string;
   fetchPriority?: "high" | "low" | "auto";
+  /** Optional currency used for analytics; omit to skip the select_item event. */
+  currency?: string;
 }
 
-export const ProductCard = memo(function ProductCard({
+export function ProductCard({
   product,
   basePath = "",
   categoryId,
@@ -26,8 +26,8 @@ export const ProductCard = memo(function ProductCard({
   listId,
   listName,
   fetchPriority,
+  currency,
 }: ProductCardProps) {
-  const { currency } = useStore();
   const t = useTranslations("products");
   const imageUrl = product.thumbnail_url || null;
 
@@ -53,7 +53,7 @@ export const ProductCard = memo(function ProductCard({
     : null;
 
   const handleClick = () => {
-    if (index != null && listId && listName) {
+    if (index != null && listId && listName && currency) {
       trackSelectItem(product, listId, listName, index, currency);
     }
   };
@@ -107,4 +107,4 @@ export const ProductCard = memo(function ProductCard({
       </div>
     </Link>
   );
-});
+}

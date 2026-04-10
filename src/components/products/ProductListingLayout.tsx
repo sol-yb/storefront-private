@@ -8,6 +8,7 @@ import type { RefObject } from "react";
 import { FilterBar } from "@/components/products/filters";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { ProductGridSkeleton } from "@/components/products/ProductGridSkeleton";
+import { useStore } from "@/contexts/StoreContext";
 import type { ActiveFilters } from "@/types/filters";
 
 interface ProductListingLayoutProps {
@@ -46,6 +47,7 @@ export function ProductListingLayout({
   listName,
 }: ProductListingLayoutProps): React.ReactElement {
   const t = useTranslations("products");
+  const { currency } = useStore();
   return (
     <div>
       <FilterBar
@@ -80,6 +82,7 @@ export function ProductListingLayout({
             listId={listId}
             listName={listName}
             priorityCount={3}
+            currency={currency}
           />
 
           <div
