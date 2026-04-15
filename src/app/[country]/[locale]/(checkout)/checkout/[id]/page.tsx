@@ -11,6 +11,7 @@ import { AddressSection } from "@/components/checkout/AddressSection";
 import { CouponCode } from "@/components/checkout/CouponCode";
 import { DeliveryMethodSection } from "@/components/checkout/DeliveryMethodSection";
 import {
+  type PaymentCompleteResult,
   PaymentSection,
   type PaymentSectionHandle,
 } from "@/components/checkout/PaymentSection";
@@ -124,6 +125,7 @@ function CheckoutPageContent({ params }: CheckoutPageProps) {
   );
   const [policyConsent, setPolicyConsent] = useState(false);
   const [policyError, setPolicyError] = useState(false);
+  const [isSessionPayment, setIsSessionPayment] = useState(true);
 
   const fulfillments = cart?.fulfillments ?? [];
 
@@ -404,28 +406,32 @@ function CheckoutPageContent({ params }: CheckoutPageProps) {
     [],
   );
 
-  // Handle payment completion (called by PaymentSection after Stripe confirms)
+  // Handle payment completion (called by PaymentSection after payment is confirmed)
   const handlePaymentComplete = useCallback(
-    async (paymentSessionId: string) => {
+    async (result: PaymentCompleteResult) => {
       const currentOrder = cartRef.current;
       if (!currentOrder) return;
 
       setError(null);
 
       try {
-        const sessionResult = await completeCheckoutPaymentSession(
-          currentOrder.id,
-          paymentSessionId,
-        );
-
-        if (!sessionResult.success) {
-          setError(
-            sessionResult.error ||
-              tRef.current("failedToCompletePaymentSession"),
+        // For session-based payments, complete the payment session first
+        if (result.type === "session") {
+          const sessionResult = await completeCheckoutPaymentSession(
+            currentOrder.id,
+            result.sessionId,
           );
-          setProcessing(false);
-          return;
+
+          if (!sessionResult.success) {
+            setError(
+              sessionResult.error ||
+                tRef.current("failedToCompletePaymentSession"),
+            );
+            setProcessing(false);
+            return;
+          }
         }
+        // For direct payments, the payment was already created in PaymentSection
 
         try {
           trackAddPaymentInfo(currentOrder);
@@ -696,6 +702,7 @@ function CheckoutPageContent({ params }: CheckoutPageProps) {
             onPaymentComplete={handlePaymentComplete}
             processing={processing}
             setProcessing={setProcessing}
+            onSessionMethodChange={setIsSessionPayment}
             errors={sectionErrors.payment}
           />
         </div>
@@ -726,8 +733,10 @@ function CheckoutPageContent({ params }: CheckoutPageProps) {
               <Loader2 className="h-4 w-4 animate-spin" />
               {tc("processing")}
             </>
-          ) : (
+          ) : isSessionPayment ? (
             t("payNow")
+          ) : (
+            t("placeOrder")
           )}
         </button>
       </div>

@@ -10,7 +10,7 @@ import { actionResult } from "./utils";
 export async function createCheckoutPaymentSession(
   cartId: string,
   paymentMethodId: string,
-  gatewayPaymentMethodId?: string,
+  externalData?: Record<string, unknown>,
 ) {
   return actionResult(async () => {
     const options = await getCartOptions();
@@ -19,15 +19,34 @@ export async function createCheckoutPaymentSession(
       id,
       {
         payment_method_id: paymentMethodId,
-        ...(gatewayPaymentMethodId && {
-          external_data: { stripe_payment_method_id: gatewayPaymentMethodId },
-        }),
+        ...(externalData && { external_data: externalData }),
       },
       options,
     );
     updateTag("checkout");
     return { session };
   }, "Failed to create payment session");
+}
+
+/**
+ * Creates a direct payment for non-session payment methods
+ * (e.g. Check, Cash on Delivery, Bank Transfer).
+ */
+export async function createDirectPayment(
+  cartId: string,
+  paymentMethodId: string,
+) {
+  return actionResult(async () => {
+    const options = await getCartOptions();
+    const id = await requireCartId();
+    const payment = await getClient().carts.payments.create(
+      id,
+      { payment_method_id: paymentMethodId },
+      options,
+    );
+    updateTag("checkout");
+    return { payment };
+  }, "Failed to create payment");
 }
 
 export async function completeCheckoutPaymentSession(

@@ -4,10 +4,11 @@ import type {
   AddressParams,
   Cart,
   Country,
+  PaymentMethod,
   CreditCard as SpreeCreditCard,
   State,
 } from "@spree/sdk";
-import { CircleAlert, CreditCard, Loader2 } from "lucide-react";
+import { CircleAlert, CreditCard, Info, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   forwardRef,
@@ -29,7 +30,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCountryStates } from "@/hooks/useCountryStates";
 import { getCreditCards } from "@/lib/data/credit-cards";
-import { createCheckoutPaymentSession } from "@/lib/data/payment";
+import {
+  createCheckoutPaymentSession,
+  createDirectPayment,
+} from "@/lib/data/payment";
 import {
   type AddressFormData,
   addressToFormData,
@@ -38,6 +42,11 @@ import {
 } from "@/lib/utils/address";
 import { getCardIconType, getCardLabel } from "@/lib/utils/credit-card";
 import { extractBasePath } from "@/lib/utils/path";
+import { resolveGatewayId } from "@/lib/utils/payment-gateway";
+
+export type PaymentCompleteResult =
+  | { type: "session"; sessionId: string }
+  | { type: "direct" };
 
 export interface PaymentSectionHandle {
   submit: () => Promise<{ error?: string }>;
@@ -52,9 +61,10 @@ interface PaymentSectionProps {
     billing_address?: AddressParams;
     use_shipping?: boolean;
   }) => Promise<boolean>;
-  onPaymentComplete: (paymentSessionId: string) => Promise<void>;
+  onPaymentComplete: (result: PaymentCompleteResult) => Promise<void>;
   processing: boolean;
   setProcessing: (processing: boolean) => void;
+  onSessionMethodChange?: (isSessionBased: boolean) => void;
   errors?: string[];
 }
 
@@ -71,13 +81,42 @@ export const PaymentSection = forwardRef<
     onPaymentComplete,
     processing,
     setProcessing,
+    onSessionMethodChange,
     errors,
   },
   ref,
 ) {
   const t = useTranslations("checkout");
 
-  // Initialize billing address from cart, check if it matches shipping
+  // ── Payment methods from Spree ──────────────────────────────────────
+  const paymentMethods = cart.payment_methods ?? [];
+  const hasMultipleMethods = paymentMethods.length > 1;
+
+  // Default to the first method
+  const [selectedMethodId, setSelectedMethodId] = useState<string>(
+    () => paymentMethods[0]?.id ?? "",
+  );
+  const selectedMethod = paymentMethods.find(
+    (pm) => pm.id === selectedMethodId,
+  );
+  const isSessionBased = selectedMethod?.session_required ?? false;
+
+  // Zero-amount check
+  const amountDue = parseFloat(cart.amount_due ?? cart.total);
+  const isZeroAmount = amountDue === 0;
+
+  // Notify parent when session method changes (for button text)
+  const onSessionMethodChangeRef = useRef(onSessionMethodChange);
+  onSessionMethodChangeRef.current = onSessionMethodChange;
+
+  const prevIsSessionRef = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (prevIsSessionRef.current === isSessionBased) return;
+    prevIsSessionRef.current = isSessionBased;
+    onSessionMethodChangeRef.current?.(isSessionBased);
+  }, [isSessionBased]);
+
+  // ── Billing address ─────────────────────────────────────────────────
   const shipAddressData = useMemo(
     () => addressToFormData(cart.shipping_address),
     [cart.shipping_address],
@@ -94,35 +133,29 @@ export const PaymentSection = forwardRef<
   );
   const [useShippingForBilling, setUseShippingForBilling] =
     useState(initialUseShipping);
-  // Saved cards state
+
+  // ── Saved cards (session-based gateways only) ───────────────────────
   const [savedCards, setSavedCards] = useState<SpreeCreditCard[]>([]);
-  // null = "add new payment method", string = gateway_payment_profile_id of selected card
+  // null = "add new payment method", string = gateway_payment_profile_id
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
-  // Payment gateway state
+  // ── Payment gateway state (session-based) ───────────────────────────
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
   const [gatewayError, setGatewayError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const gatewayHandleRef = useRef<StripePaymentFormHandle | null>(null);
   const initRef = useRef(false);
-  // Monotonic counter to discard stale createSession responses
   const sessionRequestIdRef = useRef(0);
 
   const handleGatewayReady = useCallback((handle: StripePaymentFormHandle) => {
     gatewayHandleRef.current = handle;
   }, []);
 
-  // Find the payment method that requires a session (e.g. Stripe, Adyen)
-  const sessionPaymentMethod = cart.payment_methods?.find(
-    (pm) => pm.session_required,
-  );
-
-  // Helper: create a payment session
+  // ── Session management ──────────────────────────────────────────────
   const createSession = useCallback(
-    async (cardId: string | null) => {
-      if (!sessionPaymentMethod) return;
-
+    async (cardId: string | null, method: PaymentMethod) => {
+      const currentGatewayId = resolveGatewayId(method.type);
       const requestId = ++sessionRequestIdRef.current;
 
       setLoading(true);
@@ -132,13 +165,18 @@ export const PaymentSection = forwardRef<
       gatewayHandleRef.current = null;
 
       try {
+        // Build gateway-specific external_data
+        const externalData =
+          currentGatewayId === "stripe" && cardId
+            ? { stripe_payment_method_id: cardId }
+            : undefined;
+
         const result = await createCheckoutPaymentSession(
           cart.id,
-          sessionPaymentMethod.id,
-          cardId ?? undefined,
+          method.id,
+          externalData,
         );
 
-        // Discard if a newer request was started while this one was in flight
         if (requestId !== sessionRequestIdRef.current) return;
 
         if (result.success && result.session) {
@@ -163,16 +201,20 @@ export const PaymentSection = forwardRef<
         }
       }
     },
-    [sessionPaymentMethod, cart.id, t],
+    [cart.id, t],
   );
 
   // Track the cart total so we can recreate the session when it changes
   const lastTotalRef = useRef<string | null>(null);
   const selectedCardRef = useRef<string | null>(null);
 
-  // On mount: load saved cards (if authenticated), then create initial session — once.
+  // On mount: load saved cards (if authenticated + session method), then create initial session
   useEffect(() => {
-    if (initRef.current || !sessionPaymentMethod) return;
+    if (initRef.current) return;
+    if (!selectedMethod) return;
+    if (isZeroAmount) return;
+    if (!isSessionBased) return;
+
     initRef.current = true;
 
     const init = async () => {
@@ -180,7 +222,6 @@ export const PaymentSection = forwardRef<
 
       let initialCardId: string | null = null;
 
-      // Load saved cards for authenticated users
       if (isAuthenticated) {
         try {
           const result = await getCreditCards();
@@ -203,22 +244,28 @@ export const PaymentSection = forwardRef<
       selectedCardRef.current = initialCardId;
       lastTotalRef.current = cart.total;
 
-      // Create the initial payment session
-      await createSession(initialCardId);
+      await createSession(initialCardId, selectedMethod);
     };
 
     init();
-  }, [sessionPaymentMethod, isAuthenticated, createSession, cart.total]);
+  }, [
+    selectedMethod,
+    isSessionBased,
+    isAuthenticated,
+    createSession,
+    cart.total,
+    isZeroAmount,
+  ]);
 
-  // When cart total changes (shipping rate, coupon, etc.), recreate the
-  // payment session so the amount matches the new order total.
+  // When cart total changes, recreate the payment session
   useEffect(() => {
     if (!initRef.current) return;
+    if (!isSessionBased || !selectedMethod) return;
     if (lastTotalRef.current === cart.total) return;
 
     lastTotalRef.current = cart.total;
-    createSession(selectedCardRef.current);
-  }, [cart.total, createSession]);
+    createSession(selectedCardRef.current, selectedMethod);
+  }, [cart.total, createSession, isSessionBased, selectedMethod]);
 
   const [billStates, isPendingBill] = useCountryStates(
     billAddress.country_iso,
@@ -235,25 +282,104 @@ export const PaymentSection = forwardRef<
 
   const handleCardSelect = (cardId: string | null) => {
     if (cardId === selectedCardId) return;
+    if (!selectedMethod) return;
     setSelectedCardId(cardId);
     selectedCardRef.current = cardId;
-    createSession(cardId);
+    createSession(cardId, selectedMethod);
+  };
+
+  const handleMethodSelect = (methodId: string) => {
+    if (methodId === selectedMethodId) return;
+    setSelectedMethodId(methodId);
+
+    const newMethod = paymentMethods.find((pm) => pm.id === methodId);
+    if (!newMethod) return;
+
+    if (newMethod.session_required) {
+      // Switching to a session-based method: create session
+      // Reset saved cards state — will be re-initialized
+      if (!initRef.current) {
+        initRef.current = true;
+        const init = async () => {
+          setLoading(true);
+          let cardId: string | null = null;
+
+          if (isAuthenticated) {
+            try {
+              const result = await getCreditCards();
+              const gatewayCards = result.data.filter(
+                (card) => card.gateway_payment_profile_id,
+              );
+              setSavedCards(gatewayCards);
+              if (gatewayCards.length > 0) {
+                const defaultCard =
+                  gatewayCards.find((c) => c.default) || gatewayCards[0];
+                cardId = defaultCard.gateway_payment_profile_id;
+                setSelectedCardId(cardId);
+              }
+            } catch {
+              // proceed without saved cards
+            }
+          }
+
+          selectedCardRef.current = cardId;
+          lastTotalRef.current = cart.total;
+          await createSession(cardId, newMethod);
+        };
+        init();
+      } else {
+        createSession(selectedCardRef.current, newMethod);
+      }
+    } else {
+      // Switching to a direct method: clear session state
+      setClientSecret(null);
+      setPaymentSessionId(null);
+      setGatewayError(null);
+      gatewayHandleRef.current = null;
+      setLoading(false);
+    }
   };
 
   const updateBillAddress = (field: keyof AddressFormData, value: string) => {
     setBillAddress((prev) => updateAddressField(prev, field, value));
   };
 
-  // Expose submit handle to parent via ref
+  // ── Submit ──────────────────────────────────────────────────────────
   useImperativeHandle(
     ref,
     () => ({
       submit: async () => {
-        if (!paymentSessionId || !clientSecret) {
-          return { error: t("failedToInitPayment") };
+        // Zero amount — no payment needed
+        if (isZeroAmount) {
+          setProcessing(true);
+          try {
+            // Still update billing address
+            let addressSuccess: boolean;
+            if (useShippingForBilling) {
+              addressSuccess = await onUpdateBillingAddress({
+                use_shipping: true,
+              });
+            } else {
+              const billingData = formDataToAddress(billAddress);
+              addressSuccess = await onUpdateBillingAddress({
+                billing_address: billingData,
+              });
+            }
+            if (!addressSuccess) {
+              setProcessing(false);
+              return { error: t("failedToSaveBilling") };
+            }
+            await onPaymentComplete({ type: "direct" });
+            return {};
+          } catch {
+            const msg = t("paymentError");
+            setProcessing(false);
+            return { error: msg };
+          }
         }
-        if (!selectedCardId && !gatewayHandleRef.current) {
-          return { error: t("failedToInitPayment") };
+
+        if (!selectedMethod) {
+          return { error: t("selectPaymentMethod") };
         }
 
         setProcessing(true);
@@ -278,36 +404,62 @@ export const PaymentSection = forwardRef<
             return { error: t("failedToSaveBilling") };
           }
 
-          // 2. Confirm payment with gateway
-          // Point to the confirm-payment intermediate page so that offsite
-          // gateways (3D Secure, redirect-based) can verify the payment
-          // session before completing the cart.
-          const basePath = extractBasePath(window.location.pathname);
-          const returnUrl = `${window.location.origin}${basePath}/confirm-payment/${cart.id}?session=${paymentSessionId}`;
+          // 2. Process payment based on method type
+          if (selectedMethod.session_required) {
+            // Session-based flow (Stripe, Adyen, etc.)
+            if (!paymentSessionId || !clientSecret) {
+              setProcessing(false);
+              return { error: t("failedToInitPayment") };
+            }
+            if (!selectedCardId && !gatewayHandleRef.current) {
+              setProcessing(false);
+              return { error: t("failedToInitPayment") };
+            }
 
-          let error: string | undefined;
+            const basePath = extractBasePath(window.location.pathname);
+            const returnUrl = `${window.location.origin}${basePath}/confirm-payment/${cart.id}?session=${paymentSessionId}`;
 
-          if (selectedCardId) {
-            const result = await confirmWithSavedCard(
-              clientSecret,
-              selectedCardId,
-              returnUrl,
-            );
-            error = result.error;
-          } else {
-            const result =
-              await gatewayHandleRef.current!.confirmPayment(returnUrl);
-            error = result.error;
+            let error: string | undefined;
+
+            if (selectedCardId) {
+              const result = await confirmWithSavedCard(
+                clientSecret,
+                selectedCardId,
+                returnUrl,
+              );
+              error = result.error;
+            } else {
+              const result =
+                await gatewayHandleRef.current!.confirmPayment(returnUrl);
+              error = result.error;
+            }
+
+            if (error) {
+              setGatewayError(error);
+              setProcessing(false);
+              return { error };
+            }
+
+            await onPaymentComplete({
+              type: "session",
+              sessionId: paymentSessionId,
+            });
+            return {};
           }
 
-          if (error) {
-            setGatewayError(error);
+          // Direct payment flow (Check, Cash on Delivery, etc.)
+          const paymentResult = await createDirectPayment(
+            cart.id,
+            selectedMethod.id,
+          );
+          if (!paymentResult.success) {
+            const msg = paymentResult.error || t("failedToCreatePayment");
+            setGatewayError(msg);
             setProcessing(false);
-            return { error };
+            return { error: msg };
           }
 
-          // 3. Payment succeeded — complete session and cart
-          await onPaymentComplete(paymentSessionId);
+          await onPaymentComplete({ type: "direct" });
           return {};
         } catch {
           const msg = t("paymentError");
@@ -318,6 +470,8 @@ export const PaymentSection = forwardRef<
       },
     }),
     [
+      isZeroAmount,
+      selectedMethod,
       paymentSessionId,
       clientSecret,
       selectedCardId,
@@ -333,19 +487,77 @@ export const PaymentSection = forwardRef<
 
   const isAddingNew = selectedCardId === null;
 
+  // ── Zero amount: no payment required ────────────────────────────────
+  if (isZeroAmount) {
+    return (
+      <div>
+        <h2 className="text-lg font-bold text-gray-900">
+          {t("paymentMethod")}
+        </h2>
+        <div className="mt-2 rounded-sm border bg-gray-50 px-4 py-6 text-center">
+          <Info
+            className="w-8 h-8 text-gray-300 mx-auto mb-2"
+            strokeWidth={1.5}
+          />
+          <p className="text-sm text-gray-600">{t("noPaymentRequired")}</p>
+        </div>
+
+        {/* Billing address */}
+        <div className="mt-4">
+          <label className="flex items-center gap-2.5 cursor-pointer">
+            <Checkbox
+              checked={useShippingForBilling}
+              onCheckedChange={(checked) =>
+                handleUseShippingChange(checked === true)
+              }
+            />
+            <span className="text-sm text-gray-900">{t("sameAsShipping")}</span>
+          </label>
+          {!useShippingForBilling && (
+            <div className="mt-4">
+              <AddressFormFields
+                address={billAddress}
+                countries={countries}
+                states={billStates}
+                loadingStates={isPendingBill}
+                onChange={updateBillAddress}
+                idPrefix="bill"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── No payment methods available ────────────────────────────────────
+  if (paymentMethods.length === 0) {
+    return (
+      <div>
+        <h2 className="text-lg font-bold text-gray-900">
+          {t("paymentMethod")}
+        </h2>
+        <div className="mt-2 rounded-sm border bg-gray-50 px-4 py-8 text-center">
+          <CreditCard
+            className="w-10 h-10 text-gray-300 mx-auto mb-3"
+            strokeWidth={1.5}
+          />
+          <p className="text-sm text-gray-500">{t("noPaymentMethods")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Render ──────────────────────────────────────────────────────────
   return (
     <div>
       {/* Section Header */}
       <h2 className="text-lg font-bold text-gray-900">{t("paymentMethod")}</h2>
       <p className="text-sm text-gray-500 mt-0.5">{t("secureTransactions")}</p>
-      {/* Demo-only: Remove for production. */}
-      <p className="text-xs text-gray-400 mb-3">
-        {t("testCardNote", { testCard: "4242 4242 4242 4242" })}
-      </p>
 
       {/* Inline requirement errors from parent */}
       {errors && errors.length > 0 && (
-        <div className="rounded-sm border border-red-300 bg-red-50 px-4 py-3 mb-3">
+        <div className="rounded-sm border border-red-300 bg-red-50 px-4 py-3 mb-3 mt-2">
           {errors.map((err, i) => (
             <p key={i} className="text-sm text-red-700">
               {err}
@@ -354,126 +566,202 @@ export const PaymentSection = forwardRef<
         </div>
       )}
 
-      {/* Payment method bordered container — Shopify style */}
+      {/* Payment methods */}
       <RadioGroup
-        value={selectedCardId ?? "__new__"}
-        onValueChange={(val) =>
-          handleCardSelect(val === "__new__" ? null : val)
-        }
-        className="rounded-sm border overflow-hidden gap-0"
+        value={selectedMethodId}
+        onValueChange={handleMethodSelect}
+        className="rounded-sm border overflow-hidden gap-0 mt-3"
       >
-        {/* Saved Cards */}
-        {savedCards.length > 0 && (
-          <>
-            {savedCards.map((card, index) => (
-              <label
-                key={card.id}
-                className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
-                  selectedCardId === card.gateway_payment_profile_id
-                    ? "bg-blue-50"
-                    : "bg-white hover:bg-gray-50"
-                } ${index > 0 ? "border-t" : ""}`}
-              >
-                <RadioGroupItem
-                  value={card.gateway_payment_profile_id ?? card.id}
-                />
-                <PaymentIcon
-                  type={getCardIconType(card.brand)}
-                  format="flatRounded"
-                  width={34}
-                />
-                <span className="text-sm text-gray-900 flex-1">
-                  {t("savedCardLabel", {
-                    brand: getCardLabel(card.brand),
-                    digits: card.last4,
-                  })}
-                </span>
-                <span className="text-xs text-gray-500">
-                  {t("cardExpiry", {
-                    month: String(card.month).padStart(2, "0"),
-                    year: String(card.year),
-                  })}
-                </span>
-                {card.default && (
-                  <span className="text-[11px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                    {t("default")}
+        {paymentMethods.map((pm, index) => {
+          const isSelected = pm.id === selectedMethodId;
+          const pmGatewayId = pm.session_required
+            ? resolveGatewayId(pm.type)
+            : null;
+          const isPmStripe = pmGatewayId === "stripe";
+
+          return (
+            <div key={pm.id}>
+              {/* Method header row */}
+              {hasMultipleMethods && (
+                <label
+                  className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
+                    isSelected ? "bg-blue-50" : "bg-white hover:bg-gray-50"
+                  } ${index > 0 ? "border-t" : ""}`}
+                >
+                  <RadioGroupItem value={pm.id} />
+                  <span className="text-sm font-medium text-gray-900">
+                    {pm.name}
                   </span>
-                )}
-              </label>
-            ))}
+                </label>
+              )}
 
-            {/* Add new card option */}
-            <label
-              className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer border-t transition-colors ${
-                isAddingNew ? "bg-blue-50" : "bg-white hover:bg-gray-50"
-              }`}
-            >
-              <RadioGroupItem value="__new__" />
-              <CreditCard className="w-5 h-5 text-gray-400" strokeWidth={1.5} />
-              <span className="text-sm text-gray-900">
-                {t("addNewPaymentMethod")}
-              </span>
-            </label>
-          </>
-        )}
+              {/* Single method header (no radio, like current behavior) */}
+              {!hasMultipleMethods && (
+                <div className="flex items-center justify-between px-4 py-3.5 bg-blue-50">
+                  <div className="flex items-center gap-3">
+                    <RadioGroupItem value={pm.id} />
+                    <span className="text-sm font-medium text-gray-900">
+                      {pm.name}
+                    </span>
+                  </div>
+                </div>
+              )}
 
-        {/* Credit card header when no saved cards */}
-        {savedCards.length === 0 && (
-          <div className="flex items-center justify-between px-4 py-3.5 bg-blue-50">
-            <div className="flex items-center gap-3">
-              <RadioGroupItem value="__new__" />
-              <span className="text-sm font-medium text-gray-900">
-                {t("creditCard")}
-              </span>
+              {/* Sub-form for the selected method */}
+              {isSelected && (
+                <div
+                  className={`border-t bg-gray-50 ${hasMultipleMethods ? "" : ""}`}
+                >
+                  {/* ── Session-based: Stripe ── */}
+                  {pm.session_required && isPmStripe && (
+                    <>
+                      {/* Demo-only test card note */}
+                      <p className="text-xs text-gray-400 px-4 pt-3">
+                        {t("testCardNote", {
+                          testCard: "4242 4242 4242 4242",
+                        })}
+                      </p>
+
+                      {/* Saved cards (nested radio group) */}
+                      {savedCards.length > 0 && (
+                        <div className="px-4 pt-3">
+                          <RadioGroup
+                            value={selectedCardId ?? "__new__"}
+                            onValueChange={(val) =>
+                              handleCardSelect(val === "__new__" ? null : val)
+                            }
+                            className="gap-0 rounded-sm border overflow-hidden"
+                          >
+                            {savedCards.map((card, cardIndex) => (
+                              <label
+                                key={card.id}
+                                className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                                  selectedCardId ===
+                                  card.gateway_payment_profile_id
+                                    ? "bg-white"
+                                    : "bg-white hover:bg-gray-50"
+                                } ${cardIndex > 0 ? "border-t" : ""}`}
+                              >
+                                <RadioGroupItem
+                                  value={
+                                    card.gateway_payment_profile_id ?? card.id
+                                  }
+                                />
+                                <PaymentIcon
+                                  type={getCardIconType(card.brand)}
+                                  format="flatRounded"
+                                  width={34}
+                                />
+                                <span className="text-sm text-gray-900 flex-1">
+                                  {t("savedCardLabel", {
+                                    brand: getCardLabel(card.brand),
+                                    digits: card.last4,
+                                  })}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {t("cardExpiry", {
+                                    month: String(card.month).padStart(2, "0"),
+                                    year: String(card.year),
+                                  })}
+                                </span>
+                                {card.default && (
+                                  <span className="text-[11px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+                                    {t("default")}
+                                  </span>
+                                )}
+                              </label>
+                            ))}
+
+                            {/* Add new card */}
+                            <label
+                              className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-t transition-colors ${
+                                isAddingNew
+                                  ? "bg-white"
+                                  : "bg-white hover:bg-gray-50"
+                              }`}
+                            >
+                              <RadioGroupItem value="__new__" />
+                              <CreditCard
+                                className="w-5 h-5 text-gray-400"
+                                strokeWidth={1.5}
+                              />
+                              <span className="text-sm text-gray-900">
+                                {t("addNewPaymentMethod")}
+                              </span>
+                            </label>
+                          </RadioGroup>
+                        </div>
+                      )}
+
+                      {/* Loading state */}
+                      {loading && (
+                        <div className="flex items-center justify-center py-10">
+                          <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
+                          <span className="ml-2 text-sm text-gray-500">
+                            {t("loadingPaymentForm")}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Gateway error */}
+                      {gatewayError && !loading && (
+                        <div className="px-4 py-3">
+                          <div className="rounded-sm border border-red-300 bg-red-50 px-4 py-3">
+                            <p className="text-sm text-red-700 flex items-center gap-2">
+                              <CircleAlert className="h-4 w-4 flex-shrink-0" />
+                              {gatewayError}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Stripe PaymentElement */}
+                      {clientSecret && !loading && isAddingNew && (
+                        <div className="p-4">
+                          <StripePaymentForm
+                            key={clientSecret}
+                            clientSecret={clientSecret}
+                            onReady={handleGatewayReady}
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* ── Session-based: unsupported gateway ── */}
+                  {pm.session_required && !isPmStripe && (
+                    <div className="px-4 py-6 text-center">
+                      <Info
+                        className="w-8 h-8 text-gray-300 mx-auto mb-2"
+                        strokeWidth={1.5}
+                      />
+                      <p className="text-sm text-gray-500">
+                        {t("unsupportedGateway")}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* ── Direct/manual payment ── */}
+                  {!pm.session_required && (
+                    <div className="px-4 py-4">
+                      {pm.description && (
+                        <p className="text-sm text-gray-600 mb-2">
+                          {pm.description}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500">
+                        {t("manualPaymentInfo")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        )}
-
-        {/* Card form area — inside the bordered container */}
-        <div className="border-t bg-gray-50">
-          {loading && (
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
-              <span className="ml-2 text-sm text-gray-500">
-                {t("loadingPaymentForm")}
-              </span>
-            </div>
-          )}
-
-          {gatewayError && !loading && (
-            <div className="px-4 py-3">
-              <div className="rounded-sm border border-red-300 bg-red-50 px-4 py-3">
-                <p className="text-sm text-red-700 flex items-center gap-2">
-                  <CircleAlert className="h-4 w-4 flex-shrink-0" />
-                  {gatewayError}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {clientSecret && !loading && isAddingNew && (
-            <div className="p-4">
-              <StripePaymentForm
-                key={clientSecret}
-                clientSecret={clientSecret}
-                onReady={handleGatewayReady}
-              />
-            </div>
-          )}
-
-          {!sessionPaymentMethod && !loading && (
-            <div className="px-4 py-8 text-center">
-              <CreditCard
-                className="w-10 h-10 text-gray-300 mx-auto mb-3"
-                strokeWidth={1.5}
-              />
-              <p className="text-sm text-gray-500">{t("noPaymentMethods")}</p>
-            </div>
-          )}
-        </div>
+          );
+        })}
       </RadioGroup>
 
-      {/* Billing address — Shopify checkbox below payment box */}
+      {/* Billing address — below payment box */}
       <div className="mt-4">
         <label className="flex items-center gap-2.5 cursor-pointer">
           <Checkbox

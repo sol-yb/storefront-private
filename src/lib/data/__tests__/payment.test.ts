@@ -68,10 +68,12 @@ describe("payment server actions", () => {
       expect(result).toEqual({ success: true, session: mockSession });
     });
 
-    it("passes stripe payment method id in external_data", async () => {
+    it("passes external_data when provided", async () => {
       mockClient.carts.paymentSessions.create.mockResolvedValue(mockSession);
 
-      await createCheckoutPaymentSession("cart-1", "pm-1", "spm_123");
+      await createCheckoutPaymentSession("cart-1", "pm-1", {
+        stripe_payment_method_id: "spm_123",
+      });
 
       expect(mockClient.carts.paymentSessions.create).toHaveBeenCalledWith(
         "cart-1",
