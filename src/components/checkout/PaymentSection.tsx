@@ -26,6 +26,10 @@ import {
   type AdyenPaymentFormHandle,
 } from "@/components/checkout/AdyenPaymentForm";
 import {
+  PayPalPaymentForm,
+  type PayPalPaymentFormHandle,
+} from "@/components/checkout/PayPalPaymentForm";
+import {
   confirmWithSavedCard,
   StripePaymentForm,
   type StripePaymentFormHandle,
@@ -151,13 +155,21 @@ export function PaymentSection({
   const [gatewayError, setGatewayError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const gatewayHandleRef = useRef<
-    StripePaymentFormHandle | AdyenPaymentFormHandle | null
+    | StripePaymentFormHandle
+    | AdyenPaymentFormHandle
+    | PayPalPaymentFormHandle
+    | null
   >(null);
   const initRef = useRef(false);
   const sessionRequestIdRef = useRef(0);
 
   const handleGatewayReady = useCallback(
-    (handle: StripePaymentFormHandle | AdyenPaymentFormHandle) => {
+    (
+      handle:
+        | StripePaymentFormHandle
+        | AdyenPaymentFormHandle
+        | PayPalPaymentFormHandle,
+    ) => {
       gatewayHandleRef.current = handle;
     },
     [],
@@ -770,6 +782,19 @@ export function PaymentSection({
                                     key={sid}
                                     sessionId={sid}
                                     sessionData={sdata}
+                                    onReady={handleGatewayReady}
+                                  />
+                                </div>
+                              ) : null;
+                            }
+                            case "paypal": {
+                              const orderId = ext.id as string | undefined;
+                              return orderId ? (
+                                <div className="p-4">
+                                  <PayPalPaymentForm
+                                    key={orderId}
+                                    paypalOrderId={orderId}
+                                    currency={cart.currency}
                                     onReady={handleGatewayReady}
                                   />
                                 </div>
