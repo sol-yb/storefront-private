@@ -420,6 +420,9 @@ function CheckoutPageContent({ params }: CheckoutPageProps) {
           const sessionResult = await completeCheckoutPaymentSession(
             currentOrder.id,
             result.sessionId,
+            result.sessionResult
+              ? { session_result: result.sessionResult }
+              : undefined,
           );
 
           if (!sessionResult.success) {

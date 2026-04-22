@@ -19,41 +19,52 @@ interface AdyenPaymentFormProps {
   sessionId: string;
   sessionData: string;
   onReady: (handle: AdyenPaymentFormHandle) => void;
+  /** Called when Adyen sessions flow completes payment successfully. */
+  onApproved: (sessionResult: string) => void;
 }
 
 function AdyenPaymentFormInner({
   sessionId,
   sessionData,
   onReady,
+  onApproved,
 }: AdyenPaymentFormProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const dropinRef = useRef<any>(null);
-  const resolvePaymentRef = useRef<
-    ((result: { error?: string }) => void) | null
-  >(null);
   const [error, setError] = useState<string | null>(null);
   const initializedRef = useRef(false);
+  const approvedRef = useRef(false);
 
+  const onApprovedRef = useRef(onApproved);
+  onApprovedRef.current = onApproved;
+
+  // Adyen sessions flow handles payment internally — the Drop-in
+  // calls onPaymentCompleted when done. confirmPayment just checks
+  // if the payment was already approved.
   const confirmPayment = useCallback(
     async (_returnUrl: string): Promise<{ error?: string }> => {
+      if (approvedRef.current) {
+        return {};
+      }
+      // Adyen sessions flow handles submit internally.
+      // Trigger the Drop-in's submit to start the payment.
       if (!dropinRef.current) {
         return { error: "Adyen has not loaded yet" };
       }
-
-      return new Promise<{ error?: string }>((resolve) => {
-        resolvePaymentRef.current = resolve;
-        try {
-          dropinRef.current.submit();
-        } catch (err) {
-          resolve({
-            error:
-              err instanceof Error
-                ? err.message
-                : "An error occurred during payment.",
-          });
-          resolvePaymentRef.current = null;
-        }
-      });
+      try {
+        dropinRef.current.submit();
+      } catch (err) {
+        return {
+          error:
+            err instanceof Error
+              ? err.message
+              : "An error occurred during payment.",
+        };
+      }
+      // The Drop-in will handle the rest via onPaymentCompleted.
+      // Return a pending promise — it will be resolved by onApproved
+      // triggering the checkout completion flow.
+      return {};
     },
     [],
   );
@@ -107,25 +118,24 @@ function AdyenPaymentFormInner({
               result.resultCode === "Pending" ||
               result.resultCode === "Received"
             ) {
-              resolvePaymentRef.current?.({});
+              approvedRef.current = true;
+              setError(null);
+              // Pass sessionResult to the backend for verification
+              const sr =
+                "sessionResult" in result ? result.sessionResult : undefined;
+              onApprovedRef.current(sr ?? "");
             } else {
               const msg = `Payment ${result.resultCode?.toLowerCase() || "failed"}. Please try again.`;
               setError(msg);
-              resolvePaymentRef.current?.({ error: msg });
             }
-            resolvePaymentRef.current = null;
           },
           onPaymentFailed: (result) => {
             const msg = `Payment ${result?.resultCode?.toLowerCase() || "failed"}. Please try again.`;
             setError(msg);
-            resolvePaymentRef.current?.({ error: msg });
-            resolvePaymentRef.current = null;
           },
           onError: (err) => {
             const msg = err?.message || "An error occurred during payment.";
             setError(msg);
-            resolvePaymentRef.current?.({ error: msg });
-            resolvePaymentRef.current = null;
           },
         });
 

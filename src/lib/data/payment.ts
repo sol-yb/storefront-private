@@ -52,6 +52,7 @@ export async function createDirectPayment(
 export async function completeCheckoutPaymentSession(
   cartId: string,
   sessionId: string,
+  params?: { session_result?: string; external_data?: Record<string, unknown> },
 ) {
   return actionResult(async () => {
     const options = await getCartOptions();
@@ -59,7 +60,7 @@ export async function completeCheckoutPaymentSession(
     const session = await getClient().carts.paymentSessions.complete(
       id,
       sessionId,
-      undefined,
+      params,
       options,
     );
     updateTag("checkout");

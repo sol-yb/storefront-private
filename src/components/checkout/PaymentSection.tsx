@@ -53,7 +53,7 @@ import { extractBasePath } from "@/lib/utils/path";
 import { resolveGatewayId } from "@/lib/utils/payment-gateway";
 
 export type PaymentCompleteResult =
-  | { type: "session"; sessionId: string }
+  | { type: "session"; sessionId: string; sessionResult?: string }
   | { type: "direct" };
 
 export interface PaymentSectionHandle {
@@ -377,49 +377,58 @@ export function PaymentSection({
     setBillAddress((prev) => updateAddressField(prev, field, value));
   };
 
-  // ── Auto-complete after gateway approval (PayPal popup / Adyen Pay button) ──
-  const handleGatewayApproved = useCallback(async () => {
-    if (completionInFlightRef.current) return;
-    if (!paymentSessionId) return;
+  // ── Auto-complete after gateway approval (PayPal popup / Adyen sessions) ──
+  const handleGatewayApproved = useCallback(
+    async (sessionResult?: string) => {
+      if (completionInFlightRef.current) return;
+      if (!paymentSessionId) return;
 
-    completionInFlightRef.current = true;
-    setProcessing(true);
-    setGatewayError(null);
+      completionInFlightRef.current = true;
+      setProcessing(true);
+      setGatewayError(null);
 
-    try {
-      // Update billing address
-      let addressSuccess: boolean;
-      if (useShippingForBilling) {
-        addressSuccess = await onUpdateBillingAddress({ use_shipping: true });
-      } else {
-        const billingData = formDataToAddress(billAddress);
-        addressSuccess = await onUpdateBillingAddress({
-          billing_address: billingData,
+      try {
+        // Update billing address
+        let addressSuccess: boolean;
+        if (useShippingForBilling) {
+          addressSuccess = await onUpdateBillingAddress({
+            use_shipping: true,
+          });
+        } else {
+          const billingData = formDataToAddress(billAddress);
+          addressSuccess = await onUpdateBillingAddress({
+            billing_address: billingData,
+          });
+        }
+
+        if (!addressSuccess) {
+          setProcessing(false);
+          completionInFlightRef.current = false;
+          setGatewayError(t("failedToSaveBilling"));
+          return;
+        }
+
+        await onPaymentComplete({
+          type: "session",
+          sessionId: paymentSessionId,
+          sessionResult,
         });
-      }
-
-      if (!addressSuccess) {
+      } catch {
+        setGatewayError(t("paymentError"));
         setProcessing(false);
         completionInFlightRef.current = false;
-        setGatewayError(t("failedToSaveBilling"));
-        return;
       }
-
-      await onPaymentComplete({ type: "session", sessionId: paymentSessionId });
-    } catch {
-      setGatewayError(t("paymentError"));
-      setProcessing(false);
-      completionInFlightRef.current = false;
-    }
-  }, [
-    paymentSessionId,
-    useShippingForBilling,
-    billAddress,
-    onUpdateBillingAddress,
-    onPaymentComplete,
-    setProcessing,
-    t,
-  ]);
+    },
+    [
+      paymentSessionId,
+      useShippingForBilling,
+      billAddress,
+      onUpdateBillingAddress,
+      onPaymentComplete,
+      setProcessing,
+      t,
+    ],
+  );
 
   // ── Submit ──────────────────────────────────────────────────────────
   useImperativeHandle(
@@ -852,6 +861,7 @@ export function PaymentSection({
                                     sessionId={sid}
                                     sessionData={sdata}
                                     onReady={handleGatewayReady}
+                                    onApproved={handleGatewayApproved}
                                   />
                                 </div>
                               ) : null;
