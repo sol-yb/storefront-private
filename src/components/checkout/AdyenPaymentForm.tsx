@@ -89,6 +89,17 @@ function AdyenPaymentFormInner({
 
         if (cancelled || !containerRef.current) return;
 
+        // Register payment method components globally so Drop-in can use them
+        AdyenCheckout.register(
+          Card,
+          GooglePay,
+          ApplePay,
+          PayPal,
+          Klarna,
+          Bancontact,
+          Redirect,
+        );
+
         const checkout = await AdyenCheckout({
           clientKey: adyenClientKey,
           environment: adyenEnvironment,
