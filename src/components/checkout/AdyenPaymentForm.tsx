@@ -34,7 +34,7 @@ function AdyenPaymentFormInner({
     ((result: { error?: string }) => void) | null
   >(null);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const initializedRef = useRef(false);
 
   const confirmPayment = useCallback(
     async (_returnUrl: string): Promise<{ error?: string }> => {
@@ -67,14 +67,14 @@ function AdyenPaymentFormInner({
   }, []);
 
   useEffect(() => {
-    if (mounted) return;
+    if (initializedRef.current) return;
     if (!containerRef.current) return;
+    initializedRef.current = true;
 
     let cancelled = false;
 
     async function init() {
       try {
-        console.log("[Adyen] Loading SDK...");
         const adyen = await import("@adyen/adyen-web");
         const {
           AdyenCheckout,
@@ -99,11 +99,6 @@ function AdyenPaymentFormInner({
           Bancontact,
           Redirect,
         );
-
-        console.log("[Adyen] Creating checkout with session:", {
-          id: sessionId,
-          sessionData: sessionData?.substring(0, 30) + "...",
-        });
 
         const checkout = await AdyenCheckout({
           clientKey: adyenClientKey,
@@ -143,11 +138,6 @@ function AdyenPaymentFormInner({
 
         if (cancelled || !containerRef.current) return;
 
-        console.log(
-          "[Adyen] Checkout created, payment methods:",
-          checkout.paymentMethodsResponse,
-        );
-
         const dropin = new Dropin(checkout, {
           openFirstPaymentMethod: true,
           paymentMethodComponents: [
@@ -161,14 +151,16 @@ function AdyenPaymentFormInner({
           ],
         });
 
-        console.log("[Adyen] Mounting dropin to:", containerRef.current);
-        dropin.mount(containerRef.current);
+        // Mount into a non-React-managed DOM node to avoid Preact/React conflicts.
+        // The Adyen SDK uses Preact internally; mounting directly into a React ref
+        // causes Preact's render() to silently fail because React owns that DOM node.
+        const mountNode = document.createElement("div");
+        containerRef.current.appendChild(mountNode);
+        dropin.mount(mountNode);
         dropinRef.current = dropin;
-        setMounted(true);
-        console.log("[Adyen] Dropin mounted successfully");
-
         onReady({ confirmPayment, fetchUpdates });
       } catch (err) {
+        initializedRef.current = false;
         if (!cancelled) {
           setError(
             err instanceof Error
@@ -188,8 +180,13 @@ function AdyenPaymentFormInner({
       } catch {
         // unmount can throw if not mounted
       }
+      // Clean up the imperatively created mount node
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
+      initializedRef.current = false;
     };
-  }, [sessionId, sessionData, onReady, confirmPayment, fetchUpdates, mounted]);
+  }, [sessionId, sessionData, onReady, confirmPayment, fetchUpdates]);
 
   return (
     <div>
