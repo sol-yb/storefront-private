@@ -19,34 +19,41 @@ interface AdyenPaymentFormProps {
   sessionId: string;
   sessionData: string;
   onReady: (handle: AdyenPaymentFormHandle) => void;
-  /** Called when the Adyen Drop-in completes payment successfully. */
-  onApproved: () => void;
 }
 
 function AdyenPaymentFormInner({
   sessionId,
   sessionData,
   onReady,
-  onApproved,
 }: AdyenPaymentFormProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const dropinRef = useRef<any>(null);
+  const resolvePaymentRef = useRef<
+    ((result: { error?: string }) => void) | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
   const initializedRef = useRef(false);
 
-  const onApprovedRef = useRef(onApproved);
-  onApprovedRef.current = onApproved;
-
-  // Adyen Drop-in with sessions flow manages its own submit via its
-  // built-in Pay button. confirmPayment checks if payment already completed.
-  const approvedRef = useRef(false);
   const confirmPayment = useCallback(
     async (_returnUrl: string): Promise<{ error?: string }> => {
-      if (approvedRef.current) {
-        return {};
+      if (!dropinRef.current) {
+        return { error: "Adyen has not loaded yet" };
       }
-      // Adyen handles submit internally via its own Pay button
-      return { error: "Please complete payment using the Adyen form." };
+
+      return new Promise<{ error?: string }>((resolve) => {
+        resolvePaymentRef.current = resolve;
+        try {
+          dropinRef.current.submit();
+        } catch (err) {
+          resolve({
+            error:
+              err instanceof Error
+                ? err.message
+                : "An error occurred during payment.",
+          });
+          resolvePaymentRef.current = null;
+        }
+      });
     },
     [],
   );
@@ -93,29 +100,32 @@ function AdyenPaymentFormInner({
             id: sessionId,
             sessionData,
           },
-          // Show Adyen's own Pay button — sessions flow handles payment internally
-          showPayButton: true,
+          showPayButton: false,
           onPaymentCompleted: (result) => {
             if (
               result.resultCode === "Authorised" ||
               result.resultCode === "Pending" ||
               result.resultCode === "Received"
             ) {
-              approvedRef.current = true;
-              setError(null);
-              onApprovedRef.current();
+              resolvePaymentRef.current?.({});
             } else {
               const msg = `Payment ${result.resultCode?.toLowerCase() || "failed"}. Please try again.`;
               setError(msg);
+              resolvePaymentRef.current?.({ error: msg });
             }
+            resolvePaymentRef.current = null;
           },
           onPaymentFailed: (result) => {
             const msg = `Payment ${result?.resultCode?.toLowerCase() || "failed"}. Please try again.`;
             setError(msg);
+            resolvePaymentRef.current?.({ error: msg });
+            resolvePaymentRef.current = null;
           },
           onError: (err) => {
             const msg = err?.message || "An error occurred during payment.";
             setError(msg);
+            resolvePaymentRef.current?.({ error: msg });
+            resolvePaymentRef.current = null;
           },
         });
 

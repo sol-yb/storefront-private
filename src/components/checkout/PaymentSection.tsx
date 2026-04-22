@@ -852,7 +852,6 @@ export function PaymentSection({
                                     sessionId={sid}
                                     sessionData={sdata}
                                     onReady={handleGatewayReady}
-                                    onApproved={handleGatewayApproved}
                                   />
                                 </div>
                               ) : null;
