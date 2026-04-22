@@ -3,6 +3,7 @@
 import { CircleAlert } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import "@adyen/adyen-web/styles/adyen.css";
 import {
   adyenClientKey,
   adyenEnvironment,
@@ -73,6 +74,7 @@ function AdyenPaymentFormInner({
 
     async function init() {
       try {
+        console.log("[Adyen] Loading SDK...");
         const adyen = await import("@adyen/adyen-web");
         const {
           AdyenCheckout,
@@ -85,8 +87,6 @@ function AdyenPaymentFormInner({
           Bancontact,
           Redirect,
         } = adyen;
-        await import("@adyen/adyen-web/styles/adyen.css");
-
         if (cancelled || !containerRef.current) return;
 
         // Register payment method components globally so Drop-in can use them
@@ -99,6 +99,11 @@ function AdyenPaymentFormInner({
           Bancontact,
           Redirect,
         );
+
+        console.log("[Adyen] Creating checkout with session:", {
+          id: sessionId,
+          sessionData: sessionData?.substring(0, 30) + "...",
+        });
 
         const checkout = await AdyenCheckout({
           clientKey: adyenClientKey,
@@ -138,6 +143,11 @@ function AdyenPaymentFormInner({
 
         if (cancelled || !containerRef.current) return;
 
+        console.log(
+          "[Adyen] Checkout created, payment methods:",
+          checkout.paymentMethodsResponse,
+        );
+
         const dropin = new Dropin(checkout, {
           openFirstPaymentMethod: true,
           paymentMethodComponents: [
@@ -151,9 +161,11 @@ function AdyenPaymentFormInner({
           ],
         });
 
+        console.log("[Adyen] Mounting dropin to:", containerRef.current);
         dropin.mount(containerRef.current);
         dropinRef.current = dropin;
         setMounted(true);
+        console.log("[Adyen] Dropin mounted successfully");
 
         onReady({ confirmPayment, fetchUpdates });
       } catch (err) {
