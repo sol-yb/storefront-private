@@ -19,52 +19,39 @@ interface AdyenPaymentFormProps {
   sessionId: string;
   sessionData: string;
   onReady: (handle: AdyenPaymentFormHandle) => void;
+  /** Called when the Adyen Drop-in completes payment successfully. */
+  onApproved: () => void;
 }
 
 function AdyenPaymentFormInner({
   sessionId,
   sessionData,
   onReady,
+  onApproved,
 }: AdyenPaymentFormProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  // Adyen SDK types use Preact internally — use a loose ref to avoid
-  // coupling to their internal component hierarchy.
   const dropinRef = useRef<any>(null);
-  const resolvePaymentRef = useRef<
-    ((result: { error?: string }) => void) | null
-  >(null);
   const [error, setError] = useState<string | null>(null);
   const initializedRef = useRef(false);
 
+  const onApprovedRef = useRef(onApproved);
+  onApprovedRef.current = onApproved;
+
+  // Adyen Drop-in with sessions flow manages its own submit via its
+  // built-in Pay button. confirmPayment checks if payment already completed.
+  const approvedRef = useRef(false);
   const confirmPayment = useCallback(
     async (_returnUrl: string): Promise<{ error?: string }> => {
-      if (!dropinRef.current) {
-        return { error: "Adyen has not loaded yet" };
+      if (approvedRef.current) {
+        return {};
       }
-
-      // The Drop-in handles its own submit flow. We trigger it
-      // programmatically and wait for onPaymentCompleted/onPaymentFailed.
-      return new Promise<{ error?: string }>((resolve) => {
-        resolvePaymentRef.current = resolve;
-        try {
-          dropinRef.current.submit();
-        } catch (err) {
-          resolve({
-            error:
-              err instanceof Error
-                ? err.message
-                : "An error occurred during payment.",
-          });
-          resolvePaymentRef.current = null;
-        }
-      });
+      // Adyen handles submit internally via its own Pay button
+      return { error: "Please complete payment using the Adyen form." };
     },
     [],
   );
 
-  const fetchUpdates = useCallback(async () => {
-    // Adyen sessions auto-update; no manual fetch needed
-  }, []);
+  const fetchUpdates = useCallback(async () => {}, []);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -89,7 +76,6 @@ function AdyenPaymentFormInner({
         } = adyen;
         if (cancelled || !containerRef.current) return;
 
-        // Register payment method components globally so Drop-in can use them
         AdyenCheckout.register(
           Card,
           GooglePay,
@@ -107,32 +93,29 @@ function AdyenPaymentFormInner({
             id: sessionId,
             sessionData,
           },
-          showPayButton: false,
+          // Show Adyen's own Pay button — sessions flow handles payment internally
+          showPayButton: true,
           onPaymentCompleted: (result) => {
             if (
               result.resultCode === "Authorised" ||
               result.resultCode === "Pending" ||
               result.resultCode === "Received"
             ) {
-              resolvePaymentRef.current?.({});
+              approvedRef.current = true;
+              setError(null);
+              onApprovedRef.current();
             } else {
               const msg = `Payment ${result.resultCode?.toLowerCase() || "failed"}. Please try again.`;
               setError(msg);
-              resolvePaymentRef.current?.({ error: msg });
             }
-            resolvePaymentRef.current = null;
           },
-          onPaymentFailed: () => {
-            const msg = "An error occurred during payment.";
+          onPaymentFailed: (result) => {
+            const msg = `Payment ${result?.resultCode?.toLowerCase() || "failed"}. Please try again.`;
             setError(msg);
-            resolvePaymentRef.current?.({ error: msg });
-            resolvePaymentRef.current = null;
           },
           onError: (err) => {
             const msg = err?.message || "An error occurred during payment.";
             setError(msg);
-            resolvePaymentRef.current?.({ error: msg });
-            resolvePaymentRef.current = null;
           },
         });
 
@@ -151,9 +134,7 @@ function AdyenPaymentFormInner({
           ],
         });
 
-        // Mount into a non-React-managed DOM node to avoid Preact/React conflicts.
-        // The Adyen SDK uses Preact internally; mounting directly into a React ref
-        // causes Preact's render() to silently fail because React owns that DOM node.
+        // Mount into a non-React-managed DOM node to avoid Preact/React conflicts
         const mountNode = document.createElement("div");
         containerRef.current.appendChild(mountNode);
         dropin.mount(mountNode);
@@ -180,7 +161,6 @@ function AdyenPaymentFormInner({
       } catch {
         // unmount can throw if not mounted
       }
-      // Clean up the imperatively created mount node
       if (containerRef.current) {
         containerRef.current.innerHTML = "";
       }

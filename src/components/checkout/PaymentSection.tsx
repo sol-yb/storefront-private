@@ -377,8 +377,8 @@ export function PaymentSection({
     setBillAddress((prev) => updateAddressField(prev, field, value));
   };
 
-  // ── PayPal: auto-complete after user approves in the popup ─────────
-  const handlePayPalApproved = useCallback(async () => {
+  // ── Auto-complete after gateway approval (PayPal popup / Adyen Pay button) ──
+  const handleGatewayApproved = useCallback(async () => {
     if (completionInFlightRef.current) return;
     if (!paymentSessionId) return;
 
@@ -852,6 +852,7 @@ export function PaymentSection({
                                     sessionId={sid}
                                     sessionData={sdata}
                                     onReady={handleGatewayReady}
+                                    onApproved={handleGatewayApproved}
                                   />
                                 </div>
                               ) : null;
@@ -865,7 +866,7 @@ export function PaymentSection({
                                     paypalOrderId={orderId}
                                     currency={cart.currency}
                                     onReady={handleGatewayReady}
-                                    onApproved={handlePayPalApproved}
+                                    onApproved={handleGatewayApproved}
                                   />
                                 </div>
                               ) : null;
