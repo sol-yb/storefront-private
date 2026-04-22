@@ -73,7 +73,18 @@ function AdyenPaymentFormInner({
 
     async function init() {
       try {
-        const { AdyenCheckout, Dropin } = await import("@adyen/adyen-web");
+        const adyen = await import("@adyen/adyen-web");
+        const {
+          AdyenCheckout,
+          Dropin,
+          Card,
+          GooglePay,
+          ApplePay,
+          PayPal,
+          Klarna,
+          Bancontact,
+          Redirect,
+        } = adyen;
         await import("@adyen/adyen-web/styles/adyen.css");
 
         if (cancelled || !containerRef.current) return;
@@ -118,6 +129,15 @@ function AdyenPaymentFormInner({
 
         const dropin = new Dropin(checkout, {
           openFirstPaymentMethod: true,
+          paymentMethodComponents: [
+            Card,
+            GooglePay,
+            ApplePay,
+            PayPal,
+            Klarna,
+            Bancontact,
+            Redirect,
+          ],
         });
 
         dropin.mount(containerRef.current);
