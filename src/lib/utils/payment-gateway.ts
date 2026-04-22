@@ -54,5 +54,6 @@ export const isAdyenConfigured = Boolean(
 export const adyenClientKey = process.env.NEXT_PUBLIC_ADYEN_CLIENT_KEY ?? "";
 
 /** Adyen environment: "test" or "live". */
-export const adyenEnvironment = (process.env.NEXT_PUBLIC_ADYEN_ENVIRONMENT ??
-  "test") as "test" | "live";
+const rawAdyenEnv = process.env.NEXT_PUBLIC_ADYEN_ENVIRONMENT;
+export const adyenEnvironment: "test" | "live" =
+  rawAdyenEnv === "live" ? "live" : "test";

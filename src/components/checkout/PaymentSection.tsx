@@ -103,11 +103,13 @@ export function PaymentSection({
   const selectedMethod = paymentMethods.find(
     (pm) => pm.id === selectedMethodId,
   );
-  const isSessionBased = selectedMethod?.session_required ?? false;
-
   // Zero-amount check
   const amountDue = parseFloat(cart.amount_due ?? cart.total);
   const isZeroAmount = amountDue === 0;
+
+  // Free orders are always treated as non-session (no payment needed)
+  const isSessionBased =
+    !isZeroAmount && (selectedMethod?.session_required ?? false);
 
   // Notify parent when session method changes (for button text)
   const onSessionMethodChangeRef = useRef(onSessionMethodChange);
@@ -352,7 +354,9 @@ export function PaymentSection({
         createSession(selectedCardRef.current, newMethod);
       }
     } else {
-      // Switching to a direct method: clear session state
+      // Switching to a direct method: invalidate any in-flight session
+      // request so a late-resolving createSession won't repopulate state.
+      sessionRequestIdRef.current += 1;
       setSessionExternalData(null);
       setPaymentSessionId(null);
       setGatewayError(null);
