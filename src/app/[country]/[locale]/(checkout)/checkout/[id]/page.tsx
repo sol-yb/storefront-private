@@ -30,12 +30,14 @@ async function CheckoutDataLoader({ params }: CheckoutPageProps) {
 
   const { id: cartId, country: urlCountry } = await params;
 
-  // Fetch all initial data in parallel during SSR
-  const [cartData, market, addressesData, authStatus] = await Promise.all([
+  // Check auth first so we can skip address fetch for guests
+  const authStatus = await checkAuth();
+
+  // Fetch initial data in parallel during SSR
+  const [cartData, market, addressesData] = await Promise.all([
     getCheckoutOrder(cartId),
     resolveMarket(urlCountry).catch(() => null),
-    getAddresses(),
-    checkAuth(),
+    authStatus ? getAddresses() : Promise.resolve({ data: [] as Address[] }),
   ]);
 
   // Redirect to order-placed if already complete

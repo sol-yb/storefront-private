@@ -181,7 +181,7 @@ function CheckoutPageContentInner({
   const cartKey = cart
     ? `${cart.id}-${cart.total}-${cart.total_quantity}-${cart.amount_due ?? ""}`
     : null;
-  const prevOrderKeyRef = useRef(cartKey);
+  const prevOrderKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (
