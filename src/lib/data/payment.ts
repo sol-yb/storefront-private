@@ -110,6 +110,7 @@ export async function completeCheckoutOrder(cartId: string) {
 export async function confirmPaymentAndCompleteCart(
   cartId: string,
   sessionId?: string,
+  sessionResult?: string,
 ): Promise<
   { success: true; order: unknown } | { success: false; error: string }
 > {
@@ -130,13 +131,13 @@ export async function confirmPaymentAndCompleteCart(
     if (sessionId) {
       const options = await getCartOptions();
       const id = await requireCartId();
-      const sessionResult = await getClient().carts.paymentSessions.complete(
+      const completeResult = await getClient().carts.paymentSessions.complete(
         id,
         sessionId,
-        undefined,
+        sessionResult ? { session_result: sessionResult } : undefined,
         options,
       );
-      if (sessionResult.status === "failed") {
+      if (completeResult.status === "failed") {
         return {
           success: false,
           error: "Payment was not successful. Please try again.",

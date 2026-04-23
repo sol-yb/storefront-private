@@ -40,11 +40,13 @@ export default function ConfirmPaymentPage({
     attemptedRef.current = true;
 
     const sessionId = searchParams.get("session");
+    const sessionResult = searchParams.get("sessionResult");
 
     async function confirmAndRedirect() {
       const result = await confirmPaymentAndCompleteCart(
         cartId,
         sessionId ?? undefined,
+        sessionResult ?? undefined,
       );
 
       if (result.success) {
