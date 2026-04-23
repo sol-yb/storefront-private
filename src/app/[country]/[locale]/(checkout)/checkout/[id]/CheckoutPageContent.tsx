@@ -560,8 +560,10 @@ function CheckoutPageContentInner({
     // PaymentSection handles setProcessing(false) on error internally
   };
 
-  // Loading state — only shown when no initial data (client-side navigation)
-  if (loading || authLoading) {
+  // Loading state — only shown when no initial data (client-side navigation).
+  // When initialData is provided (SSR), skip the authLoading check since
+  // we already know isAuthenticated from the server.
+  if (loading || (!initialData && authLoading)) {
     return (
       <div className="animate-pulse space-y-6">
         <div className="h-8 bg-gray-200 rounded w-1/3" />
