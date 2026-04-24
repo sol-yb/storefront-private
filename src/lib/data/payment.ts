@@ -111,6 +111,8 @@ export async function confirmPaymentAndCompleteCart(
   cartId: string,
   sessionId?: string,
   sessionResult?: string,
+  redirectResult?: string,
+  adyenSessionId?: string,
 ): Promise<
   { success: true; order: unknown } | { success: false; error: string }
 > {
@@ -135,6 +137,27 @@ export async function confirmPaymentAndCompleteCart(
         id,
         sessionId,
         sessionResult ? { session_result: sessionResult } : undefined,
+        options,
+      );
+      if (completeResult.status === "failed") {
+        return {
+          success: false,
+          error: "Payment was not successful. Please try again.",
+        };
+      }
+    } else if (redirectResult) {
+      // Adyen redirect flow: redirectResult is appended by Adyen to the return URL.
+      // Pass it to the backend which resolves the session and processes the redirect.
+      const options = await getCartOptions();
+      const id = await requireCartId();
+      const completeResult = await getClient().carts.paymentSessions.complete(
+        id,
+        adyenSessionId ?? "",
+        {
+          external_data: {
+            redirect_result: redirectResult,
+          },
+        },
         options,
       );
       if (completeResult.status === "failed") {

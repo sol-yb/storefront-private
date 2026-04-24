@@ -194,10 +194,16 @@ export function PaymentSection({
 
       try {
         // Build gateway-specific external_data
-        const externalData =
-          currentGatewayId === "stripe" && cardId
-            ? { stripe_payment_method_id: cardId }
-            : undefined;
+        const basePath = extractBasePath(window.location.pathname);
+        const returnUrl = `${window.location.origin}${basePath}/confirm-payment/${cart.id}`;
+
+        const externalData: Record<string, unknown> = {
+          return_url: returnUrl,
+        };
+
+        if (currentGatewayId === "stripe" && cardId) {
+          externalData.stripe_payment_method_id = cardId;
+        }
 
         const result = await createCheckoutPaymentSession(
           cart.id,
