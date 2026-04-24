@@ -83,6 +83,8 @@ describe("ConfirmPaymentPage", () => {
         "cart-1",
         "session-1",
         undefined,
+        undefined,
+        undefined,
       );
       expect(mockReplace).toHaveBeenCalledWith("/us/en/order-placed/cart-1");
     });
@@ -105,6 +107,8 @@ describe("ConfirmPaymentPage", () => {
         "cart-1",
         "session-1",
         "eyJhYmMiOiJ4eXoifQ==",
+        undefined,
+        undefined,
       );
     });
   });
@@ -138,7 +142,13 @@ describe("ConfirmPaymentPage", () => {
     });
 
     await waitFor(() => {
-      expect(mockConfirm).toHaveBeenCalledWith("cart-1", undefined, undefined);
+      expect(mockConfirm).toHaveBeenCalledWith(
+        "cart-1",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(mockReplace).toHaveBeenCalledWith("/us/en/order-placed/cart-1");
     });
   });

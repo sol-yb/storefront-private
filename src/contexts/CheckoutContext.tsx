@@ -8,8 +8,10 @@ import {
   useState,
 } from "react";
 
+const PENDING = Symbol("pending");
+
 interface CheckoutContextValue {
-  summaryContent: ReactNode;
+  summaryContent: ReactNode | typeof PENDING;
   setSummaryContent: (content: ReactNode) => void;
 }
 
@@ -18,7 +20,9 @@ const CheckoutContext = createContext<CheckoutContextValue | undefined>(
 );
 
 export function CheckoutProvider({ children }: { children: ReactNode }) {
-  const [summaryContent, setSummaryContent] = useState<ReactNode>(null);
+  const [summaryContent, setSummaryContent] = useState<
+    ReactNode | typeof PENDING
+  >(PENDING);
 
   const value = useMemo<CheckoutContextValue>(
     () => ({ summaryContent, setSummaryContent }),
@@ -51,14 +55,6 @@ function CheckoutSummarySkeleton() {
         </div>
         <div className="h-4 bg-gray-200 rounded w-16" />
       </div>
-      <div className="flex items-center gap-4">
-        <div className="w-16 h-16 bg-gray-200 rounded-lg" />
-        <div className="flex-1 space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-2/3" />
-          <div className="h-3 bg-gray-200 rounded w-1/3" />
-        </div>
-        <div className="h-4 bg-gray-200 rounded w-16" />
-      </div>
       <div className="border-t border-gray-200 pt-4 space-y-3">
         <div className="flex justify-between">
           <div className="h-4 bg-gray-200 rounded w-20" />
@@ -79,5 +75,6 @@ function CheckoutSummarySkeleton() {
 
 export function CheckoutSummary() {
   const { summaryContent } = useCheckout();
-  return <>{summaryContent ?? <CheckoutSummarySkeleton />}</>;
+  if (summaryContent === PENDING) return <CheckoutSummarySkeleton />;
+  return <>{summaryContent}</>;
 }
