@@ -10,7 +10,7 @@ import { actionResult } from "./utils";
 export async function createCheckoutPaymentSession(
   cartId: string,
   paymentMethodId: string,
-  gatewayPaymentMethodId?: string,
+  externalData?: Record<string, unknown>,
 ) {
   return actionResult(async () => {
     const options = await getCartOptions();
@@ -19,9 +19,7 @@ export async function createCheckoutPaymentSession(
       id,
       {
         payment_method_id: paymentMethodId,
-        ...(gatewayPaymentMethodId && {
-          external_data: { stripe_payment_method_id: gatewayPaymentMethodId },
-        }),
+        ...(externalData && { external_data: externalData }),
       },
       options,
     );
@@ -30,9 +28,31 @@ export async function createCheckoutPaymentSession(
   }, "Failed to create payment session");
 }
 
+/**
+ * Creates a direct payment for non-session payment methods
+ * (e.g. Check, Cash on Delivery, Bank Transfer).
+ */
+export async function createDirectPayment(
+  cartId: string,
+  paymentMethodId: string,
+) {
+  return actionResult(async () => {
+    const options = await getCartOptions();
+    const id = await requireCartId();
+    const payment = await getClient().carts.payments.create(
+      id,
+      { payment_method_id: paymentMethodId },
+      options,
+    );
+    updateTag("checkout");
+    return { payment };
+  }, "Failed to create payment");
+}
+
 export async function completeCheckoutPaymentSession(
   cartId: string,
   sessionId: string,
+  params?: { session_result?: string; external_data?: Record<string, unknown> },
 ) {
   return actionResult(async () => {
     const options = await getCartOptions();
@@ -40,7 +60,7 @@ export async function completeCheckoutPaymentSession(
     const session = await getClient().carts.paymentSessions.complete(
       id,
       sessionId,
-      undefined,
+      params,
       options,
     );
     updateTag("checkout");
@@ -90,6 +110,9 @@ export async function completeCheckoutOrder(cartId: string) {
 export async function confirmPaymentAndCompleteCart(
   cartId: string,
   sessionId?: string,
+  sessionResult?: string,
+  redirectResult?: string,
+  adyenSessionId?: string,
 ): Promise<
   { success: true; order: unknown } | { success: false; error: string }
 > {
@@ -110,13 +133,34 @@ export async function confirmPaymentAndCompleteCart(
     if (sessionId) {
       const options = await getCartOptions();
       const id = await requireCartId();
-      const sessionResult = await getClient().carts.paymentSessions.complete(
+      const completeResult = await getClient().carts.paymentSessions.complete(
         id,
         sessionId,
-        undefined,
+        sessionResult ? { session_result: sessionResult } : undefined,
         options,
       );
-      if (sessionResult.status === "failed") {
+      if (completeResult.status === "failed") {
+        return {
+          success: false,
+          error: "Payment was not successful. Please try again.",
+        };
+      }
+    } else if (redirectResult) {
+      // Adyen redirect flow: redirectResult is appended by Adyen to the return URL.
+      // Pass it to the backend which resolves the session and processes the redirect.
+      const options = await getCartOptions();
+      const id = await requireCartId();
+      const completeResult = await getClient().carts.paymentSessions.complete(
+        id,
+        adyenSessionId ?? "",
+        {
+          external_data: {
+            redirect_result: redirectResult,
+          },
+        },
+        options,
+      );
+      if (completeResult.status === "failed") {
         return {
           success: false,
           error: "Payment was not successful. Please try again.",
