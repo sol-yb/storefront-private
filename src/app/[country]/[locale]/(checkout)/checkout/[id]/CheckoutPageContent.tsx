@@ -152,22 +152,12 @@ function CheckoutPageContentInner({
     return result;
   }, []);
 
-  // Track cart key for sidebar updates — useLayoutEffect so the sidebar
-  // renders on the first paint (before the browser paints the empty slot)
-  const cartKey = cart
-    ? `${cart.id}-${cart.total}-${cart.total_quantity}-${cart.amount_due ?? ""}`
-    : null;
-  const prevOrderKeyRef = useRef<string | null>(null);
-
+  // useLayoutEffect so the sidebar renders on the first paint (before the
+  // browser paints the empty slot). Always re-publish when `cart` changes —
+  // a previous ref-based "cartKey" optimization skipped updates whenever the
+  // aggregate fields it tracked happened to be unchanged, which produced
+  // stale sidebar state after item add/remove/quantity edits.
   useLayoutEffect(() => {
-    if (
-      cartKey === prevOrderKeyRef.current &&
-      prevOrderKeyRef.current !== null
-    ) {
-      return;
-    }
-    prevOrderKeyRef.current = cartKey;
-
     if (cart) {
       setSummaryContent(
         <CheckoutSidebar
@@ -182,81 +172,91 @@ function CheckoutPageContentInner({
     }
   }, [
     cart,
-    cartKey,
     setSummaryContent,
     handleApplyCode,
     handleRemoveDiscount,
     handleRemoveGiftCard,
   ]);
 
-  // Refresh cart data (used after coupon changes, express checkout, etc.)
-  const loadOrder = useCallback(async () => {
-    setLoading(true);
-    if (!paymentError) setError(null);
+  // Refresh cart data (used after coupon changes, express checkout, etc.).
+  // `silent` keeps the current SSR-painted view on screen while we reconcile
+  // in the background — used by the mount-time refresh that backs out
+  // Next.js router-cache/BFCache staleness.
+  const loadOrder = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      if (!paymentError) setError(null);
 
-    try {
-      const [cartData, market, addressesData, authStatus] = await Promise.all([
-        getCheckoutOrder(cartId),
-        resolveMarket(urlCountry).catch(() => null),
-        getAddresses(),
-        checkAuth(),
-      ]);
+      try {
+        const [cartData, market, addressesData, authStatus] = await Promise.all(
+          [
+            getCheckoutOrder(cartId),
+            resolveMarket(urlCountry).catch(() => null),
+            getAddresses(),
+            checkAuth(),
+          ],
+        );
 
-      const countriesData = market
-        ? await getMarketCountries(market.id).catch(() => ({
-            data: [] as Country[],
-          }))
-        : { data: [] as Country[] };
+        const countriesData = market
+          ? await getMarketCountries(market.id).catch(() => ({
+              data: [] as Country[],
+            }))
+          : { data: [] as Country[] };
 
-      if (!cartData) {
-        setError(tRef.current("orderNotFound"));
-        setLoading(false);
-        return;
-      }
-
-      if (cartData.current_step === "complete") {
-        routerRef.current.push(`${basePath}/order-placed/${cartId}`);
-        return;
-      }
-
-      setCart(cartData);
-      setCountries(countriesData.data);
-      setSavedAddresses(addressesData.data);
-      setIsAuthenticated(authStatus);
-
-      return cartData;
-    } catch {
-      setError(tRef.current("failedToLoadCheckout"));
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [cartId, urlCountry, basePath, paymentError]);
-
-  // Only fetch on mount if we don't have initial data (e.g. client-side navigation)
-  useEffect(() => {
-    if (initialData) {
-      // Fire begin_checkout analytics for SSR-loaded data
-      if (!beginCheckoutFiredRef.current && initialData.cart) {
-        try {
-          trackBeginCheckout(initialData.cart);
-        } catch {
-          // Analytics should never break checkout flow
+        if (!cartData) {
+          setError(tRef.current("orderNotFound"));
+          if (!silent) setLoading(false);
+          return;
         }
-        beginCheckoutFiredRef.current = true;
+
+        if (cartData.current_step === "complete") {
+          routerRef.current.push(`${basePath}/order-placed/${cartId}`);
+          return;
+        }
+
+        setCart(cartData);
+        setCountries(countriesData.data);
+        setSavedAddresses(addressesData.data);
+        setIsAuthenticated(authStatus);
+
+        return cartData;
+      } catch {
+        setError(tRef.current("failedToLoadCheckout"));
+        return null;
+      } finally {
+        if (!silent) setLoading(false);
       }
+    },
+    [cartId, urlCountry, basePath, paymentError],
+  );
+
+  // On mount, refresh the cart from the server so it picks up changes the
+  // user made since the page was rendered/last cached. This matters when
+  // Next.js's router cache or the browser's BFCache restores a prior view
+  // of /checkout/[id] (e.g. add item → checkout → back → add another item
+  // → checkout again) — without this, the sidebar would keep showing the
+  // first cart. SSR initial data is still used for the first paint.
+  useEffect(() => {
+    const fireBeginCheckout = (cartData: Cart | null | undefined) => {
+      if (!cartData || beginCheckoutFiredRef.current) return;
+      try {
+        trackBeginCheckout(cartData);
+      } catch {
+        // Analytics should never break checkout flow
+      }
+      beginCheckoutFiredRef.current = true;
+    };
+
+    if (initialData) {
+      fireBeginCheckout(initialData.cart);
+      // Reconcile silently — keep the SSR-painted sidebar until fresh data
+      // arrives, so there's no flash back to a skeleton. Goes through
+      // loadOrder so completion redirect and not-found handling still run
+      // if the order changed under us.
+      loadOrder(true);
       return;
     }
-    loadOrder().then((cartData) => {
-      if (cartData && !beginCheckoutFiredRef.current) {
-        try {
-          trackBeginCheckout(cartData);
-        } catch {
-          // Analytics should never break checkout flow
-        }
-        beginCheckoutFiredRef.current = true;
-      }
-    });
+    loadOrder().then(fireBeginCheckout);
   }, [initialData, loadOrder]);
 
   // Handle email blur — persist email as the first backend call
