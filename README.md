@@ -176,6 +176,41 @@ npm run build
 npm start
 ```
 
+### Testing
+
+Unit and integration tests run through Vitest:
+
+```bash
+npm test            # one-shot
+npm run test:watch  # watch mode
+```
+
+End-to-end tests run through Playwright against a real Spree backend booted in Docker. The compose file at `e2e-backend/docker-compose.yml` ships Postgres + Redis + the official `ghcr.io/spree/spree:5.4.3.1` image — no `create-spree-app` setup required. Seeding and API-key creation go through the official [`@spree/cli`](https://spreecommerce.org/docs/developer/cli/quickstart) (`spree seed`, `spree sample-data`, `spree api-key create`), installed as a dev dependency.
+
+```bash
+# 1. Export a Stripe test-mode key pair from your own Stripe sandbox.
+#    Both keys must belong to the same account — Stripe no longer
+#    publishes a working sample secret key, and a mismatched pair makes
+#    the checkout payment step fail.
+export STRIPE_PUBLISHABLE_KEY=pk_test_…
+export STRIPE_SECRET_KEY=sk_test_…
+
+# 2. Boot Spree + Postgres + Redis, seed sample data, register a Stripe
+#    payment gateway, mint a publishable key, and write .env.e2e.
+npm run e2e:up
+
+# 3. Run the suite. Playwright boots `next dev` against .env.e2e.
+npm run test:e2e
+
+# Optional: interactive UI mode.
+npm run test:e2e:ui
+
+# Tear everything down.
+npm run e2e:down
+```
+
+The checkout test pays with card `4242 4242 4242 4242` through Stripe's [test mode](https://docs.stripe.com/keys). PaymentIntents land in whichever Stripe test account owns the keys you exported. In CI, set `STRIPE_SECRET_KEY` as a repository secret and `STRIPE_PUBLISHABLE_KEY` as a repository variable (Settings → Secrets and variables → Actions). The E2E job skips itself on fork PRs, where GitHub never exposes repository secrets.
+
 ## Project Structure
 
 ```
