@@ -1,10 +1,10 @@
 "use server";
 
 import type { Customer } from "@spree/sdk";
-import { SpreeError } from "@spree/sdk";
 import { updateTag } from "next/cache";
 import {
   clearAccessToken,
+  clearAuthCookies,
   clearCartCookies,
   clearRefreshToken,
   ensureFreshSession,
@@ -13,6 +13,7 @@ import {
   getCartToken,
   getClient,
   getRefreshToken,
+  isAuthError,
   setAccessToken,
   setRefreshToken,
   withAuthRefresh,
@@ -20,16 +21,11 @@ import {
 import { actionResult } from "./utils";
 
 /**
- * Clear auth cookies, tolerating a read-only (Server Component) context where
- * cookie writes are not permitted.
+ * Fetch the current customer with automatic token refresh. Throws on any
+ * failure (auth or transient) so callers can distinguish the two.
  */
-async function clearAuthTokens() {
-  try {
-    await clearAccessToken();
-    await clearRefreshToken();
-  } catch {
-    // Best-effort — not writable during a Server Component render.
-  }
+async function fetchCustomer(): Promise<Customer> {
+  return withAuthRefresh((options) => getClient().customer.get(options));
 }
 
 /**
@@ -67,16 +63,12 @@ export async function getCustomer(): Promise<Customer | null> {
   if (!token) return null;
 
   try {
-    return await withAuthRefresh(async (options) => {
-      return getClient().customer.get(options);
-    });
+    return await fetchCustomer();
   } catch (error) {
-    // Only clear tokens on auth failures — transient errors should not log users out
-    if (
-      error instanceof SpreeError &&
-      (error.status === 401 || error.status === 403)
-    ) {
-      await clearAuthTokens();
+    // Only clear tokens on confirmed auth failures — transient errors (network,
+    // 5xx) must not log users out.
+    if (isAuthError(error)) {
+      await clearAuthCookies();
     }
     return null;
   }
@@ -86,18 +78,37 @@ export async function getCustomer(): Promise<Customer | null> {
  * Reconcile the customer session on the client: refresh an expired JWT when
  * possible, then return the current customer. `refreshed` is true when a
  * transparent token refresh occurred, signalling the client to re-render
- * server components so their data reflects the renewed session.
+ * server components so their data reflects the renewed session. `stale` is true
+ * when the customer fetch failed transiently — the caller should keep its
+ * current session rather than treat it as logged out.
  */
 export async function syncSession(): Promise<{
   customer: Customer | null;
   refreshed: boolean;
+  stale?: boolean;
 }> {
   const state = await ensureFreshSession();
   if (state === "anonymous" || state === "expired") {
     return { customer: null, refreshed: false };
   }
-  const customer = await getCustomer();
-  return { customer, refreshed: state === "refreshed" };
+  if (state === "stale") {
+    // The expired JWT couldn't be refreshed due to a transient failure — keep
+    // the current client session rather than logging out on a blip.
+    return { customer: null, refreshed: false, stale: true };
+  }
+
+  try {
+    const customer = await fetchCustomer();
+    return { customer, refreshed: state === "refreshed" };
+  } catch (error) {
+    if (isAuthError(error)) {
+      await clearAuthCookies();
+      return { customer: null, refreshed: false };
+    }
+    // Transient failure — preserve the session. Still surface a rotation that
+    // did occur so the client re-renders server components under the new token.
+    return { customer: null, refreshed: state === "refreshed", stale: true };
+  }
 }
 
 /**
@@ -231,11 +242,8 @@ export async function updateCustomer(data: {
         return getClient().customer.update(data, options);
       });
     } catch (error) {
-      if (
-        error instanceof SpreeError &&
-        (error.status === 401 || error.status === 403)
-      ) {
-        await clearAuthTokens();
+      if (isAuthError(error)) {
+        await clearAuthCookies();
       }
       throw error;
     }

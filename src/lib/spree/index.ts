@@ -2,8 +2,10 @@
 
 // Auth helpers (token refresh, cookie-based auth)
 export {
+  clearAuthCookies,
   ensureFreshSession,
   getAuthOptions,
+  isAuthError,
   type SessionState,
   withAuthRefresh,
 } from "./auth-helpers";
