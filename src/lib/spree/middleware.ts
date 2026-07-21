@@ -4,7 +4,7 @@ const COUNTRY_COOKIE = "spree_country";
 const LOCALE_COOKIE = "spree_locale";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
-const HAS_COUNTRY_LOCALE = /^\/([a-z]{2})\/([a-z]{2})(\/|$)/i;
+const HAS_COUNTRY_LOCALE = /^\/([a-z]{2})\/([a-z]{2}(?:-[a-z]{2})?)(\/|$)/i;
 
 export interface SpreeMiddlewareConfig {
   /** Default country ISO code (default: 'us') */
