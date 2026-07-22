@@ -1,3 +1,4 @@
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { CartProvider } from "@/contexts/CartContext";
 import { getCustomer } from "@/lib/data/customer";
 import { getWholesaleChannel } from "@/lib/data/wholesale";
@@ -8,7 +9,14 @@ import { WholesaleSignInWall } from "./WholesaleSignInWall";
 
 interface WholesaleGateProps {
   basePath: string;
-  children: React.ReactNode;
+  /**
+   * Approved-buyer content, as a function so it is only invoked in the
+   * approved branch. A plain `children` node would be constructed by the
+   * caller regardless of the gate's decision; a thunk guarantees the gated
+   * fetch (which hits the login-required channel) never runs for a guest or
+   * an unapproved buyer.
+   */
+  children: () => React.ReactNode;
 }
 
 /**
@@ -62,7 +70,11 @@ export async function WholesaleGate({
   return (
     <CartProvider surface="wholesale">
       <WholesaleHeader basePath={basePath} customerName={displayName} />
-      <main>{children}</main>
+      <main>{children()}</main>
+      {/* The wholesale portal needs its own drawer bound to THIS provider —
+          the root layout's <CartDrawer /> reads the outer DTC context, so
+          wholesale add-to-cart / quick-order opens would never reach it. */}
+      <CartDrawer />
     </CartProvider>
   );
 }

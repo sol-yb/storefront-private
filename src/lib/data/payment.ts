@@ -10,7 +10,10 @@ import {
   type Surface,
 } from "@/lib/spree";
 import { getCart } from "./cart";
-import { resolveSurfaceForCart } from "./checkout";
+import {
+  resolveSurfaceForCart,
+  resolveSurfaceForCartVerified,
+} from "./checkout";
 import { getOrder } from "./orders";
 import { actionResult } from "./utils";
 
@@ -93,8 +96,11 @@ export async function completeCheckoutPaymentSession(
  * When the order was already completed (403/422), fetch it from the API
  * so the caller always gets the order data for caching on the thank-you page.
  */
-export async function completeCheckoutOrder(cartId: string) {
-  const surface = await resolveSurfaceForCart(cartId);
+export async function completeCheckoutOrder(
+  cartId: string,
+  knownSurface?: Surface,
+) {
+  const surface = knownSurface ?? (await resolveSurfaceForCart(cartId));
   try {
     const options = await getCartOptions(surface);
     const order: Order = await getClientForSurface(surface).carts.complete(
@@ -139,9 +145,10 @@ export async function confirmPaymentAndCompleteCart(
 ): Promise<
   { success: true; order: unknown } | { success: false; error: string }
 > {
-  const surface = await resolveSurfaceForCart(cartId);
+  // Cookies may have been cleared during the offsite redirect, so verify the
+  // surface against the cart's own channel rather than trusting the cookie.
+  const surface = await resolveSurfaceForCartVerified(cartId);
   try {
-    // Use explicit cartId — cookies may have been cleared during offsite redirect
     const cart = await getCart(cartId, surface);
     if (!cart) {
       // Cart not found — the order may already be completed (e.g. by webhook).
@@ -198,7 +205,9 @@ export async function confirmPaymentAndCompleteCart(
       }
     }
 
-    const result = await completeCheckoutOrder(cartId);
+    // Pass the verified surface so completion doesn't re-resolve from the
+    // (possibly cleared) cookie.
+    const result = await completeCheckoutOrder(cartId, surface);
     if (result.success) {
       return { success: true, order: result.order };
     }

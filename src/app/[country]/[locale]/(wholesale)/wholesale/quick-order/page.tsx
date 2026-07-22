@@ -11,7 +11,7 @@ export default async function WholesaleQuickOrderPage({
   const { country, locale } = await params;
   return (
     <WholesaleGate basePath={`/${country}/${locale}`}>
-      <QuickOrderView />
+      {() => <QuickOrderView />}
     </WholesaleGate>
   );
 }

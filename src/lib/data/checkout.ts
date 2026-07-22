@@ -8,24 +8,55 @@ import {
   getCartId,
   getCartOptions,
   getClientForSurface,
+  isWholesaleEnabled,
   requireCartId,
   type Surface,
 } from "@/lib/spree";
 import { getCart } from "./cart";
 import { getOrder } from "./orders";
 import { actionResult, withFallback } from "./utils";
+import { getWholesaleChannel } from "./wholesale";
 
 /**
  * Determine which surface a checkout belongs to by matching its cart id against
- * the per-surface cart-id cookies. This is what lets one checkout flow serve
- * both surfaces: the `[id]` in the URL identifies the cart, and the cart id
- * cookie it matches identifies the channel (and thus which client + token to
- * use). Defaults to DTC when it matches neither (e.g. a completed order fetched
- * by number after cookies were cleared).
+ * the per-surface cart-id cookie. Cheap and correct for in-session actions,
+ * where the cookie is always present. For the offsite-payment return path — where
+ * the cookie may be gone — use {@link resolveSurfaceForCartVerified} instead.
+ * Defaults to DTC when it matches neither.
  */
 export async function resolveSurfaceForCart(cartId: string): Promise<Surface> {
+  if (!isWholesaleEnabled()) return "dtc";
   const wholesaleCartId = await getCartId("wholesale");
   return wholesaleCartId === cartId ? "wholesale" : "dtc";
+}
+
+/**
+ * Like {@link resolveSurfaceForCart}, but confirms an ambiguous cart against its
+ * own `channel_id` rather than trusting the cookie. Used on the offsite-payment
+ * return, where the wholesale cart cookie can be dropped during the redirect and
+ * a cookie-only check would route a wholesale checkout through the DTC client.
+ * The extra fetch only runs when wholesale is enabled and the cookie didn't
+ * already resolve the cart.
+ */
+export async function resolveSurfaceForCartVerified(
+  cartId: string,
+): Promise<Surface> {
+  if (!isWholesaleEnabled()) return "dtc";
+
+  const wholesaleCartId = await getCartId("wholesale");
+  if (wholesaleCartId === cartId) return "wholesale";
+
+  // Cookie says DTC or is absent — verify against the cart's channel. On any
+  // failure (not a wholesale cart, gated 401, network) fall back to DTC.
+  return withFallback(async () => {
+    const [cart, channel] = await Promise.all([
+      getCart(cartId, "wholesale"),
+      getWholesaleChannel(),
+    ]);
+    return cart && channel && cart.channel_id === channel.id
+      ? "wholesale"
+      : "dtc";
+  }, "dtc");
 }
 
 /** Checkout cache tag, segmented per surface. */

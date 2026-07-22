@@ -17,6 +17,10 @@ export type Surface = "dtc" | "wholesale";
 
 export const DEFAULT_SURFACE: Surface = "dtc";
 
+/** All storefront surfaces. Iterate this to act on every surface at once
+ * (e.g. clearing all carts on logout). */
+export const SURFACES: readonly Surface[] = ["dtc", "wholesale"];
+
 /**
  * Cart cookie base name for a surface. The cart-id cookie is derived by
  * appending `_id` (see cookies.ts). Wholesale gets its own pair so the two

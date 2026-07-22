@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { getConfig } from "./config";
-import { cartCookieBaseName, DEFAULT_SURFACE, type Surface } from "./surface";
+import {
+  cartCookieBaseName,
+  DEFAULT_SURFACE,
+  SURFACES,
+  type Surface,
+} from "./surface";
 
 const DEFAULT_CART_COOKIE = "_spree_cart_token";
 const DEFAULT_ACCESS_TOKEN_COOKIE = "_spree_jwt";
@@ -93,6 +98,15 @@ export async function clearCartCookies(
   const opts = { maxAge: -1, path: "/" };
   cookieStore.set(getCartCookieName(surface), "", opts);
   cookieStore.set(getCartIdCookieName(surface), "", opts);
+}
+
+/**
+ * Clear the cart cookies for every surface. Used on logout / account deletion,
+ * where leaving a wholesale cart cookie behind would leak it into the next
+ * session.
+ */
+export async function clearAllCartCookies(): Promise<void> {
+  await Promise.all(SURFACES.map((surface) => clearCartCookies(surface)));
 }
 
 // --- Access Token (JWT) ---

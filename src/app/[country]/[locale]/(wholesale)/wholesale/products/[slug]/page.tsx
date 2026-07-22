@@ -25,7 +25,13 @@ export default async function WholesaleProductPage({
 
   return (
     <WholesaleGate basePath={`/${country}/${locale}`}>
-      <WholesaleProductContent country={country} locale={locale} slug={slug} />
+      {() => (
+        <WholesaleProductContent
+          country={country}
+          locale={locale}
+          slug={slug}
+        />
+      )}
     </WholesaleGate>
   );
 }

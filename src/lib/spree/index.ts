@@ -22,6 +22,7 @@ export {
 export {
   canPersistCookies,
   clearAccessToken,
+  clearAllCartCookies,
   clearCartCookies,
   clearRefreshToken,
   getAccessToken,
@@ -43,6 +44,7 @@ export {
   cacheTagSuffix,
   cartCookieBaseName,
   DEFAULT_SURFACE,
+  SURFACES,
   type Surface,
 } from "./surface";
 export type { SpreeNextConfig, SpreeNextOptions } from "./types";

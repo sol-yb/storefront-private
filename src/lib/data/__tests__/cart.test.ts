@@ -22,6 +22,7 @@ vi.mock("@/lib/spree", () => ({
   getClientForSurface: () => mockClient,
   cacheTagSuffix: () => "",
   DEFAULT_SURFACE: "dtc",
+  isWholesaleEnabled: vi.fn().mockReturnValue(false),
   getCartToken: vi.fn().mockResolvedValue("order-token-123"),
   // Surface-aware default is (re)installed in beforeEach — clearAllMocks resets
   // implementations, so setting it here would not survive.

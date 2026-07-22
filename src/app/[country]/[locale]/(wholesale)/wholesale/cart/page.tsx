@@ -11,7 +11,7 @@ export default async function WholesaleCartPage({
   const { country, locale } = await params;
   return (
     <WholesaleGate basePath={`/${country}/${locale}`}>
-      <WholesaleCartView />
+      {() => <WholesaleCartView />}
     </WholesaleGate>
   );
 }
