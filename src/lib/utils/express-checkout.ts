@@ -56,15 +56,13 @@ export function buildLineItems(order: Cart) {
   const currency = order.currency;
   const items: Array<{ name: string; amount: number }> = [];
 
-  // Only add a Subtotal line when the amount is known — a null item_total
-  // (money fields are nullable for prices-hidden carts) must not push a
-  // $0.00 subtotal that would understate the Stripe amount.
-  if (order.item_total != null) {
-    items.push({
-      name: "Subtotal",
-      amount: toCents(order.item_total, currency),
-    });
-  }
+  // The subtotal anchors the breakdown. When it's unknown — money fields are
+  // nullable for prices-hidden carts — return no line items at all so the
+  // Express Checkout Element falls back to the total-only amount, rather than
+  // emitting orphan Discount/Tax lines against a missing subtotal.
+  if (order.item_total == null) return items;
+
+  items.push({ name: "Subtotal", amount: toCents(order.item_total, currency) });
 
   const promoTotal = toCents(order.discount_total ?? "0", currency);
   if (promoTotal < 0) {

@@ -208,17 +208,20 @@ export async function requireCartId(
 }
 
 /**
- * True when the DTC cart-id cookie was cross-written with the wholesale cart id
- * (pre-channel-scoped-listing poisoning). Directional: only the DTC surface can
- * be poisoned this way, so this never rejects the wholesale surface's own cart.
+ * Backstop for DTC cookies poisoned before channel-scoped listing existed: the
+ * poison only ever flowed wholesale→DTC (the DTC list fallback adopted the
+ * user's only cart, a wholesale one, into the DTC cookie). So on the DTC
+ * surface, a cart-id cookie equal to the wholesale cookie's cart id is always
+ * the poison and must be dropped. Directional on purpose — never drops the
+ * wholesale surface's legitimate cart; the channel_id guard handles the
+ * wholesale side. Single source of truth for this check — cart.ts and the
+ * requireCartId path both import it rather than re-implementing it.
  */
-async function isPoisonedDtcCartId(
+export async function isPoisonedDtcCartId(
   cartId: string,
   surface: Surface,
 ): Promise<boolean> {
-  if (surface !== "wholesale") {
-    const wholesaleCartId = await getCartId("wholesale");
-    return Boolean(wholesaleCartId) && wholesaleCartId === cartId;
-  }
-  return false;
+  if (surface !== "dtc") return false;
+  const wholesaleCartId = await getCartId("wholesale");
+  return Boolean(wholesaleCartId) && wholesaleCartId === cartId;
 }

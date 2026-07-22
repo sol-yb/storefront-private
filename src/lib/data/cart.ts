@@ -12,6 +12,7 @@ import {
   getCartToken,
   getClientForSurface,
   getLocaleOptions,
+  isPoisonedDtcCartId,
   requireCartId,
   type Surface,
   setCartCookies,
@@ -46,25 +47,6 @@ async function cartBelongsToSurface(
     // Channel lookup failed (transient) — don't reject on an unknown.
     return true;
   }
-}
-
-/**
- * Backstop for DTC cookies poisoned before channel-scoped listing existed: the
- * poison only ever flowed wholesale→DTC (the DTC list fallback adopted the
- * user's only cart, a wholesale one, into the DTC cookie). So on the DTC
- * surface, a cart-id cookie equal to the wholesale cookie's cart id is always
- * the poison and must be dropped. Directional on purpose — never drops the
- * wholesale surface's legitimate cart; the channel_id guard handles the
- * wholesale side correctly once that field ships. Needs no channel field and
- * self-heals the exact repro without a round-trip.
- */
-async function isPoisonedDtcCartId(
-  cartId: string,
-  surface: Surface,
-): Promise<boolean> {
-  if (surface !== "dtc") return false;
-  const wholesaleCartId = await getCartId("wholesale");
-  return Boolean(wholesaleCartId) && wholesaleCartId === cartId;
 }
 
 /**

@@ -28,6 +28,8 @@ vi.mock("@/lib/spree", () => ({
   getAccessToken: vi.fn().mockResolvedValue(undefined),
   setCartCookies: vi.fn(),
   clearCartCookies: vi.fn(),
+  // No wholesale cookie in these DTC tests → never poisoned.
+  isPoisonedDtcCartId: vi.fn().mockResolvedValue(false),
   getCartOptions: vi.fn().mockResolvedValue({
     spreeToken: "order-token-123",
     token: undefined,

@@ -17,6 +17,8 @@ const mockClient = {
   },
 };
 
+const { mockGetCartId } = vi.hoisted(() => ({ mockGetCartId: vi.fn() }));
+
 vi.mock("@/lib/spree", () => ({
   getClient: () => mockClient,
   getClientForSurface: () => mockClient,
@@ -26,11 +28,18 @@ vi.mock("@/lib/spree", () => ({
   getCartToken: vi.fn().mockResolvedValue("order-token-123"),
   // Surface-aware default is (re)installed in beforeEach — clearAllMocks resets
   // implementations, so setting it here would not survive.
-  getCartId: vi.fn(),
+  getCartId: mockGetCartId,
   getAccessToken: vi.fn().mockResolvedValue(undefined),
   getLocaleOptions: vi.fn().mockResolvedValue({ locale: "en", country: "us" }),
   setCartCookies: vi.fn(),
   clearCartCookies: vi.fn(),
+  // Real logic against the mocked getCartId — the DTC cookie is poisoned when
+  // it holds the wholesale cart's id.
+  isPoisonedDtcCartId: async (cartId: string, surface: string) => {
+    if (surface !== "dtc") return false;
+    const wholesaleCartId = await mockGetCartId("wholesale");
+    return Boolean(wholesaleCartId) && wholesaleCartId === cartId;
+  },
   getCartOptions: vi.fn().mockResolvedValue({
     spreeToken: "order-token-123",
     token: undefined,
