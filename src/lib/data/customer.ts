@@ -199,7 +199,13 @@ export async function logout(): Promise<void> {
   // next session.
   await clearAllCartCookies();
   updateTag("customer");
-  for (const surface of SURFACES) updateTag(`cart${cacheTagSuffix(surface)}`);
+  // Invalidate both the cart and the checkout (address/delivery) caches for
+  // every surface — checkout state is tagged separately, so a cart-only clear
+  // would leave the previous buyer's checkout data cached after logout.
+  for (const surface of SURFACES) {
+    updateTag(`cart${cacheTagSuffix(surface)}`);
+    updateTag(`checkout${cacheTagSuffix(surface)}`);
+  }
   updateTag("addresses");
   updateTag("credit-cards");
 }

@@ -147,7 +147,19 @@ export async function confirmPaymentAndCompleteCart(
 > {
   // Cookies may have been cleared during the offsite redirect, so verify the
   // surface against the cart's own channel rather than trusting the cookie.
-  const surface = await resolveSurfaceForCartVerified(cartId);
+  const verifiedSurface = await resolveSurfaceForCartVerified(cartId);
+  if (verifiedSurface === "unverified") {
+    // The wholesale check couldn't run to completion (transient fetch/channel
+    // failure). Fail closed rather than defaulting to DTC: completing a
+    // possibly-wholesale checkout through the DTC client, or reporting success
+    // for a cart we couldn't fetch, would be worse than asking the caller to
+    // retry once the backend recovers.
+    return {
+      success: false,
+      error: "Couldn't confirm your order yet. Please try again in a moment.",
+    };
+  }
+  const surface = verifiedSurface;
   try {
     const cart = await getCart(cartId, surface);
     if (!cart) {

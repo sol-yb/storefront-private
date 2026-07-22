@@ -312,6 +312,18 @@ describe("customer server actions", () => {
       // Logout must clear every surface's cart, not just DTC.
       expect(clearAllCartCookies).toHaveBeenCalled();
     });
+
+    it("invalidates cart and checkout caches for every surface", async () => {
+      const { updateTag } = await import("next/cache");
+      await logout();
+
+      // Both surfaces, both tags — a cart-only clear would leave the previous
+      // buyer's checkout (address/delivery) state cached after logout.
+      expect(updateTag).toHaveBeenCalledWith("cart");
+      expect(updateTag).toHaveBeenCalledWith("cart-wholesale");
+      expect(updateTag).toHaveBeenCalledWith("checkout");
+      expect(updateTag).toHaveBeenCalledWith("checkout-wholesale");
+    });
   });
 
   describe("updateCustomer", () => {

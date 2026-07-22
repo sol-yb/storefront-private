@@ -47,6 +47,19 @@ export function randomSuffix(): string {
 }
 
 /**
+ * Whether an order has a positive payable total for Stripe. Express Checkout
+ * requires a positive `amount`; a null total (money fields hidden for a
+ * prices-hidden guest cart) or a zero total has no valid payable amount, so the
+ * caller must skip Express Checkout entirely rather than send `amount: 0`.
+ */
+export function hasPayableTotal(order: Cart): boolean {
+  const total = order.total ?? order.item_total;
+  if (total == null) return false;
+  const n = Number(total);
+  return Number.isFinite(n) && n > 0;
+}
+
+/**
  * Build the line items array for the Stripe payment sheet from a Spree order.
  * NOTE: Shipping is excluded because the Express Checkout Element handles it
  * separately via shippingRates. Including it here would cause the line item

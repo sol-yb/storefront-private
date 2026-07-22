@@ -31,32 +31,49 @@ export async function resolveSurfaceForCart(cartId: string): Promise<Surface> {
 }
 
 /**
+ * Result of the verified surface resolution. `"unverified"` is distinct from
+ * `"dtc"` on purpose: it means the wholesale check couldn't run to completion
+ * (transient fetch/channel failure), so the surface is *unknown*, not confirmed
+ * DTC. Callers on the offsite-payment path must fail closed on `"unverified"`
+ * rather than routing a possibly-wholesale checkout through the DTC client.
+ */
+export type VerifiedSurface = Surface | "unverified";
+
+/**
  * Like {@link resolveSurfaceForCart}, but confirms an ambiguous cart against its
  * own `channel_id` rather than trusting the cookie. Used on the offsite-payment
  * return, where the wholesale cart cookie can be dropped during the redirect and
  * a cookie-only check would route a wholesale checkout through the DTC client.
  * The extra fetch only runs when wholesale is enabled and the cookie didn't
  * already resolve the cart.
+ *
+ * Returns `"unverified"` when the wholesale lookup fails so the caller can fail
+ * closed — a transient failure must not be mistaken for a confirmed DTC cart.
  */
 export async function resolveSurfaceForCartVerified(
   cartId: string,
-): Promise<Surface> {
+): Promise<VerifiedSurface> {
   if (!isWholesaleEnabled()) return "dtc";
 
   const wholesaleCartId = await getCartId("wholesale");
   if (wholesaleCartId === cartId) return "wholesale";
 
-  // Cookie says DTC or is absent — verify against the cart's channel. On any
-  // failure (not a wholesale cart, gated 401, network) fall back to DTC.
-  return withFallback(async () => {
+  // Cookie says DTC or is absent — verify against the cart's channel. Only a
+  // *positive* signal decides the surface: a fetched cart whose channel matches
+  // wholesale → "wholesale"; a fetched cart whose channel differs → confirmed
+  // "dtc". Anything else (fetch threw, cart null, channel null) is "unverified"
+  // so the caller fails closed instead of defaulting to DTC.
+  try {
     const [cart, channel] = await Promise.all([
       getCart(cartId, "wholesale"),
       getWholesaleChannel(),
     ]);
-    return cart && channel && cart.channel_id === channel.id
-      ? "wholesale"
-      : "dtc";
-  }, "dtc");
+    if (!cart || !channel) return "unverified";
+    if (cart.channel_id == null) return "unverified";
+    return cart.channel_id === channel.id ? "wholesale" : "dtc";
+  } catch {
+    return "unverified";
+  }
 }
 
 /** Checkout cache tag, segmented per surface. */
