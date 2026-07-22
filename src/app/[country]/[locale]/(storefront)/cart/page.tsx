@@ -192,7 +192,7 @@ export default function CartPage() {
                 </dd>
               </div>
 
-              {cart.gift_card && parseFloat(cart.gift_card_total) > 0 ? (
+              {cart.gift_card && parseFloat(cart.gift_card_total ?? "0") > 0 ? (
                 <div className="flex justify-between text-green-600">
                   <dt>{t("giftCard")}</dt>
                   <dd>-{cart.display_gift_card_total}</dd>
@@ -220,7 +220,7 @@ export default function CartPage() {
             </dl>
 
             <div className="mt-6 space-y-3">
-              {parseFloat(cart.total) > 0 && (
+              {parseFloat(cart.total ?? "0") > 0 && (
                 <ExpressCheckoutButton
                   cart={cart}
                   basePath={basePath}

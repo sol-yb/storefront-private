@@ -121,6 +121,8 @@ SPREE_PUBLISHABLE_KEY=your_publishable_api_key_here
 | `SENTRY_ORG` | Sentry organization slug (for source map uploads) | _(none)_ |
 | `SENTRY_PROJECT` | Sentry project slug (for source map uploads) | _(none)_ |
 | `SENTRY_AUTH_TOKEN` | Sentry auth token (for source map uploads in CI) | _(none)_ |
+| `SPREE_WHOLESALE_CHANNEL` | Enable switch for the wholesale B2B portal — the code of a gated Spree channel to bind the `/wholesale` surface to. No default: unset means DTC-only (see below) | _(disabled)_ |
+| `SPREE_WHOLESALE_PUBLISHABLE_KEY` | Channel-scoped publishable key for the wholesale surface. Optional — the channel header selects the channel, so this falls back to `SPREE_PUBLISHABLE_KEY` | _(falls back to `SPREE_PUBLISHABLE_KEY`)_ |
 | `SPREE_WEBHOOK_SECRET` | Webhook endpoint secret key (for transactional emails) | _(disabled)_ |
 | `RESEND_API_KEY` | [Resend](https://resend.com) API key for sending emails in production | _(dev: writes to disk)_ |
 | `EMAIL_FROM` | "From" address for transactional emails (e.g. `Store <orders@mystore.com>`) | `orders@example.com` |
@@ -128,6 +130,14 @@ SPREE_PUBLISHABLE_KEY=your_publishable_api_key_here
 | `NEXT_PUBLIC_SENTRY_SEND_DEFAULT_PII` | Send PII to Sentry client-side | `false` |
 
 > **Privacy note:** PII collection is disabled by default. Only set `SENTRY_SEND_DEFAULT_PII` / `NEXT_PUBLIC_SENTRY_SEND_DEFAULT_PII` to `true` if you have appropriate user consent or a privacy policy covering this data.
+
+#### Wholesale B2B portal (opt-in addon)
+
+The storefront ships an optional gated wholesale portal at `/wholesale`, a B2B surface that runs on a separate Spree channel while sharing the same storefront and backend as DTC.
+
+`SPREE_WHOLESALE_CHANNEL` is the enable switch and has **no default**. Leave it unset and the storefront is DTC-only: the wholesale nav link, footer link, homepage section, and the `/wholesale` routes are all hidden — the routes return 404. Set it to the code of a gated channel on your Spree backend (e.g. `wholesale`) to turn the portal on. `SPREE_WHOLESALE_PUBLISHABLE_KEY` is optional and only needed to bind a channel-scoped publishable key; without it the surface reuses `SPREE_PUBLISHABLE_KEY` and selects the channel via the `X-Spree-Channel` header.
+
+See the [wholesale portal guide](https://spreecommerce.org/docs/developer/storefront/nextjs/wholesale) for how channel switching works end to end.
 
 ### Development
 

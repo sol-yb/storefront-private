@@ -151,6 +151,9 @@ export async function register(params: {
   password_confirmation: string;
   first_name?: string;
   last_name?: string;
+  phone?: string;
+  /** Arbitrary key-value data stored on the customer (e.g. wholesale company). */
+  metadata?: Record<string, unknown>;
 }): Promise<{
   success: boolean;
   user?: {

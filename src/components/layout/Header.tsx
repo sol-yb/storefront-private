@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { CartButton } from "@/components/layout/CartButton";
 import { SearchToggle } from "@/components/layout/SearchToggle";
 import { Button } from "@/components/ui/button";
+import { isWholesaleEnabled } from "@/lib/spree";
 import { getStoreName } from "@/lib/store";
 
 const LazyMobileMenu = dynamic(
@@ -49,12 +50,17 @@ export async function Header({
   locale,
 }: HeaderProps) {
   const t = await getTranslations({ locale, namespace: "header" });
+  const wholesaleEnabled = isWholesaleEnabled();
 
   return (
     <SearchToggle
       basePath={basePath}
       left={
-        <LazyMobileMenu rootCategories={rootCategories} basePath={basePath} />
+        <LazyMobileMenu
+          rootCategories={rootCategories}
+          basePath={basePath}
+          wholesaleEnabled={wholesaleEnabled}
+        />
       }
       center={
         <Link href={basePath || "/"} className="flex items-center min-w-0">
@@ -71,7 +77,17 @@ export async function Header({
         </Link>
       }
       rightStart={
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex lg:items-center lg:gap-1">
+          {/* Trade portal entry point — understated, secondary to the catalog nav.
+              Only shown when the wholesale addon is enabled. */}
+          {wholesaleEnabled && (
+            <Link
+              href={`${basePath}/wholesale`}
+              className="px-2 py-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap"
+            >
+              {t("wholesale")}
+            </Link>
+          )}
           <LazyCountrySwitcher />
         </div>
       }

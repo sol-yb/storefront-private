@@ -37,7 +37,8 @@
     "viewAllCategory": "Voir tout dans {category}",
     "openSearch": "Ouvrir la recherche",
     "closeSearch": "Fermer la recherche",
-    "myAccount": "Mon compte"
+    "myAccount": "Mon compte",
+    "wholesale": "Vente en gros"
   },
   "footer": {
     "description": "E-commerce open source basé sur Spree REST API, TypeScript SDK et Next.js. Auto-hébergé. Vos données. Zéro frais de plateforme.",
@@ -53,7 +54,8 @@
     "cart": "Panier",
     "policies": "Politiques",
     "poweredBy": "Propulse par",
-    "copyright": "\u00a9 {year} {storeName}. Propulse par Spree Commerce."
+    "copyright": "© {year} {storeName}. Propulse par Spree Commerce.",
+    "wholesale": "Professionnels & vente en gros"
   },
   "home": {
     "welcome": "{storeName} Storefront",
@@ -68,7 +70,18 @@
     "fastShipping": "Livraison rapide",
     "shippingDescription": "Livraison rapide et fiable jusqu'a votre porte.",
     "support": "Support 24/7",
-    "supportDescription": "Notre equipe est la pour vous aider a tout moment."
+    "supportDescription": "Notre equipe est la pour vous aider a tout moment.",
+    "wholesaleBadge": "Professionnels & vente en gros",
+    "wholesaleTitle": "Vous achetez pour votre entreprise ?",
+    "wholesaleDescription": "Les acheteurs professionnels approuvés bénéficient de tarifs de gros sur l'ensemble du catalogue, de la commande rapide en volume par SKU et de leur propre historique de commandes. Postulez une seule fois — nous examinerons votre demande et activerons votre compte.",
+    "wholesaleCtaPrimary": "Accéder au portail grossiste",
+    "wholesaleCtaSecondary": "Demander un compte",
+    "wholesaleBenefitPricingTitle": "Tarifs professionnels",
+    "wholesaleBenefitPricingDescription": "Vos tarifs négociés appliqués automatiquement sur l'ensemble du catalogue.",
+    "wholesaleBenefitQuickOrderTitle": "Commande rapide en volume",
+    "wholesaleBenefitQuickOrderDescription": "Saisissez des SKU et des quantités pour composer une grande commande en quelques secondes.",
+    "wholesaleBenefitOrdersTitle": "Historique des commandes",
+    "wholesaleBenefitOrdersDescription": "Consultez vos commandes passées et recommandez vos références habituelles en quelques clics."
   },
   "cart": {
     "cart": "Panier",
@@ -163,7 +176,7 @@
     "openImageZoom": "Ouvrir le zoom de l'image",
     "priceUnder": "Moins de {price}",
     "priceAbove": "{price}+",
-    "priceRangeBucket": "{min} \u2013 {max}",
+    "priceRangeBucket": "{min} – {max}",
     "properties": "Proprietes",
     "yes": "Oui",
     "no": "Non",
@@ -355,7 +368,7 @@
     "paymentInformation": "Informations de paiement",
     "cardEndingIn": "{label} se terminant par {digits}",
     "cardExpires": "Expire le {month}/{year}",
-    "storeCreditApplied": "{amount} applique \u2014 {remaining} restant",
+    "storeCreditApplied": "{amount} applique — {remaining} restant",
     "billingAddress": "Adresse de facturation",
     "orderNotFoundDescription": "La commande que vous recherchez n'existe pas.",
     "storeCredit": "Credit boutique",
@@ -377,7 +390,7 @@
     "notAvailable": "N/D",
     "unknownShipmentStatus": "Inconnu",
     "orderTitle": "Commande #{number}",
-    "shipmentCanceledRefund": "Expedition annulee \u2014 un remboursement a ete emis.",
+    "shipmentCanceledRefund": "Expedition annulee — un remboursement a ete emis.",
     "shippingMethodUnavailable": "Indisponible",
     "totalColumn": "Total"
   },
@@ -417,7 +430,7 @@
     "backToStore": "Retour a la boutique",
     "showOrderSummary": "Afficher le recapitulatif de la commande",
     "hideOrderSummary": "Masquer le recapitulatif de la commande",
-    "allRightsReserved": "\u00a9 {year} {storeName}. Tous droits reserves."
+    "allRightsReserved": "© {year} {storeName}. Tous droits reserves."
   },
   "profile": {
     "profile": "Profil",
@@ -524,5 +537,83 @@
     "shipping": "Livraison",
     "finalizingPayment": "Finalisation du paiement...",
     "or": "ou"
+  },
+  "wholesale": {
+    "portalTitle": "Portail grossiste",
+    "portalName": "Portail grossiste",
+    "badge": "Vente en gros",
+    "nav": {
+      "catalog": "Catalogue",
+      "quickOrder": "Commande rapide",
+      "cart": "Panier",
+      "backToStore": "Retour à la boutique",
+      "signOut": "Se déconnecter"
+    },
+    "signInWall": {
+      "title": "Tarifs professionnels pour les acheteurs approuvés",
+      "description": "Connectez-vous à votre compte grossiste pour parcourir l'ensemble du catalogue à vos tarifs professionnels négociés et passer des commandes en volume.",
+      "gatedNotice": "Ce portail est réservé aux acheteurs en gros approuvés. Les prix et les produits sont visibles après votre connexion.",
+      "noAccount": "Vous n'avez pas de compte grossiste ?",
+      "applyLink": "Demander un accès",
+      "formTitle": "Se connecter",
+      "formDescription": "Utilisez l'e-mail et le mot de passe de votre compte grossiste.",
+      "submit": "Se connecter"
+    },
+    "pending": {
+      "title": "Votre demande est en cours d'examen",
+      "description": "Merci pour votre demande. Votre compte est créé, mais l'accès grossiste est encore en attente d'approbation.",
+      "nameLabel": "Nom",
+      "emailLabel": "E-mail",
+      "whatNext": "Notre équipe examine les nouvelles demandes de grossistes et active les tarifs professionnels après approbation. Vous pourrez vous connecter ici dès que votre compte sera activé.",
+      "support": "Des questions ? Contactez wholesale@example.com"
+    },
+    "plp": {
+      "title": "Catalogue grossiste",
+      "subtitle": "Vos tarifs professionnels sont appliqués automatiquement au paiement.",
+      "empty": "Aucun produit n'est encore disponible dans le catalogue grossiste.",
+      "noMatchingProducts": "Aucun produit ne correspond à \"{query}\".",
+      "tradePriceNote": "Tous les prix du catalogue affichés sont des tarifs professionnels, applicables aux commandes de {min}+ par article."
+    },
+    "pdp": {
+      "tradePriceHint": "Le tarif professionnel s'applique aux commandes de {min}+"
+    },
+    "cart": {
+      "title": "Panier grossiste",
+      "emptyDescription": "Ajoutez des produits du catalogue ou utilisez la commande rapide pour commencer.",
+      "browseCatalog": "Parcourir le catalogue",
+      "unlockNudge": "Ajoutez {count} de plus pour débloquer les tarifs professionnels",
+      "tradePriceApplied": "Tarif professionnel appliqué"
+    },
+    "quickOrder": {
+      "title": "Commande rapide",
+      "subtitle": "Saisissez des SKU et des quantités pour ajouter plusieurs produits à votre panier en une seule fois.",
+      "skuHeader": "SKU",
+      "qtyHeader": "Qté",
+      "actionsHeader": "Actions",
+      "skuPlaceholder": "Saisissez un SKU",
+      "addRow": "Ajouter une ligne",
+      "removeRow": "Supprimer la ligne",
+      "addAll": "Tout ajouter au panier",
+      "adding": "Ajout…",
+      "added": "{name} ajouté",
+      "skuNotFound": "Aucun produit trouvé pour ce SKU.",
+      "notPurchasable": "Cet article n'est pas disponible à l'achat.",
+      "addFailed": "Impossible d'ajouter cet article. Veuillez réessayer.",
+      "searching": "Recherche…",
+      "noResults": "Aucun produit trouvé"
+    },
+    "apply": {
+      "title": "Demander un accès grossiste",
+      "description": "Parlez-nous de votre entreprise. Nous examinerons votre demande et activerons les tarifs professionnels après approbation.",
+      "companyLabel": "Nom de l'entreprise",
+      "companyPlaceholder": "Acme Trading Co.",
+      "phoneLabel": "Téléphone",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "submit": "Envoyer la demande",
+      "alreadyMember": "Vous avez déjà un compte grossiste ?",
+      "receivedTitle": "Demande reçue",
+      "receivedDescription": "Merci pour votre demande. Nous examinerons votre compte et approuverons l'accès grossiste sous peu.",
+      "goToPortal": "Accéder au portail"
+    }
   }
 }

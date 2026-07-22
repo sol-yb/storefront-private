@@ -14,6 +14,9 @@ const mockClient = {
 
 vi.mock("@/lib/spree", () => ({
   getClient: () => mockClient,
+  getClientForSurface: () => mockClient,
+  cacheTagSuffix: () => "",
+  DEFAULT_SURFACE: "dtc",
   getCartToken: vi.fn().mockResolvedValue("order-token-123"),
   getCartId: vi.fn().mockResolvedValue("cart-1"),
   getAccessToken: vi.fn().mockResolvedValue(undefined),

@@ -34,9 +34,15 @@ type PanelType =
 interface MobileMenuProps {
   rootCategories: Category[];
   basePath: string;
+  /** Whether the wholesale addon is enabled — gates the trade portal link. */
+  wholesaleEnabled: boolean;
 }
 
-export function MobileMenu({ rootCategories, basePath }: MobileMenuProps) {
+export function MobileMenu({
+  rootCategories,
+  basePath,
+  wholesaleEnabled,
+}: MobileMenuProps) {
   const t = useTranslations("header");
   const [open, setOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -260,6 +266,20 @@ export function MobileMenu({ rootCategories, basePath }: MobileMenuProps) {
               >
                 {t("contact")}
               </Link>
+
+              {/* Secondary group — kept out of the category list above.
+                  Only shown when the wholesale addon is enabled. */}
+              {wholesaleEnabled && (
+                <div className="mt-2 pt-2 border-t border-gray-200">
+                  <Link
+                    href={`${basePath}/wholesale`}
+                    onClick={() => setOpen(false)}
+                    className={`${linkClass} block`}
+                  >
+                    {t("wholesale")}
+                  </Link>
+                </div>
+              )}
             </nav>
 
             {/* Footer: Country switcher (mobile + tablet) + Account (mobile only) */}

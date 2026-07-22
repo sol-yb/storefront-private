@@ -15,6 +15,9 @@ const mockClient = {
 
 vi.mock("@/lib/spree", () => ({
   getClient: () => mockClient,
+  getClientForSurface: () => mockClient,
+  cacheTagSuffix: () => "",
+  DEFAULT_SURFACE: "dtc",
   getCartToken: vi.fn().mockResolvedValue("order-token-123"),
   getCartId: vi.fn().mockResolvedValue("order-1"),
   getAccessToken: vi.fn().mockResolvedValue(undefined),
@@ -113,7 +116,10 @@ describe("checkout server actions", () => {
       expect(mockClient.carts.update).toHaveBeenCalledWith(
         "order-1",
         addresses,
-        { spreeToken: "order-token-123", token: undefined },
+        {
+          spreeToken: "order-token-123",
+          token: undefined,
+        },
       );
       expect(result).toEqual({ success: true, cart: mockOrder });
     });
@@ -358,7 +364,10 @@ describe("checkout server actions", () => {
       expect(mockClient.carts.discountCodes.remove).toHaveBeenCalledWith(
         "order-1",
         "SAVE10",
-        { spreeToken: "order-token-123", token: undefined },
+        {
+          spreeToken: "order-token-123",
+          token: undefined,
+        },
       );
       expect(result).toEqual({ success: true, cart: mockOrder });
     });
@@ -386,7 +395,10 @@ describe("checkout server actions", () => {
       expect(mockClient.carts.giftCards.remove).toHaveBeenCalledWith(
         "order-1",
         "gc_abc123",
-        { spreeToken: "order-token-123", token: undefined },
+        {
+          spreeToken: "order-token-123",
+          token: undefined,
+        },
       );
       expect(result).toEqual({ success: true, cart: mockOrder });
     });
