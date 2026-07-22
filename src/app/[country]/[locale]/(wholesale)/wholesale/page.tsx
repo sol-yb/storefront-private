@@ -32,7 +32,7 @@ export default async function WholesaleProductsPage({
   });
 
   return (
-    <WholesaleGate basePath={`/${country}/${locale}`}>
+    <WholesaleGate basePath={`/${country}/${locale}`} allowGuestBrowse>
       {() => (
         <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-8">

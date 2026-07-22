@@ -58,12 +58,16 @@ export function WholesaleHeader({
           <Link href={wholesaleBase} className="hover:text-white">
             {t("nav.catalog")}
           </Link>
-          <Link
-            href={`${wholesaleBase}/quick-order`}
-            className="hover:text-white"
-          >
-            {t("nav.quickOrder")}
-          </Link>
+          {/* Quick Order is an ordering surface — hidden from guests, who are
+              walled off it and have no wholesale cart. */}
+          {authenticated && (
+            <Link
+              href={`${wholesaleBase}/quick-order`}
+              className="hover:text-white"
+            >
+              {t("nav.quickOrder")}
+            </Link>
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">

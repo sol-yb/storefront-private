@@ -31,8 +31,3 @@ export function HiddenPricePrompt({ className }: { className?: string }) {
     </Link>
   );
 }
-
-/** Whether a null/absent price should render the sign-in prompt in this context. */
-export function useIsPriceHidden(): boolean {
-  return useHiddenPricing() !== null;
-}

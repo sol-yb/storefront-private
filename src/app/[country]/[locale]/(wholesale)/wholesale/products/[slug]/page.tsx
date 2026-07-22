@@ -24,7 +24,7 @@ export default async function WholesaleProductPage({
   const { country, locale, slug } = await params;
 
   return (
-    <WholesaleGate basePath={`/${country}/${locale}`}>
+    <WholesaleGate basePath={`/${country}/${locale}`} allowGuestBrowse>
       {() => (
         <WholesaleProductContent
           country={country}

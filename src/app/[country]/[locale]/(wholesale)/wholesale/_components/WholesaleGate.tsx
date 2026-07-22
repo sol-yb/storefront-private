@@ -19,6 +19,14 @@ interface WholesaleGateProps {
    * `login_required` channel, where the fetch would 401).
    */
   children: () => React.ReactNode;
+  /**
+   * Whether a guest may see this page on a `prices_hidden` channel. Only the
+   * browse surfaces (catalog, PDP) set this — they render read-only with
+   * sign-in-for-pricing prompts. Ordering surfaces (cart, quick order) leave it
+   * false so a guest hits the sign-in wall instead of a page whose `useCart()`
+   * would bind to the DTC provider (guests have no wholesale cart).
+   */
+  allowGuestBrowse?: boolean;
 }
 
 /**
@@ -42,6 +50,7 @@ interface WholesaleGateProps {
 export async function WholesaleGate({
   basePath,
   children,
+  allowGuestBrowse = false,
 }: WholesaleGateProps) {
   const [customer, channel] = await Promise.all([
     getCustomer(),
@@ -50,10 +59,11 @@ export async function WholesaleGate({
 
   if (!customer) {
     // On a prices-hidden channel the catalog is browsable by guests (the API
-    // just nulls the money fields), so render it with sign-in-for-pricing
-    // prompts instead of the hard wall. Any other posture (login_required, or
-    // an unknown/unreachable channel) keeps the wall.
-    if (channel?.storefront_access === "prices_hidden") {
+    // just nulls the money fields), so render browse surfaces with
+    // sign-in-for-pricing prompts instead of the hard wall. Ordering surfaces
+    // (allowGuestBrowse=false) still wall guests off, and any other posture
+    // (login_required, or an unknown/unreachable channel) always walls.
+    if (allowGuestBrowse && channel?.storefront_access === "prices_hidden") {
       return (
         <WholesaleGuestBrowse basePath={basePath}>
           {children()}
