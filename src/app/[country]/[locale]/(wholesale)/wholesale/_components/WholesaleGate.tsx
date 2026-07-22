@@ -4,27 +4,34 @@ import { getCustomer } from "@/lib/data/customer";
 import { getWholesaleChannel } from "@/lib/data/wholesale";
 import { isWholesaleApproved } from "@/lib/wholesale";
 import { WholesaleApplicationPending } from "./WholesaleApplicationPending";
+import { WholesaleGuestBrowse } from "./WholesaleGuestBrowse";
 import { WholesaleHeader } from "./WholesaleHeader";
 import { WholesaleSignInWall } from "./WholesaleSignInWall";
 
 interface WholesaleGateProps {
   basePath: string;
   /**
-   * Approved-buyer content, as a function so it is only invoked in the
-   * approved branch. A plain `children` node would be constructed by the
-   * caller regardless of the gate's decision; a thunk guarantees the gated
-   * fetch (which hits the login-required channel) never runs for a guest or
-   * an unapproved buyer.
+   * Portal content, as a function so it is invoked only in branches that should
+   * render it — never for the sign-in wall or the pending state. A plain
+   * `children` node would be constructed regardless of the gate's decision; the
+   * thunk guarantees the catalog fetch runs only when the posture allows it (an
+   * approved buyer, or a guest on a `prices_hidden` channel — never a guest on a
+   * `login_required` channel, where the fetch would 401).
    */
   children: () => React.ReactNode;
 }
 
 /**
- * Server-side gate for the approved-buyer areas of the portal (catalog, PDP,
- * cart, quick order). Branches on the session + Wholesale-group membership:
+ * Server-side gate for the portal (catalog, PDP, cart, quick order). Branches on
+ * the channel's `storefront_access` posture, the session, and Wholesale-group
+ * membership:
  *
- * - guest → inline sign-in / apply wall (never redirects to the DTC account)
- * - authenticated, not approved → application-pending state
+ * - guest, `login_required` → inline sign-in / apply wall (the channel 401s the
+ *   catalog fetch anyway, so nothing behind the wall would render)
+ * - guest, `prices_hidden` → the catalog renders with prices replaced by a
+ *   "sign in for pricing" prompt; ordering is gated behind sign-in
+ * - authenticated, not approved → application-pending state (approval, not just
+ *   login, unlocks trade pricing and ordering — same for both postures)
  * - approved member → the portal chrome + `children`, with the wholesale cart
  *   bound via <CartProvider surface="wholesale">
  *
@@ -42,6 +49,18 @@ export async function WholesaleGate({
   ]);
 
   if (!customer) {
+    // On a prices-hidden channel the catalog is browsable by guests (the API
+    // just nulls the money fields), so render it with sign-in-for-pricing
+    // prompts instead of the hard wall. Any other posture (login_required, or
+    // an unknown/unreachable channel) keeps the wall.
+    if (channel?.storefront_access === "prices_hidden") {
+      return (
+        <WholesaleGuestBrowse basePath={basePath}>
+          {children()}
+        </WholesaleGuestBrowse>
+      );
+    }
+
     return (
       <WholesaleSignInWall
         basePath={basePath}

@@ -547,7 +547,8 @@
       "quickOrder": "Quick Order",
       "cart": "Cart",
       "backToStore": "Back to store",
-      "signOut": "Sign out"
+      "signOut": "Sign out",
+      "signIn": "Sign in"
     },
     "signInWall": {
       "title": "Trade pricing for approved buyers",
@@ -614,6 +615,10 @@
       "receivedTitle": "Application received",
       "receivedDescription": "Thanks for applying. We'll review your account and approve wholesale access shortly.",
       "goToPortal": "Go to portal"
+    },
+    "hiddenPrice": {
+      "signInForPricing": "Sign in for pricing",
+      "signInToOrder": "Sign in to order"
     }
   }
 }

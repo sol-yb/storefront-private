@@ -547,7 +547,8 @@
       "quickOrder": "Szybkie zamówienie",
       "cart": "Koszyk",
       "backToStore": "Wróć do sklepu",
-      "signOut": "Wyloguj się"
+      "signOut": "Wyloguj się",
+      "signIn": "Zaloguj się"
     },
     "signInWall": {
       "title": "Ceny handlowe dla zatwierdzonych nabywców",
@@ -614,6 +615,10 @@
       "receivedTitle": "Wniosek otrzymany",
       "receivedDescription": "Dziękujemy za złożenie wniosku. Sprawdzimy Twoje konto i wkrótce zatwierdzimy dostęp hurtowy.",
       "goToPortal": "Przejdź do portalu"
+    },
+    "hiddenPrice": {
+      "signInForPricing": "Zaloguj się, aby zobaczyć ceny",
+      "signInToOrder": "Zaloguj się, aby zamówić"
     }
   }
 }

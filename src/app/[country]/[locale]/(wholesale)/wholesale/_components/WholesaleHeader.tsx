@@ -10,18 +10,30 @@ import { useCart } from "@/contexts/CartContext";
 
 interface WholesaleHeaderProps {
   basePath: string;
-  customerName: string;
+  /** Signed-in buyer's name. Omitted for a guest browsing a prices-hidden catalog. */
+  customerName?: string;
+  /**
+   * Whether a customer is signed in. When false (a guest on a `prices_hidden`
+   * channel) the header swaps the name + cart + sign-out for a single sign-in
+   * link, since a guest has no wholesale cart and nothing to sign out of.
+   */
+  authenticated?: boolean;
+  /** Sign-in destination for the guest affordance (includes `?redirect=`). */
+  signInHref?: string;
 }
 
 /**
- * Portal chrome for approved wholesale buyers. Distinct slate trade dress with
- * a "Wholesale" badge, a wholesale cart link, a link back to the DTC store, and
- * the signed-in buyer's name. The cart count comes from the wholesale-bound
- * <CartProvider> the layout wraps this in.
+ * Portal chrome for the wholesale surface. Distinct slate trade dress with a
+ * "Wholesale" badge and a link back to the DTC store. For a signed-in buyer it
+ * also shows the wholesale cart, their name, and sign-out; for a guest browsing
+ * a prices-hidden catalog it shows a sign-in link instead. The cart count comes
+ * from the wholesale-bound <CartProvider> the layout wraps this in.
  */
 export function WholesaleHeader({
   basePath,
   customerName,
+  authenticated = true,
+  signInHref,
 }: WholesaleHeaderProps) {
   const t = useTranslations("wholesale");
   const { itemCount } = useCart();
@@ -55,9 +67,11 @@ export function WholesaleHeader({
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className="hidden text-sm text-slate-300 sm:inline">
-            {customerName}
-          </span>
+          {authenticated && customerName && (
+            <span className="hidden text-sm text-slate-300 sm:inline">
+              {customerName}
+            </span>
+          )}
 
           <Button
             asChild
@@ -71,31 +85,46 @@ export function WholesaleHeader({
             </Link>
           </Button>
 
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="relative text-slate-200 hover:bg-slate-800 hover:text-white"
-          >
-            <Link href={`${wholesaleBase}/cart`} aria-label={t("nav.cart")}>
-              <ShoppingCart className="h-5 w-5" />
-              {itemCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-xs font-semibold text-slate-900">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
-          </Button>
+          {authenticated ? (
+            <>
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="relative text-slate-200 hover:bg-slate-800 hover:text-white"
+              >
+                <Link href={`${wholesaleBase}/cart`} aria-label={t("nav.cart")}>
+                  <ShoppingCart className="h-5 w-5" />
+                  {itemCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-xs font-semibold text-slate-900">
+                      {itemCount}
+                    </span>
+                  )}
+                </Link>
+              </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => logout()}
-            className="text-slate-200 hover:bg-slate-800 hover:text-white"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("nav.signOut")}</span>
-          </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => logout()}
+                className="text-slate-200 hover:bg-slate-800 hover:text-white"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("nav.signOut")}</span>
+              </Button>
+            </>
+          ) : (
+            <Button
+              asChild
+              variant="secondary"
+              size="sm"
+              className="bg-white text-slate-900 hover:bg-slate-100"
+            >
+              <Link href={signInHref ?? `${wholesaleBase}`}>
+                {t("nav.signIn")}
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

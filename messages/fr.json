@@ -547,7 +547,8 @@
       "quickOrder": "Commande rapide",
       "cart": "Panier",
       "backToStore": "Retour à la boutique",
-      "signOut": "Se déconnecter"
+      "signOut": "Se déconnecter",
+      "signIn": "Se connecter"
     },
     "signInWall": {
       "title": "Tarifs professionnels pour les acheteurs approuvés",
@@ -614,6 +615,10 @@
       "receivedTitle": "Demande reçue",
       "receivedDescription": "Merci pour votre demande. Nous examinerons votre compte et approuverons l'accès grossiste sous peu.",
       "goToPortal": "Accéder au portail"
+    },
+    "hiddenPrice": {
+      "signInForPricing": "Connectez-vous pour voir les prix",
+      "signInToOrder": "Connectez-vous pour commander"
     }
   }
 }

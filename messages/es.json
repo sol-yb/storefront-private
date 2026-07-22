@@ -547,7 +547,8 @@
       "quickOrder": "Pedido rápido",
       "cart": "Carrito",
       "backToStore": "Volver a la tienda",
-      "signOut": "Cerrar sesión"
+      "signOut": "Cerrar sesión",
+      "signIn": "Iniciar sesión"
     },
     "signInWall": {
       "title": "Precios comerciales para compradores aprobados",
@@ -614,6 +615,10 @@
       "receivedTitle": "Solicitud recibida",
       "receivedDescription": "Gracias por tu solicitud. Revisaremos tu cuenta y aprobaremos el acceso mayorista en breve.",
       "goToPortal": "Ir al portal"
+    },
+    "hiddenPrice": {
+      "signInForPricing": "Inicia sesión para ver precios",
+      "signInToOrder": "Inicia sesión para pedir"
     }
   }
 }

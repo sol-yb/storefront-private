@@ -547,7 +547,8 @@
       "quickOrder": "Schnellbestellung",
       "cart": "Warenkorb",
       "backToStore": "Zurück zum Shop",
-      "signOut": "Abmelden"
+      "signOut": "Abmelden",
+      "signIn": "Anmelden"
     },
     "signInWall": {
       "title": "Handelspreise für freigegebene Käufer",
@@ -614,6 +615,10 @@
       "receivedTitle": "Bewerbung eingegangen",
       "receivedDescription": "Vielen Dank für Ihre Bewerbung. Wir prüfen Ihr Konto und geben den Großhandelszugang in Kürze frei.",
       "goToPortal": "Zum Portal"
+    },
+    "hiddenPrice": {
+      "signInForPricing": "Zur Preisanzeige anmelden",
+      "signInToOrder": "Zum Bestellen anmelden"
     }
   }
 }
