@@ -37,7 +37,8 @@
     "viewAllCategory": "Ver todo en {category}",
     "openSearch": "Abrir busqueda",
     "closeSearch": "Cerrar busqueda",
-    "myAccount": "Mi cuenta"
+    "myAccount": "Mi cuenta",
+    "wholesale": "Mayorista"
   },
   "footer": {
     "description": "Comercio electrónico de código abierto basado en Spree REST API, TypeScript SDK y Next.js. Alójalo tú mismo. Tus datos. Sin comisiones de plataforma.",
@@ -53,7 +54,8 @@
     "cart": "Carrito",
     "policies": "Politicas",
     "poweredBy": "Impulsado por",
-    "copyright": "\u00a9 {year} {storeName}. Impulsado por Spree Commerce."
+    "copyright": "© {year} {storeName}. Impulsado por Spree Commerce.",
+    "wholesale": "Comercio y venta al por mayor"
   },
   "home": {
     "welcome": "{storeName} Storefront",
@@ -68,7 +70,18 @@
     "fastShipping": "Envio rapido",
     "shippingDescription": "Entrega rapida y fiable hasta tu puerta.",
     "support": "Soporte 24/7",
-    "supportDescription": "Nuestro equipo esta aqui para ayudarte en cualquier momento."
+    "supportDescription": "Nuestro equipo esta aqui para ayudarte en cualquier momento.",
+    "wholesaleBadge": "Comercio y venta al por mayor",
+    "wholesaleTitle": "¿Compras para tu empresa?",
+    "wholesaleDescription": "Los compradores mayoristas aprobados obtienen precios al por mayor en todo el catálogo, pedidos rápidos por lotes mediante SKU y su propio historial de pedidos. Solicítalo una vez: lo revisaremos y activaremos tu cuenta.",
+    "wholesaleCtaPrimary": "Entrar al portal mayorista",
+    "wholesaleCtaSecondary": "Solicitar una cuenta",
+    "wholesaleBenefitPricingTitle": "Precios comerciales",
+    "wholesaleBenefitPricingDescription": "Tus tarifas negociadas se aplican automáticamente en todo el catálogo.",
+    "wholesaleBenefitQuickOrderTitle": "Pedido rápido por lotes",
+    "wholesaleBenefitQuickOrderDescription": "Introduce SKUs y cantidades para crear un pedido grande en segundos.",
+    "wholesaleBenefitOrdersTitle": "Historial de pedidos",
+    "wholesaleBenefitOrdersDescription": "Consulta pedidos anteriores y vuelve a pedir tus líneas habituales con un par de clics."
   },
   "cart": {
     "cart": "Carrito",
@@ -163,7 +176,7 @@
     "openImageZoom": "Abrir zoom de imagen",
     "priceUnder": "Menos de {price}",
     "priceAbove": "{price}+",
-    "priceRangeBucket": "{min} \u2013 {max}",
+    "priceRangeBucket": "{min} – {max}",
     "properties": "Propiedades",
     "yes": "Si",
     "no": "No",
@@ -188,7 +201,7 @@
     "emailAddress": "Correo electronico",
     "emailPlaceholder": "tu@ejemplo.com",
     "usingAccountEmail": "Usando el correo electronico de tu cuenta",
-    "signInPrompt": "\u00bfYa tienes una cuenta?",
+    "signInPrompt": "¿Ya tienes una cuenta?",
     "signIn": "Iniciar sesion",
     "signInDescription": "para acceder a tus direcciones guardadas e historial de pedidos.",
     "shippingAddress": "Direccion de envio",
@@ -269,7 +282,7 @@
     "addNewAddress": "Agregar nueva direccion",
     "saveAddress": "Guardar direccion",
     "failedToSave": "Error al guardar la direccion",
-    "deleteAddressTitle": "\u00bfEliminar direccion?",
+    "deleteAddressTitle": "¿Eliminar direccion?",
     "deleteAddressConfirmation": "Esto eliminara permanentemente esta direccion. Esta accion no se puede deshacer.",
     "delete": "Eliminar",
     "deleting": "Eliminando...",
@@ -287,7 +300,7 @@
     "signIn": "Iniciar sesion",
     "signingIn": "Iniciando sesion...",
     "invalidCredentials": "Correo electronico o contrasena invalidos",
-    "dontHaveAccount": "\u00bfNo tienes una cuenta?",
+    "dontHaveAccount": "¿No tienes una cuenta?",
     "signUp": "Registrate",
     "accountOverview": "Resumen de la cuenta",
     "orderHistory": "Historial de pedidos",
@@ -306,11 +319,11 @@
     "noAddresses": "No hay direcciones guardadas",
     "noAddressesDescription": "Las direcciones que agregues durante el checkout apareceran aqui.",
     "defaultAddress": "Predeterminada",
-    "deleteConfirm": "\u00bfEstas seguro de que deseas eliminar esta direccion?",
+    "deleteConfirm": "¿Estas seguro de que deseas eliminar esta direccion?",
     "setAsDefault": "Establecer como predeterminada",
     "showPassword": "Mostrar contrasena",
     "hidePassword": "Ocultar contrasena",
-    "forgotPassword": "\u00bfOlvidaste tu contrasena?",
+    "forgotPassword": "¿Olvidaste tu contrasena?",
     "policyConsentRequired": "Debes aceptar las politicas de la tienda para crear una cuenta"
   },
   "register": {
@@ -321,7 +334,7 @@
     "passwordsDontMatch": "Las contrasenas no coinciden",
     "passwordTooShort": "La contrasena debe tener al menos 6 caracteres",
     "registrationFailed": "Error en el registro. Por favor, intenta de nuevo.",
-    "alreadyHaveAccount": "\u00bfYa tienes una cuenta?",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "signIn": "Iniciar sesion",
     "unexpectedError": "Ocurrio un error inesperado. Por favor, intenta de nuevo.",
     "firstName": "Nombre",
@@ -355,7 +368,7 @@
     "paymentInformation": "Informacion de pago",
     "cardEndingIn": "{label} terminada en {digits}",
     "cardExpires": "Vence {month}/{year}",
-    "storeCreditApplied": "Aplicado {amount} \u2014 {remaining} restante",
+    "storeCreditApplied": "Aplicado {amount} — {remaining} restante",
     "billingAddress": "Direccion de facturacion",
     "orderNotFoundDescription": "El pedido que buscas no existe.",
     "storeCredit": "Credito de la tienda",
@@ -377,13 +390,13 @@
     "notAvailable": "N/D",
     "unknownShipmentStatus": "Desconocido",
     "orderTitle": "Pedido #{number}",
-    "shipmentCanceledRefund": "Envio cancelado \u2014 se ha emitido un reembolso.",
+    "shipmentCanceledRefund": "Envio cancelado — se ha emitido un reembolso.",
     "shippingMethodUnavailable": "No disponible",
     "totalColumn": "Total"
   },
   "orderPlaced": {
-    "thanksForOrder": "\u00a1Gracias por tu pedido, {name}!",
-    "thanksForOrderAnonymous": "\u00a1Gracias por tu pedido!",
+    "thanksForOrder": "¡Gracias por tu pedido, {name}!",
+    "thanksForOrderAnonymous": "¡Gracias por tu pedido!",
     "orderNumber": "Pedido #{number}",
     "emailConfirmation": "Recibiras una confirmacion por correo electronico en breve.",
     "orderItems": "Articulos del pedido",
@@ -417,7 +430,7 @@
     "backToStore": "Volver a la tienda",
     "showOrderSummary": "Mostrar resumen del pedido",
     "hideOrderSummary": "Ocultar resumen del pedido",
-    "allRightsReserved": "\u00a9 {year} {storeName}. Todos los derechos reservados."
+    "allRightsReserved": "© {year} {storeName}. Todos los derechos reservados."
   },
   "profile": {
     "profile": "Perfil",
@@ -428,7 +441,7 @@
     "currentPasswordHelp": "Confirma tu contrasena actual para cambiar tu correo electronico.",
     "saveChanges": "Guardar cambios",
     "saving": "Guardando...",
-    "profileUpdated": "\u00a1Perfil actualizado con exito!",
+    "profileUpdated": "¡Perfil actualizado con exito!",
     "accountInformation": "Informacion de la cuenta",
     "accountId": "ID de cuenta",
     "loadingProfile": "Cargando perfil...",
@@ -443,9 +456,9 @@
     "default": "Predeterminado",
     "removing": "Eliminando...",
     "secureInfo": "Tu informacion de pago esta almacenada de forma segura.",
-    "deleteConfirm": "\u00bfEstas seguro de que deseas eliminar esta tarjeta?",
+    "deleteConfirm": "¿Estas seguro de que deseas eliminar esta tarjeta?",
     "cardMaskedLabel": "{label} terminada en {digits}, vence {month}/{year}",
-    "removePaymentMethodTitle": "\u00bfEliminar metodo de pago?",
+    "removePaymentMethodTitle": "¿Eliminar metodo de pago?",
     "endingIn": "terminada en",
     "cardEndingIn": "{label} terminada en {digits}",
     "cardExpires": "Vence {month}/{year}",
@@ -472,7 +485,7 @@
     "activeGiftCards": "Tarjetas regalo activas",
     "expiredRedeemed": "Expiradas / Canjeadas",
     "copy": "Copiar",
-    "copied": "\u00a1Copiado!",
+    "copied": "¡Copiado!",
     "copyCodeToClipboard": "Copiar codigo al portapapeles",
     "expiresOn": "Expira el {date}",
     "percentUsed": "{percent}% usado",
@@ -524,5 +537,88 @@
     "shipping": "Envio",
     "finalizingPayment": "Finalizando tu pago...",
     "or": "o"
+  },
+  "wholesale": {
+    "portalTitle": "Portal mayorista",
+    "portalName": "Portal mayorista",
+    "badge": "Mayorista",
+    "nav": {
+      "catalog": "Catálogo",
+      "quickOrder": "Pedido rápido",
+      "cart": "Carrito",
+      "backToStore": "Volver a la tienda",
+      "signOut": "Cerrar sesión",
+      "signIn": "Iniciar sesión"
+    },
+    "signInWall": {
+      "title": "Precios comerciales para compradores aprobados",
+      "description": "Inicia sesión en tu cuenta mayorista para explorar todo el catálogo con tus precios comerciales negociados y realizar pedidos por lotes.",
+      "gatedNotice": "Este portal está disponible solo para compradores mayoristas aprobados. Los precios y productos son visibles después de iniciar sesión.",
+      "noAccount": "¿No tienes una cuenta mayorista?",
+      "applyLink": "Solicitar acceso",
+      "formTitle": "Iniciar sesión",
+      "formDescription": "Usa el correo electrónico y la contraseña de tu cuenta mayorista.",
+      "submit": "Iniciar sesión"
+    },
+    "pending": {
+      "title": "Tu solicitud está en revisión",
+      "description": "Gracias por tu solicitud. Tu cuenta está creada, pero el acceso mayorista aún está pendiente de aprobación.",
+      "nameLabel": "Nombre",
+      "emailLabel": "Correo electrónico",
+      "whatNext": "Nuestro equipo revisa las nuevas solicitudes mayoristas y activa los precios comerciales una vez aprobadas. Podrás iniciar sesión aquí en cuanto se active tu cuenta.",
+      "support": "¿Preguntas? Contacta con wholesale@example.com"
+    },
+    "plp": {
+      "title": "Catálogo mayorista",
+      "subtitle": "Tus precios comerciales se aplican automáticamente al finalizar la compra.",
+      "empty": "Aún no hay productos disponibles en el catálogo mayorista.",
+      "noMatchingProducts": "Ningún producto coincide con \"{query}\".",
+      "tradePriceNote": "Todos los precios del catálogo que se muestran son precios comerciales, aplicables a pedidos de {min}+ por artículo."
+    },
+    "pdp": {
+      "tradePriceHint": "El precio comercial se aplica a pedidos de {min}+"
+    },
+    "cart": {
+      "title": "Carrito mayorista",
+      "emptyDescription": "Añade productos del catálogo o usa el pedido rápido para empezar.",
+      "browseCatalog": "Explorar catálogo",
+      "unlockNudge": "Añade {count} más para desbloquear los precios comerciales",
+      "tradePriceApplied": "Precio comercial aplicado"
+    },
+    "quickOrder": {
+      "title": "Pedido rápido",
+      "subtitle": "Introduce SKUs y cantidades para añadir varios productos a tu carrito a la vez.",
+      "skuHeader": "SKU",
+      "qtyHeader": "Cant.",
+      "actionsHeader": "Acciones",
+      "skuPlaceholder": "Introduce un SKU",
+      "addRow": "Añadir fila",
+      "removeRow": "Eliminar fila",
+      "addAll": "Añadir todo al carrito",
+      "adding": "Añadiendo…",
+      "added": "{name} añadido",
+      "skuNotFound": "No se encontró ningún producto para este SKU.",
+      "notPurchasable": "Este artículo no está disponible para comprar.",
+      "addFailed": "No se pudo añadir este artículo. Inténtalo de nuevo.",
+      "searching": "Buscando…",
+      "noResults": "No se encontraron productos"
+    },
+    "apply": {
+      "title": "Solicitar acceso mayorista",
+      "description": "Cuéntanos sobre tu empresa. Revisaremos tu solicitud y activaremos los precios comerciales una vez aprobada.",
+      "companyLabel": "Nombre de la empresa",
+      "companyPlaceholder": "Acme Trading Co.",
+      "phoneLabel": "Teléfono",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "submit": "Enviar solicitud",
+      "alreadyMember": "¿Ya tienes una cuenta mayorista?",
+      "receivedTitle": "Solicitud recibida",
+      "receivedDescription": "Gracias por tu solicitud. Revisaremos tu cuenta y aprobaremos el acceso mayorista en breve.",
+      "goToPortal": "Ir al portal"
+    },
+    "hiddenPrice": {
+      "signInForPricing": "Inicia sesión para ver precios",
+      "signInToOrder": "Inicia sesión para pedir"
+    }
   }
 }

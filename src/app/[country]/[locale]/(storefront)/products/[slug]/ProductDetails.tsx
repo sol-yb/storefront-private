@@ -2,14 +2,17 @@
 
 import type { Media, Product, Variant } from "@spree/sdk";
 import { CircleCheckBig, CircleX, Loader2, ShoppingBag } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
+import { HiddenPricePrompt } from "@/components/products/HiddenPricePrompt";
 import { MediaGallery } from "@/components/products/MediaGallery";
 import { ProductCustomFields } from "@/components/products/ProductCustomFields";
 import { VariantPicker } from "@/components/products/VariantPicker";
 import { Button } from "@/components/ui/button";
 import { QuantityPicker } from "@/components/ui/quantity-picker";
 import { useCart } from "@/contexts/CartContext";
+import { useHiddenPricing } from "@/contexts/HiddenPricingContext";
 import { useStore } from "@/contexts/StoreContext";
 import { trackAddToCart, trackViewItem } from "@/lib/analytics/gtm";
 
@@ -22,6 +25,11 @@ export function ProductDetails({ product, basePath }: ProductDetailsProps) {
   const { addItem } = useCart();
   const { currency } = useStore();
   const t = useTranslations("products");
+  const tw = useTranslations("wholesale");
+  // Non-null inside a HiddenPricingProvider (wholesale `prices_hidden`, guest
+  // view): prices are null on purpose, and ordering is gated behind sign-in.
+  const hiddenPricing = useHiddenPricing();
+  const pricesHidden = hiddenPricing !== null;
 
   // Filter variants list
   const variants = useMemo(() => {
@@ -128,10 +136,12 @@ export function ProductDetails({ product, basePath }: ProductDetailsProps) {
 
           {/* Price */}
           <div className="mt-4 flex items-center gap-4">
-            {displayPrice && (
+            {displayPrice ? (
               <span className="text-3xl font-bold text-gray-900">
                 {displayPrice}
               </span>
+            ) : (
+              <HiddenPricePrompt className="inline-flex items-center gap-1.5 text-base font-medium text-slate-600 underline underline-offset-4 hover:text-slate-900" />
             )}
             {onSale && strikethroughPrice && (
               <>
@@ -174,35 +184,45 @@ export function ProductDetails({ product, basePath }: ProductDetailsProps) {
 
           {/* Quantity & Add to Cart */}
           <div className="mt-8">
-            <div className="flex gap-4">
-              <QuantityPicker
-                quantity={quantity}
-                onDecrement={() => setQuantity(Math.max(1, quantity - 1))}
-                onIncrement={() => setQuantity(quantity + 1)}
-                size="lg"
-              />
-
-              {/* Add to Cart Button */}
-              <Button
-                size="lg"
-                onClick={handleAddToCart}
-                disabled={loading || !isPurchasable}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="animate-spin h-5 w-5" />
-                    {t("adding")}
-                  </>
-                ) : isPurchasable ? (
-                  <>
-                    <ShoppingBag className="w-5 h-5" />
-                    {t("addToCart")}
-                  </>
-                ) : (
-                  t("outOfStock")
-                )}
+            {pricesHidden ? (
+              // Guest on a prices-hidden channel: no pricing, no ordering —
+              // route them through the wholesale sign-in first.
+              <Button asChild size="lg">
+                <Link href={hiddenPricing.signInHref}>
+                  {tw("hiddenPrice.signInToOrder")}
+                </Link>
               </Button>
-            </div>
+            ) : (
+              <div className="flex gap-4">
+                <QuantityPicker
+                  quantity={quantity}
+                  onDecrement={() => setQuantity(Math.max(1, quantity - 1))}
+                  onIncrement={() => setQuantity(quantity + 1)}
+                  size="lg"
+                />
+
+                {/* Add to Cart Button */}
+                <Button
+                  size="lg"
+                  onClick={handleAddToCart}
+                  disabled={loading || !isPurchasable}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin h-5 w-5" />
+                      {t("adding")}
+                    </>
+                  ) : isPurchasable ? (
+                    <>
+                      <ShoppingBag className="w-5 h-5" />
+                      {t("addToCart")}
+                    </>
+                  ) : (
+                    t("outOfStock")
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Description */}

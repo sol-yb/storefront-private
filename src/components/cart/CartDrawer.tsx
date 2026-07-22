@@ -207,6 +207,7 @@ export function CartDrawer() {
 
                         <div className="text-sm font-medium">
                           {item.compare_at_amount &&
+                          item.price != null &&
                           parseFloat(item.compare_at_amount) >
                             parseFloat(item.price) ? (
                             <>
@@ -261,7 +262,7 @@ export function CartDrawer() {
             )}
 
             {/* Express Checkout — must stay mounted during processing */}
-            {cart && parseFloat(cart.total) > 0 && (
+            {cart && parseFloat(cart.total ?? "0") > 0 && (
               <ExpressCheckoutButton
                 cart={cart}
                 basePath={basePath}

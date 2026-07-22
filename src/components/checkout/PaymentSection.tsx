@@ -105,9 +105,14 @@ export function PaymentSection({
     paymentMethods.find((pm) => pm.id === selectedMethodId) ??
     paymentMethods[0];
   const effectiveSelectedMethodId = selectedMethod?.id ?? "";
-  // Zero-amount check
-  const amountDue = parseFloat(cart.amount_due ?? cart.total);
-  const isZeroAmount = amountDue === 0;
+  // Zero-amount check. A null amount (money fields are nullable for
+  // prices-hidden guests) must NOT read as zero — that would complete
+  // checkout with no payment. Only a real numeric 0 is a free order;
+  // an unknown amount falls through to the normal payment path.
+  const rawAmountDue = cart.amount_due ?? cart.total;
+  const amountDue =
+    rawAmountDue == null ? Number.NaN : parseFloat(rawAmountDue);
+  const isZeroAmount = Number.isFinite(amountDue) && amountDue === 0;
 
   // Free orders are always treated as non-session (no payment needed)
   const isSessionBased =

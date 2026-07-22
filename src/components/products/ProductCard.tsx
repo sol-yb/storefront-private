@@ -4,6 +4,7 @@ import type { Product } from "@spree/sdk";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { memo } from "react";
+import { HiddenPricePrompt } from "@/components/products/HiddenPricePrompt";
 import { ProductImage } from "@/components/ui/product-image";
 import { trackSelectItem } from "@/lib/analytics/gtm";
 
@@ -90,10 +91,14 @@ export const ProductCard = memo(function ProductCard({
         </h3>
 
         <div className="mt-2 flex items-center gap-2">
-          {displayPrice && (
+          {displayPrice ? (
             <span className="text-lg font-semibold text-gray-900">
               {displayPrice}
             </span>
+          ) : (
+            // Null price: a deliberate hide inside a HiddenPricingProvider
+            // (renders a sign-in prompt), otherwise renders nothing.
+            <HiddenPricePrompt />
           )}
           {onSale && strikethroughPrice && (
             <span className="text-sm text-gray-500 line-through">
