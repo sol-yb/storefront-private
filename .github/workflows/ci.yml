@@ -103,7 +103,7 @@ jobs:
       - name: Install Playwright system deps only
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
-      - name: Boot Spree backend (Postgres + Redis + Spree 5.4.3.1)
+      - name: Boot Spree backend (Postgres + Redis + latest Spree)
         run: docker compose -f e2e-backend/docker-compose.yml up -d --wait
       - name: Seed Spree and issue API key
         env:

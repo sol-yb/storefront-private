@@ -76,12 +76,13 @@ npx @spree/cli seed
 echo "==> Loading sample products and categories (spree sample-data)"
 npx @spree/cli sample-data
 
-# Vanilla Spree ships without any payment gateway configured. The Admin API
-# can create one declaratively, but that endpoint only exists from Spree 5.5
-# onward — this E2E targets the stable 5.4.3.1 image, so we fall back to a
-# `bin/rails runner` snippet that creates a SpreeStripe::Gateway row directly.
-# The script is idempotent: re-running matches the existing row by name
-# (where(...).first_or_initialize) and reapplies the same attributes.
+# The official Spree image bundles the Stripe integration (spree_stripe), so
+# SpreeStripe::Gateway is available — but no gateway row is seeded, since that
+# carries account-specific API keys. We create one with a `bin/rails runner`
+# snippet that writes the row directly with the E2E test keys — version-agnostic,
+# so it works whichever Spree image is pinned. The script is idempotent:
+# re-running matches the existing row by name (where(...).first_or_initialize)
+# and reapplies the same attributes.
 # The keys reach Ruby via the container environment (-e pass-through from
 # this script's env) rather than heredoc interpolation, so the Ruby source
 # never embeds them — the heredoc delimiter is quoted on purpose.
