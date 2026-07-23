@@ -50,6 +50,28 @@ export async function createCheckoutPaymentSession(
 }
 
 /**
+ * Syncs an existing payment session with the provider (e.g. after the cart
+ * total changed). Keeps the provider-side session — and therefore the
+ * mounted gateway form — alive, unlike creating a fresh session.
+ */
+export async function updateCheckoutPaymentSession(
+  cartId: string,
+  sessionId: string,
+  params: { amount?: string; external_data?: Record<string, unknown> } = {},
+) {
+  return actionResult(async () => {
+    const surface = await resolveSurfaceForCart(cartId);
+    const options = await getCartOptions(surface);
+    const id = await requireCartId(surface);
+    const session = await getClientForSurface(
+      surface,
+    ).carts.paymentSessions.update(id, sessionId, params, options);
+    updateTag(checkoutTag(surface));
+    return { session };
+  }, "Failed to update payment session");
+}
+
+/**
  * Creates a direct payment for non-session payment methods
  * (e.g. Check, Cash on Delivery, Bank Transfer).
  */

@@ -41,6 +41,7 @@ import { getCreditCards } from "@/lib/data/credit-cards";
 import {
   createCheckoutPaymentSession,
   createDirectPayment,
+  updateCheckoutPaymentSession,
 } from "@/lib/data/payment";
 import {
   type AddressFormData,
@@ -299,15 +300,63 @@ export function PaymentSection({
     isZeroAmount,
   ]);
 
-  // When cart total changes, recreate the payment session
+  // When the cart total changes, sync the live payment session with the
+  // provider in place. Recreating it instead would unmount the gateway form
+  // (fresh session ⇒ new client secret ⇒ new `key`) and silently wipe
+  // whatever the customer already typed — e.g. when a shipping-rate save
+  // lands while they enter card details.
   useEffect(() => {
     if (!initRef.current) return;
     if (!isSessionBased || !selectedMethod) return;
     if (lastTotalRef.current === cart.total) return;
 
     lastTotalRef.current = cart.total;
-    createSession(selectedCardRef.current, selectedMethod);
-  }, [cart.total, createSession, isSessionBased, selectedMethod]);
+
+    if (!paymentSessionId) {
+      createSession(selectedCardRef.current, selectedMethod);
+      return;
+    }
+
+    const method = selectedMethod;
+    const sync = async () => {
+      try {
+        const result = await updateCheckoutPaymentSession(
+          cart.id,
+          paymentSessionId,
+          { amount: cart.total ?? undefined },
+        );
+        if (!result.success || !result.session) {
+          throw new Error("session update rejected");
+        }
+        // Providers that can't update in place hand back fresh identifiers;
+        // adopting them remounts the form (the `key` changes), which is the
+        // unavoidable case. Identical data keeps the mounted form untouched.
+        const extData = result.session.external_data;
+        if (extData && Object.keys(extData).length > 0) {
+          const next = {
+            ...extData,
+            _external_id: result.session.external_id,
+          };
+          setSessionExternalData((prev) =>
+            JSON.stringify(prev) === JSON.stringify(next) ? prev : next,
+          );
+          setPaymentSessionId(result.session.id);
+        }
+      } catch {
+        // Gateway doesn't support in-place updates — fall back to the
+        // destructive recreate rather than paying against a stale amount.
+        createSession(selectedCardRef.current, method);
+      }
+    };
+    sync();
+  }, [
+    cart.id,
+    cart.total,
+    createSession,
+    isSessionBased,
+    paymentSessionId,
+    selectedMethod,
+  ]);
 
   const [billStates, isPendingBill] = useCountryStates(
     billAddress.country_iso,
