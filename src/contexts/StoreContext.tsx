@@ -50,7 +50,7 @@ function buildCountriesFromMarkets(markets: Market[]): CountryWithMarket[] {
     }
   }
 
-  return result;
+  return result.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /** Find a country by ISO code in the flat countries list. */
